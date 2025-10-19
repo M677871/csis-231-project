@@ -50,15 +50,19 @@ public class OtpService {
         try {
             if (from != null && !from.isBlank() && user.getEmail() != null) {
                 SimpleMailMessage msg = new SimpleMailMessage();
-                msg.setFrom(from);
+                msg.setFrom(from);                      // should equal MAIL_USERNAME for Gmail
                 msg.setTo(user.getEmail());
                 msg.setSubject("Your OTP code");
                 msg.setText("Your one-time code is: " + code + " (valid 5 minutes)");
                 mailSender.send(msg);
+                log.info("OTP email queued to {}", user.getEmail());
+            } else {
+                log.warn("Skip email: from='{}' or user.email='{}' is blank", from, user.getEmail());
             }
         } catch (Exception e) {
-            log.warn("Failed to send OTP email: {}", e.getMessage());
+            log.error("Failed to send OTP email", e);   // <-- full stacktrace
         }
+
 
         log.info("OTP for user={} purpose={} CODE={}", user.getUsername(), purpose, code);
     }

@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 public class AuthService {
     @Autowired private com.csis231.api.auth.Otp.OtpService otpService;
 
-
     @Autowired private UserRepository userRepository;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private JwtUtil jwtUtil;
