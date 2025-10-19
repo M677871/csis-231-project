@@ -1,0 +1,36 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/csis_231_db}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASS:postgres}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
+management:               # <-- move out from under spring
+  health:
+    mail:
+      enabled: false
+
+jwt:
+  secret: ${JWT_SECRET:CustomerManagementSystemJWTSecretKey2024SecureAuthenticationTokenForCSIS231Project}
+  expiration: ${JWT_EXPIRATION:900000}
+
+mail:
+  from: ${MAIL_FROM:}
