@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+
+<AnchorPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.demo.controllers.ForgotController"
+            prefWidth="800" prefHeight="480" styleClass="root">
+    <children>
+        <StackPane AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+            <children>
+                <VBox spacing="18" alignment="CENTER" styleClass="auth-surface">
+                    <children>
+                        <Label text="Forgot password" styleClass="title-label"/>
+                        <VBox spacing="10" styleClass="form-card">
+                            <children>
+                                <VBox spacing="6">
+                                    <Label text="Email or Username" styleClass="field-label"/>
+                                    <TextField fx:id="emailOrUsername" promptText="email or username" styleClass="form-field"/>
+                                </VBox>
+                                <Button text="Send reset link" onAction="#onSend" maxWidth="Infinity" styleClass="primary-button"/>
+                                <Hyperlink text="Back to Login" onAction="#goLogin"/>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+            </children>
+        </StackPane>
+    </children>
+</AnchorPane>

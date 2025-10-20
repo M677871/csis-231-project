@@ -1,10 +1,19 @@
-HELP.md
+# IDE / build
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
 target/
+build/
+.nb-gradle/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+!**/src/main/**/build/
+!**/src/test/**/build/
 
-### STS ###
+# STS / Eclipse
 .apt_generated
 .classpath
 .factorypath
@@ -13,23 +22,8 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
-.vscode/
-.env
-application.yml
+# Secrets everywhere in the repo
+**/.env
+**/.env.*
+**/application*.yml
+**/application*.yaml

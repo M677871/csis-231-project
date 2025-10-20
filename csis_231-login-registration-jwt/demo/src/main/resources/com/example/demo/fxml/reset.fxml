@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.demo.controllers.ResetController"
+      spacing="16" alignment="CENTER" prefWidth="720" prefHeight="520">
+    <padding><Insets top="30" right="30" bottom="30" left="30"/></padding>
+
+    <Label text="Reset Password" style="-fx-font-size:24; -fx-font-weight:bold;"/>
+
+    <VBox spacing="8" maxWidth="420">
+        <Label text="Email"/>
+        <TextField fx:id="email" promptText="email@example.com"/>
+
+        <Label text="Code"/>
+        <TextField fx:id="code" promptText="code from email"/>
+
+        <Label text="New password"/>
+        <PasswordField fx:id="newPassword" promptText="new password"/>
+    </VBox>
+
+    <Button text="Change password" onAction="#onReset" maxWidth="420" prefWidth="420"/>
+    <Hyperlink text="Back to Login" onAction="#goLogin"/>
+</VBox>

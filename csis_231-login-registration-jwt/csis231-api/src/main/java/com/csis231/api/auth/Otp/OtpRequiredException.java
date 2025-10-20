@@ -1,6 +1,12 @@
 package com.csis231.api.auth.Otp;
 
+import lombok.*;
+
+@Getter
+@Setter
+@ToString
 public class OtpRequiredException extends RuntimeException {
+
     private final String username;
 
     public OtpRequiredException(String username) {
@@ -8,5 +14,4 @@ public class OtpRequiredException extends RuntimeException {
         this.username = username;
     }
 
-    public String getUsername() { return username; }
 }

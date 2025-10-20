@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.demo.controllers.DashboardController"
+            prefWidth="1040" prefHeight="640" styleClass="root">
+    <top>
+        <HBox spacing="12" alignment="CENTER_LEFT" styleClass="topbar">
+            <children>
+                <Label text="Dashboard" styleClass="title-label"/>
+                <Pane HBox.hgrow="ALWAYS"/>
+                <Label fx:id="welcome" styleClass="subtitle-label"/>
+                <Button text="Logout" onAction="#onLogout" styleClass="danger-button"/>
+            </children>
+        </HBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content-scroll">
+            <content>
+                <VBox spacing="16">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+                    <children>
+                        <TitledPane text="Profile" expanded="true" styleClass="card">
+                            <content>
+                                <GridPane hgap="18" vgap="10">
+                                    <padding>
+                                        <Insets top="15" right="15" bottom="15" left="15"/>
+                                    </padding>
+                                    <children>
+                                        <Label text="Name:"/>
+                                        <Label fx:id="name" GridPane.columnIndex="1"/>
+                                        <Label text="Email:" GridPane.rowIndex="1"/>
+                                        <Label fx:id="email" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                                        <Label text="Role:" GridPane.rowIndex="2"/>
+                                        <Label fx:id="role" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                                    </children>
+                                </GridPane>
+                            </content>
+                        </TitledPane>
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>

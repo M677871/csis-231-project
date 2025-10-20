@@ -63,6 +63,9 @@ public class SecurityConfig {
                                 // ,"/actuator/health"  // uncomment only if you add actuator dependency
                         ).permitAll()
                         .requestMatchers("/api/auth/otp/**").permitAll()
+                        // In SecurityFilterChain http.authorizeHttpRequests(...)
+                        .requestMatchers("/api/auth/password/forgot", "/api/auth/password/reset").permitAll()
+
 
                         // Role-based domains (make sure your User.Role has these values)
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

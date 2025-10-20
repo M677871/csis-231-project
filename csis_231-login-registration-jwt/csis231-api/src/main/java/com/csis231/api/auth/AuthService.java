@@ -1,9 +1,11 @@
 package com.csis231.api.auth;
 
+import com.csis231.api.auth.Otp.OtpPurposes;
 import com.csis231.api.auth.Otp.OtpRequiredException;
 import com.csis231.api.auth.Otp.OtpService;
 import com.csis231.api.user.User;
 import com.csis231.api.user.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.*;
@@ -88,8 +90,24 @@ public class AuthService {
                 user.getRole().name()
         );
     }
+    @Transactional
+    public void requestPasswordReset(ForgotPasswordRequest req) {
+        userRepository.findByEmail(req.email())
+                .ifPresent(otpService::sendPasswordResetOtp);
+        // Always return 200 even if email doesn't exist (avoid user enumeration)
+    }
 
-    public boolean validateToken(String token) { return jwtUtil.validateToken(token); }
+    @Transactional
+    public void resetPassword(ResetPasswordRequest req) {
+        var user = userRepository.findByEmail(req.email())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid email or code"));
+
+        otpService.verifyOtpOrThrow(user, OtpPurposes.PASSWORD_RESET, req.code()); // <-- plural & new method
+
+        user.setPassword(passwordEncoder.encode(req.newPassword()));
+    }
+
+        public boolean validateToken(String token) { return jwtUtil.validateToken(token); }
 
     public String generateTokenFor(String username) {
         return jwtUtil.generateToken(username);

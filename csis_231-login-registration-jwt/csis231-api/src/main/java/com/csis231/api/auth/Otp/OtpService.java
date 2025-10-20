@@ -25,47 +25,77 @@ public class OtpService {
     @Value("${mail.from:}")
     private String from;
 
-    private static final long TTL_SECONDS = 300; // 5 minutes
 
+    // Default variant (keeps your existing login OTP flow working)
     @Transactional
-    public void createAndSend(User user, String purpose) {
-        // Invalidate any still-active codes for this user/purpose
-        List<OtpCode> actives = repo.findActive(user.getId(), purpose, Instant.now());
+    public String createAndSend(User user, String purpose) {
+        return createAndSend(user, purpose, 5, "Your OTP code", null);
+    }
+
+    // New flexible variant used by password reset
+    @Transactional
+    public String createAndSend(User user, String purpose, int ttlMinutes,
+                                String subject, String body /* optional, can be null */) {
+        // Invalidate active codes for this user/purpose
+        List<OtpCode> actives = repo.findActiveByUserId(purpose, user.getId(), Instant.now());
         actives.forEach(c -> c.setConsumedAt(Instant.now()));
 
-        // Generate a 6-digit code
-        String code = String.format("%06d",
-                ThreadLocalRandom.current().nextInt(0, 1_000_000));
+        // Generate 6-digit code
+        String code = String.format("%06d", ThreadLocalRandom.current().nextInt(0, 1_000_000));
 
         // Persist
         OtpCode entity = OtpCode.builder()
                 .user(user)
                 .code(code)
                 .purpose(purpose)
-                .expiresAt(Instant.now().plusSeconds(TTL_SECONDS))
+                .expiresAt(Instant.now().plusSeconds(ttlMinutes * 60L))
                 .build();
         repo.save(entity);
 
-        // Try email (if configured), always log for dev
+        // Email
         try {
             if (from != null && !from.isBlank() && user.getEmail() != null) {
                 SimpleMailMessage msg = new SimpleMailMessage();
-                msg.setFrom(from);                      // should equal MAIL_USERNAME for Gmail
+                msg.setFrom(from);
                 msg.setTo(user.getEmail());
-                msg.setSubject("Your OTP code");
-                msg.setText("Your one-time code is: " + code + " (valid 5 minutes)");
+                msg.setSubject(subject != null ? subject : "Your OTP code");
+                msg.setText(body != null ? body : ("Your one-time code is: " + code + " (valid " + ttlMinutes + " minutes)"));
                 mailSender.send(msg);
-                log.info("OTP email queued to {}", user.getEmail());
-            } else {
-                log.warn("Skip email: from='{}' or user.email='{}' is blank", from, user.getEmail());
             }
-        } catch (Exception e) {
-            log.error("Failed to send OTP email", e);   // <-- full stacktrace
+        } catch (Exception ex) {
+            log.info("OTP email not sent (dev/local is fine). {}", ex.toString());
         }
 
-
         log.info("OTP for user={} purpose={} CODE={}", user.getUsername(), purpose, code);
+        return code;
     }
+
+
+    @Transactional
+    public void sendPasswordResetOtp(User user) {
+        int ttlMinutes = 10;
+        String code = createAndSend(user, OtpPurposes.PASSWORD_RESET, ttlMinutes,
+                "Password Reset Code",
+                null );
+
+
+        try {
+            if (from != null && !from.isBlank() && user.getEmail() != null) {
+                SimpleMailMessage msg = new SimpleMailMessage();
+                msg.setFrom(from);
+                msg.setTo(user.getEmail());
+                msg.setSubject("Password Reset Code");
+                msg.setText("Use this code to reset your password (valid " + ttlMinutes + " minutes): " + code);
+                mailSender.send(msg);
+            }
+        } catch (Exception ex) {
+            log.warn("Could not send password reset email to {} (will still allow reset with code): {}", user.getEmail(), ex.toString());
+        }
+
+        log.info("Password reset OTP for user={} CODE={}", user.getUsername(), code);
+    }
+
+
 
     @Transactional
     public boolean verify(User user, String purpose, String code) {
@@ -85,5 +115,28 @@ public class OtpService {
         }
         return ok;
     }
+
+    @Transactional
+    public void verifyOtpOrThrow(User user, String purpose, String code) {
+        Instant now = Instant.now();
+
+        OtpCode latest = repo.findTopByUserIdAndPurposeOrderByIdDesc(user.getId(), purpose)
+                .orElseThrow(() -> new OtpRequiredException("Invalid email or code"));
+
+        boolean invalid = latest.getConsumedAt() != null
+                || now.isAfter(latest.getExpiresAt())
+                || !latest.getCode().equals(code);
+
+        if (invalid) {
+            throw new OtpRequiredException("Invalid email or code");
+        }
+
+        // consume the code
+        latest.setConsumedAt(now);
+        repo.save(latest);
+    }
+
+
+
 
 }

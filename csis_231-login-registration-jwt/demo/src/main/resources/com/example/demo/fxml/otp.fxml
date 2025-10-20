@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+
+<AnchorPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.demo.controllers.OtpController"
+            prefWidth="820" prefHeight="520" styleClass="root">
+    <children>
+        <StackPane AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+            <children>
+                <VBox spacing="18" alignment="CENTER" styleClass="auth-surface">
+                    <children>
+                        <Label text="Verify OTP" styleClass="title-label"/>
+                        <Label text="Enter the 6‑digit code we sent" styleClass="subtitle-label"/>
+                        <VBox spacing="10" styleClass="form-card">
+                            <children>
+                                <VBox spacing="6">
+                                    <Label text="OTP Code" styleClass="field-label"/>
+                                    <TextField fx:id="code" promptText="123456" styleClass="form-field"/>
+                                </VBox>
+                                <Button text="Verify" onAction="#onVerify" maxWidth="Infinity" styleClass="primary-button"/>
+                                <Button text="Resend code" onAction="#onResend" maxWidth="Infinity" styleClass="secondary-button"/>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+            </children>
+        </StackPane>
+    </children>
+</AnchorPane>
