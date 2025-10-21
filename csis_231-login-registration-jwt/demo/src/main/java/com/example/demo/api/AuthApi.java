@@ -53,21 +53,20 @@ public final class AuthApi {
         }
     }
 
-    // Ask backend to send an OTP for resetting the password.
-// Accepts username OR email; picks the right key automatically.
-    public static void requestResetOtp(String identifier) throws Exception {
+
+    public static void requestResetOtp(String email) throws Exception {
         ObjectNode n = M.createObjectNode();
-        if (identifier != null && identifier.contains("@")) {
-            n.put("email", identifier.trim());
-        } else {
-            n.put("username", identifier == null ? "" : identifier.trim());
-        }
-        HttpResponse<String> res = ApiClient.post(path("auth.otp.request", "/api/auth/otp/request"),
-                M.writeValueAsString(n));
+        n.put("email", email == null ? "" : email.trim());
+
+        HttpResponse<String> res = ApiClient.post(
+                path("auth.password.forgot", "/api/auth/password/forgot"),
+                M.writeValueAsString(n)
+        );
         if (res.statusCode() / 100 != 2) {
             throw new RuntimeException("HTTP " + res.statusCode() + " - " + safe(res.body()));
         }
     }
+
 
     public static void resetWithCode(String emailOrUser, String code, String newPassword) throws Exception {
         ObjectNode n = M.createObjectNode();
@@ -83,7 +82,7 @@ public final class AuthApi {
         n.put("code", code == null ? "" : code.trim());
         n.put("newPassword", newPassword == null ? "" : newPassword.trim());
 
-        HttpResponse<String> res = ApiClient.post(path("auth.reset", "/api/auth/reset/password"),
+        HttpResponse<String> res = ApiClient.post(path("auth.reset", "/api/auth/password/reset"),
                 M.writeValueAsString(n));
         if (res.statusCode() / 100 != 2) {
             throw new RuntimeException("HTTP " + res.statusCode() + " - " + safe(res.body()));

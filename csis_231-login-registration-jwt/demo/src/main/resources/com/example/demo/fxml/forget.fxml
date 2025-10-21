@@ -19,7 +19,7 @@
                                     <Label text="Email or Username" styleClass="field-label"/>
                                     <TextField fx:id="emailOrUsername" promptText="email or username" styleClass="form-field"/>
                                 </VBox>
-                                <Button text="Send reset link" onAction="#onSend" maxWidth="Infinity" styleClass="primary-button"/>
+                                <Button text="Send OTP code" onAction="#onSend" maxWidth="Infinity" styleClass="primary-button"/>
                                 <Hyperlink text="Back to Login" onAction="#goLogin"/>
                             </children>
                         </VBox>
