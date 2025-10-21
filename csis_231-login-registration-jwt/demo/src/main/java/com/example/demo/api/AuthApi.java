@@ -45,12 +45,40 @@ public final class AuthApi {
         return parseAuthResponse(res.body());
     }
 
+    // AuthApi.java
     public static void register(RegisterRequest req) throws Exception {
         String body = M.writeValueAsString(req);
         HttpResponse<String> res = ApiClient.post(path("auth.register", "/api/auth/register"), body);
-        if (res.statusCode() / 100 != 2) {
-            throw new RuntimeException("HTTP " + res.statusCode() + " - " + safe(res.body()));
+
+        int code = res.statusCode();
+        if (code / 100 != 2) {
+            String msg = extractMessage(res.body());
+
+            // Friendly defaults for common cases
+            if (code == 409) {
+                if (msg == null || msg.isBlank()) msg = "Username or email already exists.";
+                throw new RuntimeException(msg);
+            } else if (code == 400) {
+                if (msg == null || msg.isBlank()) msg = "Please check your inputs.";
+                throw new RuntimeException(msg);
+            }
+            throw new RuntimeException("Error (" + code + "): " + (msg == null ? "" : msg));
         }
+    }
+
+    private static String extractMessage(String body) {
+        try {
+            if (body == null || body.isBlank()) return "";
+            var n = M.readTree(body);
+            if (n.has("message")) return n.get("message").asText();
+            if (n.has("error"))   return n.get("error").asText();
+            if (n.isTextual())    return n.asText();
+            // sometimes servers return a list of validation messages:
+            if (n.has("errors") && n.get("errors").isArray() && n.get("errors").size() > 0) {
+                return n.get("errors").get(0).asText();
+            }
+        } catch (Exception ignore) {}
+        return body == null ? "" : body;
     }
 
 
@@ -68,26 +96,21 @@ public final class AuthApi {
     }
 
 
-    public static void resetWithCode(String emailOrUser, String code, String newPassword) throws Exception {
+    public static void resetWithCode(String email, String code, String newPassword) throws Exception {
         ObjectNode n = M.createObjectNode();
-
-        // If user typed an email, send 'email'; if they typed a username, also send 'username' (some backends require email only)
-        if (emailOrUser != null && emailOrUser.contains("@")) {
-            n.put("email", emailOrUser.trim());
-        } else {
-            n.put("email", emailOrUser == null ? "" : emailOrUser.trim()); // keep the key 'email' to match your Postman
-            n.put("username", emailOrUser == null ? "" : emailOrUser.trim()); // fallback if server accepts username
-        }
-
+        n.put("email", email == null ? "" : email.trim());
         n.put("code", code == null ? "" : code.trim());
         n.put("newPassword", newPassword == null ? "" : newPassword.trim());
 
-        HttpResponse<String> res = ApiClient.post(path("auth.reset", "/api/auth/password/reset"),
-                M.writeValueAsString(n));
+        HttpResponse<String> res = ApiClient.post(
+                path("auth.reset", "/api/auth/password/reset"),
+                M.writeValueAsString(n)
+        );
         if (res.statusCode() / 100 != 2) {
             throw new RuntimeException("HTTP " + res.statusCode() + " - " + safe(res.body()));
         }
     }
+
 
 
 

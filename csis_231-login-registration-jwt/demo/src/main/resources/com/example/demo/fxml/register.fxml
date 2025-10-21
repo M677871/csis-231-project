@@ -1,52 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.control.*?>
 <?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-
-<AnchorPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.demo.controllers.RegisterController"
-            prefWidth="900" prefHeight="560" styleClass="root">
+            prefWidth="900" prefHeight="560">
     <children>
-        <StackPane AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+        <StackPane AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0"
+                   AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
             <children>
-                <VBox spacing="18" alignment="CENTER" styleClass="auth-surface">
+                <VBox spacing="18" alignment="CENTER">
                     <children>
-                        <Label text="Create account" styleClass="title-label"/>
-                        <VBox spacing="10" styleClass="form-card">
+                        <Label text="Create account" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+                        <VBox spacing="12" maxWidth="520"
+                              style="-fx-padding: 24; -fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 12, 0.2, 0, 2);">
                             <children>
-                                <GridPane hgap="14" vgap="10">
+
+                                <GridPane hgap="12" vgap="12">
                                     <columnConstraints>
                                         <ColumnConstraints percentWidth="50"/>
                                         <ColumnConstraints percentWidth="50"/>
                                     </columnConstraints>
+
                                     <children>
-                                        <VBox GridPane.columnIndex="0" spacing="6">
-                                            <Label text="Username" styleClass="field-label"/>
-                                            <TextField fx:id="username" promptText="john" styleClass="form-field"/>
-                                        </VBox>
-                                        <VBox GridPane.columnIndex="1" spacing="6">
-                                            <Label text="Email" styleClass="field-label"/>
-                                            <TextField fx:id="email" promptText="john@site.com" styleClass="form-field"/>
-                                        </VBox>
-                                        <VBox GridPane.columnIndex="0" GridPane.rowIndex="1" spacing="6">
-                                            <Label text="Password" styleClass="field-label"/>
-                                            <PasswordField fx:id="password" promptText="••••••••" styleClass="form-field"/>
-                                        </VBox>
-                                        <VBox GridPane.columnIndex="0" spacing="6">
-                                            <Label text="First name" styleClass="field-label"/>
-                                            <TextField fx:id="firstName" promptText="John" styleClass="form-field"/>
-                                        </VBox>
-                                        <VBox GridPane.columnIndex="1" spacing="6">
-                                            <Label text="Last name" styleClass="field-label"/>
-                                            <TextField fx:id="lastName" promptText="Doe" styleClass="form-field"/>
-                                        </VBox>
+                                        <!-- Row 0 -->
+                                        <Label text="Username" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                        <TextField fx:id="username" promptText="stud123" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
+                                        <!-- Row 1 -->
+                                        <Label text="Email" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                        <TextField fx:id="email" promptText="student@example.com" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
+                                        <!-- Row 2 -->
+                                        <Label text="Password" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                        <PasswordField fx:id="password" promptText="••••••••" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                                        <!-- Row 3 -->
+                                        <Label text="Confirm password" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                        <PasswordField fx:id="confirmPassword" promptText="••••••••" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                                        <!-- Row 4 -->
+                                        <Label text="First name" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                                        <TextField fx:id="firstName" promptText="FirstName" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                                        <!-- Row 5 -->
+                                        <Label text="Last name" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                                        <TextField fx:id="lastName" promptText="LastName" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+                                        <!-- Row 6 -->
+                                        <Label text="Phone (optional)" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                                        <TextField fx:id="phone" promptText="+961..." GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+
+                                        <!-- Row 7: Role -->
+                                        <Label text="Role" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+                                        <ComboBox fx:id="role" GridPane.rowIndex="7" GridPane.columnIndex="1">
+                                            <items>
+                                                <FXCollections fx:factory="observableArrayList">
+                                                    <String fx:value="Student"/>
+                                                    <String fx:value="Instructor"/>
+                                                </FXCollections>
+                                            </items>
+                                        </ComboBox>
                                     </children>
                                 </GridPane>
-                                <Button text="Register" onAction="#onRegister" maxWidth="Infinity" styleClass="primary-button"/>
-                                <Hyperlink text="Back to Login" onAction="#goLogin"/>
+
+                                <Button text="Register" onAction="#onRegister" maxWidth="Infinity"/>
+                                <Hyperlink text="Back to Login" onAction="#goLogin" />
                             </children>
                         </VBox>
                     </children>
