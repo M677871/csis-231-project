@@ -51,4 +51,5 @@ public class OtpController {
             AlertUtils.error("Failed to resend: " + ex.getMessage());
         }
     }
+    public void goLogin(){ Launcher.go("login.fxml", "Login"); }
 }

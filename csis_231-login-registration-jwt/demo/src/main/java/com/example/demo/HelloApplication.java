@@ -9,11 +9,9 @@ public class HelloApplication extends Application {
         // Initialize the global launcher with the primary stage
         Launcher.init(stage);
 
-        // Optional: set minimum size so layouts don’t collapse
-        stage.setMinWidth(800);
-        stage.setMinHeight(520);
+        stage.setMinWidth(850);
+        stage.setMinHeight(550);
 
-        // First screen
         Launcher.go("login.fxml", "Login");
     }
 

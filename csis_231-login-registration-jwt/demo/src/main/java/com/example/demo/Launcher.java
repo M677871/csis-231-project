@@ -10,12 +10,7 @@ import javafx.stage.Stage;
 import java.net.URL;
 import java.util.Objects;
 
-/**
- * Centralized scene/navigation helper.
- * - Loads FXML from /com/example/demo/fxml/
- * - Reuses a single Scene to preserve window size and avoid flicker
- * - Applies global styles.css automatically
- */
+
 public final class Launcher {
 
     private static Stage stage;
@@ -26,7 +21,6 @@ public final class Launcher {
 
     private Launcher() {}
 
-    /** Must be called once from Application.start */
     public static void init(Stage primary) {
         stage = Objects.requireNonNull(primary, "primary stage is null");
 
@@ -37,11 +31,6 @@ public final class Launcher {
         }
     }
 
-    /**
-     * Navigate to an FXML view.
-     * @param fxmlFileName e.g. "login.fxml"
-     * @param title        window title
-     */
     public static void go(String fxmlFileName, String title) {
         Runnable task = () -> {
             try {

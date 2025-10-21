@@ -1,63 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.collections.*?>
+<?import javafx.geometry.*?>
 
-<?import javafx.collections.FXCollections?>
 <?import java.lang.String?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.demo.controllers.RegisterController"
-            prefWidth="900" prefHeight="560">
+            prefWidth="980" prefHeight="640">
     <children>
-        <StackPane AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0"
-                   AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+        <StackPane AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
+                   styleClass="auth-surface">
             <children>
                 <VBox spacing="18" alignment="CENTER">
                     <children>
-                        <Label text="Create account" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
-                        <VBox spacing="12" maxWidth="520"
-                              style="-fx-padding: 24; -fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 12, 0.2, 0, 2);">
+                        <Label text="Create your account ✨" styleClass="title-label"/>
+                        <Label text="It's fast and easy" styleClass="subtitle-label"/>
+                        <VBox spacing="16" maxWidth="520" styleClass="form-card">
                             <children>
-
                                 <GridPane hgap="12" vgap="12">
                                     <columnConstraints>
-                                        <ColumnConstraints percentWidth="50"/>
-                                        <ColumnConstraints percentWidth="50"/>
+                                        <ColumnConstraints percentWidth="45"/>
+                                        <ColumnConstraints percentWidth="55"/>
                                     </columnConstraints>
 
                                     <children>
-                                        <!-- Row 0 -->
-                                        <Label text="Username" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                                        <TextField fx:id="username" promptText="stud123" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                                        <Label text="Username" styleClass="field-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                        <TextField fx:id="username" promptText="username" styleClass="form-field"
+                                                   GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                                        <!-- Row 1 -->
-                                        <Label text="Email" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                                        <TextField fx:id="email" promptText="student@example.com" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                                        <Label text="Email" styleClass="field-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                        <TextField fx:id="email" promptText="student@example.com" styleClass="form-field"
+                                                   GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-                                        <!-- Row 2 -->
-                                        <Label text="Password" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                                        <PasswordField fx:id="password" promptText="••••••••" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                                        <Label text="Password" styleClass="field-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                        <PasswordField fx:id="password" promptText="••••••••" styleClass="password-field"
+                                                       GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-                                        <!-- Row 3 -->
-                                        <Label text="Confirm password" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                                        <PasswordField fx:id="confirmPassword" promptText="••••••••" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                                        <Label text="Confirm password" styleClass="field-label" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                        <PasswordField fx:id="confirmPassword" promptText="••••••••" styleClass="password-field"
+                                                       GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-                                        <!-- Row 4 -->
-                                        <Label text="First name" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-                                        <TextField fx:id="firstName" promptText="FirstName" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                                        <Label text="First name" styleClass="field-label" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                                        <TextField fx:id="firstName" promptText="First Name" styleClass="form-field"
+                                                   GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
-                                        <!-- Row 5 -->
-                                        <Label text="Last name" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
-                                        <TextField fx:id="lastName" promptText="LastName" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+                                        <Label text="Last name" styleClass="field-label" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                                        <TextField fx:id="lastName" promptText="Last Name" styleClass="form-field"
+                                                   GridPane.rowIndex="5" GridPane.columnIndex="1"/>
 
-                                        <!-- Row 6 -->
-                                        <Label text="Phone (optional)" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
-                                        <TextField fx:id="phone" promptText="+961..." GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+                                        <Label text="Phone (optional)" styleClass="field-label" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                                        <TextField fx:id="phone" promptText="+961..." styleClass="form-field"
+                                                   GridPane.rowIndex="6" GridPane.columnIndex="1"/>
 
-                                        <!-- Row 7: Role -->
-                                        <Label text="Role" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
-                                        <ComboBox fx:id="role" GridPane.rowIndex="7" GridPane.columnIndex="1">
+                                        <Label text="Role" styleClass="field-label" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+                                        <ComboBox fx:id="role" styleClass="combo-field" GridPane.rowIndex="7" GridPane.columnIndex="1">
                                             <items>
                                                 <FXCollections fx:factory="observableArrayList">
                                                     <String fx:value="Student"/>
@@ -68,8 +66,15 @@
                                     </children>
                                 </GridPane>
 
-                                <Button text="Register" onAction="#onRegister" maxWidth="Infinity"/>
-                                <Hyperlink text="Back to Login" onAction="#goLogin" />
+                                <Button text="Create account" onAction="#onRegister" styleClass="primary-button" maxWidth="Infinity"/>
+
+                                <HBox alignment="CENTER">
+                                    <children>
+                                        <Label text="Already have an account?" styleClass="subtitle-label"/>
+                                        <Hyperlink text="Sign in" onAction="#goLogin"/>
+                                    </children>
+                                    <spacing>6</spacing>
+                                </HBox>
                             </children>
                         </VBox>
                     </children>
