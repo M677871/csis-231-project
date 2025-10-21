@@ -37,7 +37,8 @@ public class OtpService {
     public String createAndSend(User user, String purpose, int ttlMinutes,
                                 String subject, String body /* optional, can be null */) {
         // Invalidate active codes for this user/purpose
-        List<OtpCode> actives = repo.findActiveByUserId(purpose, user.getId(), Instant.now());
+        List<OtpCode> actives = repo.findActiveByUserIdAndPurpose(user.getId(), purpose, Instant.now());
+
         actives.forEach(c -> c.setConsumedAt(Instant.now()));
 
         // Generate 6-digit code
@@ -101,7 +102,7 @@ public class OtpService {
     public boolean verify(User user, String purpose, String code) {
         Instant now = Instant.now();
 
-        Optional<OtpCode> latest = repo.findTopByUserIdAndPurposeOrderByIdDesc(user.getId(), purpose);
+        Optional<OtpCode> latest = repo.findTopByUser_IdAndPurposeOrderByIdDesc(user.getId(), purpose);
 
         if (latest.isEmpty()) return false;
 
@@ -120,7 +121,7 @@ public class OtpService {
     public void verifyOtpOrThrow(User user, String purpose, String code) {
         Instant now = Instant.now();
 
-        OtpCode latest = repo.findTopByUserIdAndPurposeOrderByIdDesc(user.getId(), purpose)
+        OtpCode latest = repo.findTopByUser_IdAndPurposeOrderByIdDesc(user.getId(), purpose)
                 .orElseThrow(() -> new OtpRequiredException("Invalid email or code"));
 
         boolean invalid = latest.getConsumedAt() != null
