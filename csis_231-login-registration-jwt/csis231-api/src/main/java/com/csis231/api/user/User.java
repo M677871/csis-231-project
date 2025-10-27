@@ -44,6 +44,10 @@ public class User {
     @Builder.Default
     private Boolean isActive = true;
 
+    private String profilePicture; // URL or file path to avatar
+    private String bio;            // instructor bio (nullable for students)
+    private String dateOfBirth;
+
     @Builder.Default
     private Boolean emailVerified = false;
 
