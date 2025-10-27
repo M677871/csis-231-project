@@ -18,19 +18,27 @@ public class LoginController {
     public void onLogin() {
         try {
             String u = username.getText() == null ? "" : username.getText().trim();
-            String p = password.getText() == null ? "" : password.getText().trim();
-            if (u.isEmpty() || p.isEmpty()) { AlertUtils.warn("Please enter username and password."); return; }
+            String p = password.getText() == null ? "" : password.getText();
+
+            if (u.isBlank() || p.isBlank()) {
+                AlertUtils.warn("Please enter username and password.");
+                return;
+            }
 
             AuthResponse res = AuthApi.login(new LoginRequest(u, p));
 
             if (res.otpRequired()) {
+
                 TempAuth.username = u;
-                try { AuthApi.requestOtp(u); } catch (Exception ignored) {} // best-effort
+
                 Launcher.go("otp.fxml", "Verify OTP");
+
             } else {
+                // Normal login: we already got a JWT token
                 TokenStore.set(res.token());
                 Launcher.go("dashboard.fxml", "Dashboard");
             }
+
         } catch (Exception ex) {
             AlertUtils.error("Login failed: " + ex.getMessage());
             ex.printStackTrace();
