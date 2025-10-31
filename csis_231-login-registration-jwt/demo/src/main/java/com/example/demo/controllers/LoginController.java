@@ -25,7 +25,7 @@ public class LoginController {
 
             if (res.otpRequired()) {
                 TempAuth.username = u;
-                try { AuthApi.requestOtp(u); } catch (Exception ignored) {} // best-effort
+                AlertUtils.info("OTP has been sent.");
                 Launcher.go("otp.fxml", "Verify OTP");
             } else {
                 TokenStore.set(res.token());

@@ -13,7 +13,7 @@ module com.example.demo {
     // ⬇️ Add this
     requires java.prefs;
 
-    // reflective access
+
     opens com.example.demo.controllers to javafx.fxml;
     opens com.example.demo.model to com.fasterxml.jackson.databind, javafx.base;
 

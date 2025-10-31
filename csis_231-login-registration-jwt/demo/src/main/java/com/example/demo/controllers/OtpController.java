@@ -25,8 +25,6 @@ public class OtpController {
 
             AuthResponse res = AuthApi.verifyOtp(new OtpVerifyRequest(TempAuth.username, c));
 
-            // 🧠 Some backends return only a success/OK and expect client to call /me with token from body/data.
-            // We require a token to navigate.
             String token = res.token();
             if (token == null || token.isBlank()) {
                 AlertUtils.error("OTP verified, but no token was returned. Please try again.");
@@ -34,6 +32,7 @@ public class OtpController {
             }
 
             TokenStore.set(token);
+            AlertUtils.info("OTP verified.");
             Launcher.go("dashboard.fxml", "Dashboard");
 
         } catch (Exception ex) {
