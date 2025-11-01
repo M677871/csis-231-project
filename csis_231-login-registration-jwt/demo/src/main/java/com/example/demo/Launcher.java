@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.example.demo.security.IdleGuard;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -8,6 +9,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.time.Duration;
 import java.util.Objects;
 
 
@@ -48,9 +50,19 @@ public final class Launcher {
                     scene = new Scene(root);
                     applyGlobalStyles(scene);
                     stage.setScene(scene);
+                   IdleGuard.attach(scene, Duration.ofMinutes(15));
+
+
                 } else {
-                    scene.setRoot(root); // reuse scene, keep size/position
+                    scene.setRoot(root);
+                    IdleGuard.attach(scene, Duration.ofMinutes(15));
                 }
+
+                try {
+                    javafx.scene.Scene s = stage.getScene();
+                    if (s != null) com.example.demo.security.IdleGuard.attach(s, java.time.Duration.ofMinutes(15));
+                } catch (Exception ignored) {}
+
 
                 if (title != null && !title.isBlank()) {
                     stage.setTitle(title);

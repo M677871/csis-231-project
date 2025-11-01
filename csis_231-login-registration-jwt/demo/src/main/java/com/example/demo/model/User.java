@@ -1,21 +1,25 @@
 package com.example.demo.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class MeResponse {
+/**
+ * Client-side user model.  Matches the structure of the backend entity
+ * {@code com.csis231.api.user.User}.  The password field is only used
+ * when creating or updating a user; it is never returned by the backend.
+ */
+public class User {
     private Long id;
     private String username;
     private String email;
+    private String password;
     private String firstName;
     private String lastName;
     private String phone;
+    private Boolean isActive;
+    private Boolean emailVerified;
+    private Boolean twoFactorEnabled;
     private String role;
 
-    // Optional: backend might send this directly
-    private String fullName;
+    // Standard getters and setters
 
-    // ---- getters/setters ----
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -24,6 +28,9 @@ public class MeResponse {
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
     public String getFirstName() { return firstName; }
     public void setFirstName(String firstName) { this.firstName = firstName; }
@@ -34,17 +41,15 @@ public class MeResponse {
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
 
+    public Boolean getIsActive() { return isActive; }
+    public void setIsActive(Boolean active) { this.isActive = active; }
+
+    public Boolean getEmailVerified() { return emailVerified; }
+    public void setEmailVerified(Boolean emailVerified) { this.emailVerified = emailVerified; }
+
+    public Boolean getTwoFactorEnabled() { return twoFactorEnabled; }
+    public void setTwoFactorEnabled(Boolean twoFactorEnabled) { this.twoFactorEnabled = twoFactorEnabled; }
+
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
-
-    public String getFullName() { return fullName; }
-    public void setFullName(String fullName) { this.fullName = fullName; }
-
-    // Convenience for your controller: prefer server fullName, else compose it
-    public String fullName() {
-        if (fullName != null && !fullName.isBlank()) return fullName;
-        String fn = firstName == null ? "" : firstName.trim();
-        String ln = lastName == null ? "" : lastName.trim();
-        return (fn + " " + ln).trim();
-    }
 }

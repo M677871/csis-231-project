@@ -115,7 +115,7 @@ public final class AuthApi {
 
 
     public static MeResponse me() throws Exception {
-        HttpResponse<String> res = ApiClient.get(path("me", "/api/me"));
+        HttpResponse<String> res = ApiClient.get(path("me", "/api/csis-users/me"));
         if (res.statusCode() / 100 != 2) {
             throw new RuntimeException("HTTP " + res.statusCode() + " - " + safe(res.body()));
         }

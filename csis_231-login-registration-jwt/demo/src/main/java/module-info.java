@@ -12,6 +12,7 @@ module com.example.demo {
 
     // ⬇️ Add this
     requires java.prefs;
+    requires jdk.jfr;
 
 
     opens com.example.demo.controllers to javafx.fxml;

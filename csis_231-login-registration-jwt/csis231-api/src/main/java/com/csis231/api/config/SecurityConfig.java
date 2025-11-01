@@ -41,7 +41,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration c = new CorsConfiguration();
         c.setAllowedOriginPatterns(List.of("*")); // TODO: change to your frontend origin
-        c.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
+        c.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         c.setAllowedHeaders(List.of("*"));
         c.setExposedHeaders(List.of("Authorization"));
         c.setAllowCredentials(true);
@@ -53,30 +53,27 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                // you can keep global disable if you want; refresh remains public anyway
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
-                        .requestMatchers(
-                                "/api/auth/**"    // login/register/validate
-                                // ,"/actuator/health"  // uncomment only if you add actuator dependency
-                        ).permitAll()
+                        // --- Public endpoints (unchanged + refresh added) ---
+                        .requestMatchers("/api/auth/**").permitAll()             // login/register/otp/password/refresh
                         .requestMatchers("/api/auth/otp/**").permitAll()
-                        // In SecurityFilterChain http.authorizeHttpRequests(...)
-                        .requestMatchers("/api/auth/password/forgot", "/api/auth/password/reset").permitAll()
+                        .requestMatchers("/api/auth/password/forgot",
+                                "/api/auth/password/reset").permitAll()
 
-
-                        // Role-based domains (make sure your User.Role has these values)
+                        // --- Role-scoped domains (unchanged) ---
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/instructor/**").hasAnyRole("INSTRUCTOR","ADMIN")
-                        .requestMatchers("/api/student/**").hasAnyRole("STUDENT","ADMIN")
+                        .requestMatchers("/api/instructor/**").hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers("/api/student/**").hasAnyRole("STUDENT", "ADMIN")
 
-                        // Everything else requires auth
+                        // --- Everything else requires auth ---
                         .anyRequest().authenticated()
                 );
 
-        // Place JWT filter before Spring’s username/password filter
+        // Ensure the JWT filter runs before UsernamePasswordAuthenticationFilter
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
