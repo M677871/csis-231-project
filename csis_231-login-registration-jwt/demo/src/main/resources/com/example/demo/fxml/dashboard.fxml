@@ -1,157 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.demo.controllers.DashboardController"
             prefWidth="1180" prefHeight="720">
-
-    <!-- Top bar -->
     <top>
         <HBox spacing="12" alignment="CENTER_LEFT" styleClass="topbar">
-            <Label text="UOB Portal" style="-fx-font-size: 20px; -fx-font-weight: 900;"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="welcome" text="Welcome 👋" style="-fx-font-weight: 700; -fx-text-fill: #111827;"/>
-            <Button text="Logout" onAction="#onLogout" styleClass="ghost-button"/>
+            <children>
+                <Label text="UOB Portal" style="-fx-font-size: 20px; -fx-font-weight: 900;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="welcome" text="Welcome" style="-fx-font-weight: 700; -fx-text-fill: #111827;"/>
+                <Button text="Logout" onAction="#onLogout" styleClass="ghost-button"/>
+            </children>
         </HBox>
     </top>
 
-    <!-- Main content -->
     <center>
         <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="content-scroll">
-            <VBox spacing="24" style="-fx-padding: 26;">
+            <content>
+                <VBox spacing="24" style="-fx-padding: 26;">
+                    <children>
+                        <Label text="Overview" styleClass="title-label"/>
 
-                <Label text="Overview" styleClass="title-label"/>
-
-                <!-- Overview row -->
-                <HBox spacing="24">
-                    <!-- Profile -->
-                    <VBox spacing="14" styleClass="card">
-                        <Label text="Profile" style="-fx-font-weight: 800; -fx-font-size: 15px;"/>
-                        <GridPane hgap="10" vgap="8">
-                            <columnConstraints>
-                                <ColumnConstraints percentWidth="35"/>
-                                <ColumnConstraints percentWidth="65"/>
-                            </columnConstraints>
-
-                            <Label text="Name"  styleClass="subtitle-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                            <Label fx:id="name" text=""                     GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-
-                            <Label text="Email" styleClass="subtitle-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                            <Label fx:id="email" text=""                    GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-
-                            <Label text="Role"  styleClass="subtitle-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                            <Label fx:id="role" text=""                     GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-                        </GridPane>
-                    </VBox>
-
-                    <!-- Quick Actions -->
-                    <VBox spacing="14" styleClass="card">
-                        <Label text="Quick Actions" style="-fx-font-weight: 800; -fx-font-size: 15px;"/>
-                        <FlowPane hgap="12" vgap="12">
-                            <Button text="Users"      styleClass="primary-button" onAction="#scrollToUsers"/>
-                            <Button text="Categories" styleClass="ghost-button"   onAction="#scrollToCategories"/>
-                            <Button text="Reports"    styleClass="ghost-button"/>
-                            <Button text="Settings"   styleClass="ghost-button"/>
-                        </FlowPane>
-                    </VBox>
-                </HBox>
-
-                <!-- Collapsible sections -->
-                <Accordion>
-                    <panes>
-
-                        <!-- User Management -->
-                        <TitledPane text="User Management" expanded="false">
-                            <content>
-                                <VBox spacing="16" styleClass="management-card">
-
-                                    <TableView fx:id="userTable" prefHeight="240">
-                                        <columns>
-                                            <TableColumn fx:id="userIdColumn"    text="ID"       prefWidth="60"/>
-                                            <TableColumn fx:id="userNameColumn"  text="Username" prefWidth="180"/>
-                                            <TableColumn fx:id="userEmailColumn" text="Email"    prefWidth="220"/>
-                                            <TableColumn fx:id="userRoleColumn"  text="Role"     prefWidth="120"/>
-                                        </columns>
-                                    </TableView>
-
-                                    <GridPane hgap="12" vgap="10">
+                        <HBox spacing="24">
+                            <!-- Profile -->
+                            <VBox spacing="14" styleClass="card" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label text="Profile" style="-fx-font-weight: 800; -fx-font-size: 15px;"/>
+                                    <GridPane hgap="10" vgap="8">
                                         <columnConstraints>
-                                            <ColumnConstraints percentWidth="25"/>
-                                            <ColumnConstraints percentWidth="25"/>
-                                            <ColumnConstraints percentWidth="25"/>
-                                            <ColumnConstraints percentWidth="25"/>
+                                            <ColumnConstraints percentWidth="35"/>
+                                            <ColumnConstraints percentWidth="65"/>
                                         </columnConstraints>
+                                        <children>
+                                            <Label text="Name"  styleClass="subtitle-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                            <Label fx:id="name" text="" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                                        <Label text="Username" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                                        <TextField fx:id="userNameField" promptText="Username" styleClass="rounded-text-field"
-                                                   GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                                            <Label text="Email" styleClass="subtitle-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                            <Label fx:id="email" text="" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-                                        <Label text="Email" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
-                                        <TextField fx:id="userEmailField" promptText="Email" styleClass="rounded-text-field"
-                                                   GridPane.columnIndex="3" GridPane.rowIndex="0"/>
-
-                                        <Label text="Password" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                                        <PasswordField fx:id="userPasswordField" promptText="Password" styleClass="rounded-text-field"
-                                                       GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-
-                                        <Label text="Role" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
-                                        <ChoiceBox fx:id="userRoleChoiceBox" styleClass="rounded-choice-box"
-                                                   GridPane.columnIndex="3" GridPane.rowIndex="1"/>
-
-                                        <Button text="Add User" onAction="#onAddUser" styleClass="primary-button"
-                                                GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-                                        <Button text="Update User" onAction="#onUpdateUser" styleClass="secondary-button"
-                                                GridPane.columnIndex="2" GridPane.rowIndex="2"/>
-                                        <Button text="Delete User" onAction="#onDeleteUser" styleClass="danger-button"
-                                                GridPane.columnIndex="3" GridPane.rowIndex="2"/>
+                                            <Label text="Role"  styleClass="subtitle-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                            <Label fx:id="role" text="" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                                        </children>
                                     </GridPane>
+                                </children>
+                            </VBox>
 
-                                </VBox>
-                            </content>
-                        </TitledPane>
-
-                        <!-- Category Management -->
-                        <TitledPane text="Category Management" expanded="false">
-                            <content>
-                                <VBox spacing="16" styleClass="management-card">
-
-                                    <TableView fx:id="categoryTable" prefHeight="200">
-                                        <columns>
-                                            <TableColumn fx:id="categoryIdColumn"   text="ID"   prefWidth="60"/>
-                                            <TableColumn fx:id="categoryNameColumn" text="Name" prefWidth="240"/>
-                                        </columns>
-                                    </TableView>
-
-                                    <GridPane hgap="12" vgap="10">
-                                        <columnConstraints>
-                                            <ColumnConstraints percentWidth="25"/>
-                                            <ColumnConstraints percentWidth="25"/>
-                                            <ColumnConstraints percentWidth="25"/>
-                                            <ColumnConstraints percentWidth="25"/>
-                                        </columnConstraints>
-
-                                        <Label text="Name" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                                        <TextField fx:id="categoryNameField" promptText="Category Name" styleClass="rounded-text-field"
-                                                   GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-
-                                        <Button text="Add Category" onAction="#onAddCategory" styleClass="primary-button"
-                                                GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                                        <Button text="Update Category" onAction="#onUpdateCategory" styleClass="secondary-button"
-                                                GridPane.columnIndex="2" GridPane.rowIndex="1"/>
-                                        <Button text="Delete Category" onAction="#onDeleteCategory" styleClass="danger-button"
-                                                GridPane.columnIndex="3" GridPane.rowIndex="1"/>
-                                    </GridPane>
-
-                                </VBox>
-                            </content>
-                        </TitledPane>
-
-                    </panes>
-                </Accordion>
-
-            </VBox>
+                            <!-- Quick Actions -->
+                            <VBox spacing="16" styleClass="card" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label text="Quick Actions" style="-fx-font-weight: 800; -fx-font-size: 15px;"/>
+                                    <VBox spacing="12">
+                                        <children>
+                                            <Button text="User Management" styleClass="primary-button"  onAction="#openUsers"/>
+                                            <Button text="Category Management" styleClass="ghost-button" onAction="#openCategories"/>
+                                        </children>
+                                    </VBox>
+                                    <Label text="Tip: You can return here anytime." styleClass="muted"/>
+                                </children>
+                            </VBox>
+                        </HBox>
+                    </children>
+                </VBox>
+            </content>
         </ScrollPane>
     </center>
 </BorderPane>

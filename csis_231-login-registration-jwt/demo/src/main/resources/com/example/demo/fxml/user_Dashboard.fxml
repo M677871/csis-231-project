@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.demo.controllers.UserController"
+            prefWidth="1180" prefHeight="720">
+    <top>
+        <HBox spacing="12" alignment="CENTER_LEFT" styleClass="topbar">
+            <children>
+                <Button text="← Back" onAction="#backToMain" styleClass="ghost-button"/>
+                <Label text="User Management" style="-fx-font-size: 20px; -fx-font-weight: 900;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Logout" onAction="#onLogout" styleClass="ghost-button"/>
+            </children>
+        </HBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content-scroll">
+            <content>
+                <VBox spacing="18" style="-fx-padding: 22;">
+                    <children>
+                        <VBox spacing="16" styleClass="management-card">
+                            <children>
+                                <TableView fx:id="userTable" prefHeight="360">
+                                    <columns>
+                                        <TableColumn fx:id="userIdColumn"      text="ID"         prefWidth="80"/>
+                                        <TableColumn fx:id="userNameColumn"    text="Username"   prefWidth="160"/>
+                                        <TableColumn fx:id="userEmailColumn"   text="Email"      prefWidth="220"/>
+                                        <TableColumn fx:id="firstNameColumn"   text="First Name" prefWidth="130"/>
+                                        <TableColumn fx:id="lastNameColumn"    text="Last Name"  prefWidth="130"/>
+                                        <TableColumn fx:id="phoneColumn"       text="Phone"      prefWidth="130"/>
+                                        <TableColumn fx:id="userRoleColumn"    text="Role"       prefWidth="110"/>
+                                        <TableColumn fx:id="activeColumn"      text="Active"     prefWidth="90"/>
+                                        <TableColumn fx:id="twoFaColumn"       text="2FA"        prefWidth="90"/>
+                                        <TableColumn fx:id="emailVerColumn"    text="Email ✔"    prefWidth="100"/>
+                                    </columns>
+                                </TableView>
+
+                                <GridPane hgap="12" vgap="10">
+                                    <columnConstraints>
+                                        <ColumnConstraints percentWidth="25"/>
+                                        <ColumnConstraints percentWidth="25"/>
+                                        <ColumnConstraints percentWidth="25"/>
+                                        <ColumnConstraints percentWidth="25"/>
+                                    </columnConstraints>
+                                    <children>
+                                        <Label text="Username" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                                        <TextField fx:id="userNameField" promptText="Username" styleClass="rounded-text-field"
+                                                   GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                                        <Label text="Email" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                                        <TextField fx:id="userEmailField" promptText="Email" styleClass="rounded-text-field"
+                                                   GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+
+                                        <Label text="Password" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                                        <PasswordField fx:id="userPasswordField" promptText="(leave blank to keep)"
+                                                       styleClass="rounded-text-field"
+                                                       GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                                        <Label text="First Name" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                                        <TextField fx:id="firstNameField" promptText="First name" styleClass="rounded-text-field"
+                                                   GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+
+                                        <Label text="Last Name" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                                        <TextField fx:id="lastNameField" promptText="Last name" styleClass="rounded-text-field"
+                                                   GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                                        <Label text="Phone" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+                                        <TextField fx:id="phoneField" promptText="Phone" styleClass="rounded-text-field"
+                                                   GridPane.columnIndex="3" GridPane.rowIndex="2"/>
+
+                                        <Label text="Role" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                                        <ChoiceBox fx:id="userRoleChoiceBox" styleClass="rounded-choice-box"
+                                                   GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+                                        <CheckBox fx:id="activeCheck"       text="Active"        GridPane.columnIndex="2" GridPane.rowIndex="3"/>
+                                        <CheckBox fx:id="twoFaCheck"        text="Two-Factor"    GridPane.columnIndex="3" GridPane.rowIndex="3"/>
+                                        <CheckBox fx:id="emailVerifiedCheck" text="Email Verified" GridPane.columnIndex="3" GridPane.rowIndex="4"/>
+
+                                        <Button text="Add User" onAction="#onAddUser" styleClass="primary-button"
+                                                GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+                                        <Button text="Update User" onAction="#onUpdateUser" styleClass="secondary-button"
+                                                GridPane.columnIndex="2" GridPane.rowIndex="5"/>
+                                        <Button text="Delete User" onAction="#onDeleteUser" styleClass="danger-button"
+                                                GridPane.columnIndex="3" GridPane.rowIndex="5"/>
+                                    </children>
+                                </GridPane>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>

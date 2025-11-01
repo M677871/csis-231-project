@@ -1,28 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.Button?>
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.demo.controllers.CategoryController">
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.demo.controllers.CategoryController"
+            prefWidth="1180" prefHeight="720">
     <top>
-        <Label text="Category Management" />
-    </top>
-    <center>
-        <TableView fx:id="categoryTable" prefHeight="300">
-            <columns>
-                <TableColumn fx:id="idColumn" text="ID" />
-                <TableColumn fx:id="nameColumn" text="Name" />
-            </columns>
-        </TableView>
-    </center>
-    <bottom>
-        <HBox spacing="10" alignment="CENTER_LEFT">
-            <TextField fx:id="nameField" promptText="New category name" />
-            <Button text="Add Category" onAction="#handleAdd" />
-            <Button text="Delete Selected" onAction="#handleDelete" />
+        <HBox spacing="12" alignment="CENTER_LEFT" styleClass="topbar">
+            <children>
+                <Button text="← Back" onAction="#backToMain" styleClass="ghost-button"/>
+                <Label text="Category Management" style="-fx-font-size: 20px; -fx-font-weight: 900;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Logout" onAction="#onLogout" styleClass="ghost-button"/>
+            </children>
         </HBox>
-    </bottom>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content-scroll">
+            <content>
+                <VBox spacing="18" style="-fx-padding: 22;">
+                    <children>
+                        <VBox spacing="16" styleClass="management-card">
+                            <children>
+                                <TableView fx:id="categoryTable" prefHeight="360">
+                                    <columns>
+                                        <TableColumn fx:id="categoryIdColumn"   text="ID"   prefWidth="80"/>
+                                        <TableColumn fx:id="categoryNameColumn" text="Name" prefWidth="320"/>
+                                    </columns>
+                                </TableView>
+
+                                <GridPane hgap="12" vgap="10">
+                                    <columnConstraints>
+                                        <ColumnConstraints percentWidth="25"/>
+                                        <ColumnConstraints percentWidth="25"/>
+                                        <ColumnConstraints percentWidth="25"/>
+                                        <ColumnConstraints percentWidth="25"/>
+                                    </columnConstraints>
+                                    <children>
+                                        <Label text="Name" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                                        <TextField fx:id="categoryNameField" promptText="Category Name"
+                                                   styleClass="rounded-text-field"
+                                                   GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                                        <Button text="Add Category" onAction="#onAddCategory" styleClass="primary-button"
+                                                GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                                        <Button text="Update Category" onAction="#onUpdateCategory" styleClass="secondary-button"
+                                                GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                                        <Button text="Delete Category" onAction="#onDeleteCategory" styleClass="danger-button"
+                                                GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+                                    </children>
+                                </GridPane>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
 </BorderPane>
