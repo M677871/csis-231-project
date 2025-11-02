@@ -25,7 +25,7 @@ public class LoginController {
 
             if (res.otpRequired()) {
                 TempAuth.username = u;
-                AlertUtils.info("OTP has been sent.");
+                AlertUtils.info("We’ve sent a 6-digit code to your email. Please check your inbox.");
                 Launcher.go("otp.fxml", "Verify OTP");
             } else {
                 TokenStore.set(res.token());
