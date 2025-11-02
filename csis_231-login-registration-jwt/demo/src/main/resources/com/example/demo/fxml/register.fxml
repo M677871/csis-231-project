@@ -18,7 +18,7 @@
                         <VBox alignment="CENTER" spacing="8">
                             <children>
                                 <Label text="✨ Create Your Account" styleClass="title-label"/>
-                                <Label text="Join UOB Portal today - it's fast and easy" styleClass="subtitle-label"/>
+                                <Label text="Join Learn Online today - it's fast and easy" styleClass="subtitle-label"/>
                             </children>
                         </VBox>
 

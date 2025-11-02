@@ -16,7 +16,7 @@
                         <VBox alignment="CENTER" spacing="8">
                             <children>
                                 <Label text="👋 Welcome Back" styleClass="title-label"/>
-                                <Label text="Sign in to your UOB Portal account" styleClass="subtitle-label"/>
+                                <Label text="Sign in to your Learn Online account" styleClass="subtitle-label"/>
                             </children>
                         </VBox>
 

@@ -12,7 +12,7 @@
         <HBox spacing="16" alignment="CENTER_LEFT" styleClass="topbar">
             <children>
                 <Button text="← Back" onAction="#backToMain" styleClass="ghost-button"/>
-                <Label text="Category Management" style="-fx-font-size: 24px; -fx-font-weight: 900; -fx-text-fill: #1A202C;"/>
+                <Label text="Category Management" style="-fx-font-size: 24px; -fx-font-weight: 900; -fx-text-fill: #FFFFFF;"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <Button text="Logout" onAction="#onLogout" styleClass="ghost-button"/>
             </children>
@@ -29,7 +29,7 @@
                     <children>
                         <VBox spacing="20" styleClass="management-card">
                             <children>
-                                <Label text="Category List" style="-fx-font-size: 20px; -fx-font-weight: 800; -fx-text-fill: #1A202C;"/>
+                                <Label text="Category List" style="-fx-font-size: 20px; -fx-font-weight: 800; -fx-text-fill: #FFFFFF;"/>
                                 <TableView fx:id="categoryTable" prefHeight="400">
                                     <columns>
                                         <TableColumn fx:id="categoryIdColumn"   text="ID"   prefWidth="100"/>
@@ -37,7 +37,7 @@
                                     </columns>
                                 </TableView>
 
-                                <Label text="Manage Categories" style="-fx-font-size: 18px; -fx-font-weight: 700; -fx-text-fill: #2D3748; -fx-padding: 16 0 8 0;"/>
+                                <Label text="Manage Categories" style="-fx-font-size: 18px; -fx-font-weight: 700; -fx-text-fill: #FFFFFF; -fx-padding: 16 0 8 0;"/>
 
                                 <GridPane hgap="16" vgap="12">
                                     <columnConstraints>
