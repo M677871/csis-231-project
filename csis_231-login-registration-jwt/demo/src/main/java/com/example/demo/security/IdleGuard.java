@@ -50,7 +50,7 @@ public final class IdleGuard {
 
         Platform.runLater(() -> {
             try { TokenStore.clear(); } catch (Throwable ignored) {}
-            try { AlertUtils.warn("Session expired due to inactivity."); } catch (Throwable ignored) {}
+            try { AlertUtils.warn("Session expired due to inactivity. Please Login again !"); } catch (Throwable ignored) {}
             try { Launcher.go("login.fxml", "Login"); } catch (Throwable ignored) {}
         });
     }

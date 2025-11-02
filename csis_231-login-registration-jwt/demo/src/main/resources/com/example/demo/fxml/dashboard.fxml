@@ -6,60 +6,64 @@
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.demo.controllers.DashboardController"
-            prefWidth="1180" prefHeight="720">
+            prefWidth="1280" prefHeight="800"
+            styleClass="glass-pane">
     <top>
-        <HBox spacing="12" alignment="CENTER_LEFT" styleClass="topbar">
+        <HBox spacing="16" alignment="CENTER_LEFT" styleClass="topbar">
             <children>
-                <Label text="UOB Portal" style="-fx-font-size: 20px; -fx-font-weight: 900;"/>
+                <Label text="🚀 UOB Portal" style="-fx-font-size: 24px; -fx-font-weight: 900; -fx-text-fill: #1A202C;"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Label fx:id="welcome" text="Welcome" style="-fx-font-weight: 700; -fx-text-fill: #111827;"/>
+                <Label fx:id="welcome" text="Welcome" style="-fx-font-weight: 700; -fx-text-fill: #2D3748; -fx-font-size: 16px;"/>
                 <Button text="Logout" onAction="#onLogout" styleClass="ghost-button"/>
             </children>
+            <padding>
+                <Insets top="16" bottom="16" left="24" right="24"/>
+            </padding>
         </HBox>
     </top>
 
     <center>
         <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="content-scroll">
             <content>
-                <VBox spacing="24" style="-fx-padding: 26;">
+                <VBox spacing="32" style="-fx-padding: 32;">
                     <children>
-                        <Label text="Overview" styleClass="title-label"/>
+                        <Label text="Dashboard Overview" styleClass="title-label"/>
 
-                        <HBox spacing="24">
-                            <!-- Profile -->
-                            <VBox spacing="14" styleClass="card" HBox.hgrow="ALWAYS">
+                        <HBox spacing="24" alignment="TOP_LEFT">
+                            <!-- Profile Card -->
+                            <VBox spacing="20" styleClass="card" HBox.hgrow="ALWAYS">
                                 <children>
-                                    <Label text="Profile" style="-fx-font-weight: 800; -fx-font-size: 15px;"/>
-                                    <GridPane hgap="10" vgap="8">
+                                    <Label text="👤 Profile" style="-fx-font-weight: 800; -fx-font-size: 18px; -fx-text-fill: #1A202C;"/>
+                                    <GridPane hgap="16" vgap="12">
                                         <columnConstraints>
                                             <ColumnConstraints percentWidth="35"/>
                                             <ColumnConstraints percentWidth="65"/>
                                         </columnConstraints>
                                         <children>
-                                            <Label text="Name"  styleClass="subtitle-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                                            <Label fx:id="name" text="" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                                            <Label text="Name"  styleClass="field-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                            <Label fx:id="name" text="" style="-fx-font-weight: 600; -fx-text-fill: #2D3748;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                                            <Label text="Email" styleClass="subtitle-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                                            <Label fx:id="email" text="" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                                            <Label text="Email" styleClass="field-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                            <Label fx:id="email" text="" style="-fx-font-weight: 600; -fx-text-fill: #2D3748;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-                                            <Label text="Role"  styleClass="subtitle-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                                            <Label fx:id="role" text="" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                                            <Label text="Role"  styleClass="field-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                            <Label fx:id="role" text="" style="-fx-font-weight: 600; -fx-text-fill: #667eea;" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
                                         </children>
                                     </GridPane>
                                 </children>
                             </VBox>
 
-                            <!-- Quick Actions -->
-                            <VBox spacing="16" styleClass="card" HBox.hgrow="ALWAYS">
+                            <!-- Quick Actions Card -->
+                            <VBox spacing="20" styleClass="card" HBox.hgrow="ALWAYS">
                                 <children>
-                                    <Label text="Quick Actions" style="-fx-font-weight: 800; -fx-font-size: 15px;"/>
-                                    <VBox spacing="12">
+                                    <Label text="⚡ Quick Actions" style="-fx-font-weight: 800; -fx-font-size: 18px; -fx-text-fill: #1A202C;"/>
+                                    <VBox spacing="16">
                                         <children>
-                                            <Button text="User Management" styleClass="primary-button"  onAction="#openUsers"/>
-                                            <Button text="Category Management" styleClass="ghost-button" onAction="#openCategories"/>
+                                            <Button text="👥 User Management" styleClass="primary-button" onAction="#openUsers" maxWidth="Infinity"/>
+                                            <Button text="📁 Category Management" styleClass="secondary-button" onAction="#openCategories" maxWidth="Infinity"/>
                                         </children>
                                     </VBox>
-                                    <Label text="Tip: You can return here anytime." styleClass="muted"/>
+                                    <Label text="💡 Tip: You can return here anytime from any management screen." styleClass="muted"/>
                                 </children>
                             </VBox>
                         </HBox>

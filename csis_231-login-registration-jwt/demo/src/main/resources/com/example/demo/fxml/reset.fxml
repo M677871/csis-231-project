@@ -6,39 +6,49 @@
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.demo.controllers.ResetController"
-            prefWidth="900" prefHeight="560">
+            prefWidth="1000" prefHeight="700">
     <children>
         <StackPane AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
                    styleClass="auth-surface">
             <children>
-                <VBox spacing="18" alignment="CENTER">
+                <VBox spacing="24" alignment="CENTER">
                     <children>
-                        <Label text="Reset your password" styleClass="title-label"/>
-                        <Label text="Enter the code sent to your email and choose a new password" styleClass="subtitle-label"/>
-                        <VBox spacing="16" maxWidth="520" styleClass="form-card">
+                        <VBox alignment="CENTER" spacing="8">
                             <children>
-                                <GridPane hgap="12" vgap="12">
-                                    <columnConstraints>
-                                        <ColumnConstraints percentWidth="40"/>
-                                        <ColumnConstraints percentWidth="60"/>
-                                    </columnConstraints>
+                                <Label text="🔄 Reset Your Password" styleClass="title-label"/>
+                                <Label text="Enter the code from your email and choose a new password" styleClass="subtitle-label"/>
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="20" maxWidth="420" styleClass="form-card">
+                            <children>
+                                <VBox spacing="16">
                                     <children>
-                                        <Label text="Email" styleClass="field-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                                        <TextField fx:id="email" promptText="student@example.com" styleClass="form-field"
-                                                   GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                                        <VBox spacing="8">
+                                            <children>
+                                                <Label text="Email Address" styleClass="field-label"/>
+                                                <TextField fx:id="email" promptText="Enter your email" styleClass="form-field"/>
+                                            </children>
+                                        </VBox>
 
-                                        <Label text="Code" styleClass="field-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                                        <TextField fx:id="code" promptText="6-digit code" styleClass="form-field"
-                                                   GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                                        <VBox spacing="8">
+                                            <children>
+                                                <Label text="Verification Code" styleClass="field-label"/>
+                                                <TextField fx:id="code" promptText="Enter 6-digit code" styleClass="form-field"/>
+                                            </children>
+                                        </VBox>
 
-                                        <Label text="New password" styleClass="field-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                                        <PasswordField fx:id="newPassword" promptText="••••••••" styleClass="password-field"
-                                                       GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                                        <VBox spacing="8">
+                                            <children>
+                                                <Label text="New Password" styleClass="field-label"/>
+                                                <PasswordField fx:id="newPassword" promptText="Enter new password" styleClass="password-field"/>
+                                            </children>
+                                        </VBox>
                                     </children>
-                                </GridPane>
+                                </VBox>
 
-                                <Button text="Change password" onAction="#onReset" styleClass="primary-button" maxWidth="Infinity"/>
-                                <Button text="Back to login" onAction="#goLogin" styleClass="ghost-button" maxWidth="Infinity"/>
+                                <Button text="Change Password →" onAction="#onReset" styleClass="primary-button" maxWidth="Infinity"/>
+                                <Button text="← Back to Login" onAction="#goLogin" styleClass="ghost-button" maxWidth="Infinity"/>
                             </children>
                         </VBox>
                     </children>

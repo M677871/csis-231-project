@@ -6,22 +6,32 @@
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.demo.controllers.ForgotController"
-            prefWidth="900" prefHeight="560">
+            prefWidth="1000" prefHeight="700">
     <children>
         <StackPane AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
                    styleClass="auth-surface">
             <children>
-                <VBox spacing="18" alignment="CENTER">
+                <VBox spacing="24" alignment="CENTER">
                     <children>
-                        <Label text="Forgot password?" styleClass="title-label"/>
-                        <Label text="Enter your email and we’ll send you a reset code" styleClass="subtitle-label"/>
-                        <VBox spacing="16" maxWidth="460" styleClass="form-card">
+                        <VBox alignment="CENTER" spacing="8">
                             <children>
-                                <Label text="Email" styleClass="field-label"/>
-                                <TextField fx:id="emailOrUsername" promptText="hello@example.com" styleClass="form-field"/>
+                                <Label text="🔐 Forgot Password?" styleClass="title-label"/>
+                                <Label text="Enter your email and we'll send you a reset code" styleClass="subtitle-label"/>
+                            </children>
+                        </VBox>
 
-                                <Button text="Send reset code" onAction="#onSend" styleClass="primary-button" maxWidth="Infinity"/>
-                                <Button text="Back to login" onAction="#goLogin" styleClass="ghost-button" maxWidth="Infinity"/>
+                        <VBox spacing="20" maxWidth="420" styleClass="form-card">
+                            <children>
+                                <VBox spacing="8">
+                                    <children>
+                                        <Label text="Email Address" styleClass="field-label"/>
+                                        <TextField fx:id="emailOrUsername" promptText="Enter your email address"
+                                                   styleClass="form-field"/>
+                                    </children>
+                                </VBox>
+
+                                <Button text="Send Reset Code →" onAction="#onSend" styleClass="primary-button" maxWidth="Infinity"/>
+                                <Button text="← Back to Login" onAction="#goLogin" styleClass="ghost-button" maxWidth="Infinity"/>
                             </children>
                         </VBox>
                     </children>
