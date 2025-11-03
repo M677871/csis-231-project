@@ -46,7 +46,7 @@ public class UserController {
         lastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
         phoneColumn.setCellValueFactory(new PropertyValueFactory<>("phone"));
         userRoleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
-        activeColumn.setCellValueFactory(new PropertyValueFactory<>("active")); // Lombok generates getActive() for Boolean isActive
+        activeColumn.setCellValueFactory(new PropertyValueFactory<>("isActive")); // Lombok generates getActive() for Boolean isActive
         twoFaColumn.setCellValueFactory(new PropertyValueFactory<>("twoFactorEnabled"));
         emailVerColumn.setCellValueFactory(new PropertyValueFactory<>("emailVerified"));
 
