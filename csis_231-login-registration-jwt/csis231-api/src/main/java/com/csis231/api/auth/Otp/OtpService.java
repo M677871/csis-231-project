@@ -29,14 +29,25 @@ public class OtpService {
     // Default variant (keeps your existing login OTP flow working)
     @Transactional
     public String createAndSend(User user, String purpose) {
-        return createAndSend(user, purpose, 5, "Your OTP code", null);
+        if (purpose.equals(OtpPurposes.LOGIN_2FA))
+             return createAndSend(user,
+                     purpose,
+                     5,
+                     "Your OTP code for login",
+                     null);
+        return createAndSend(user,
+                purpose,
+                5,
+                "Your OTP code for reset password",
+                null);
+
     }
 
     // New flexible variant used by password reset
     @Transactional
     public String createAndSend(User user, String purpose, int ttlMinutes,
-                                String subject, String body /* optional, can be null */) {
-        // Invalidate active codes for this user/purpose
+                                String subject, String body) {
+
         List<OtpCode> actives = repo.findActiveByUserIdAndPurpose(user.getId(), purpose, Instant.now());
 
         actives.forEach(c -> c.setConsumedAt(Instant.now()));
@@ -59,7 +70,7 @@ public class OtpService {
                 SimpleMailMessage msg = new SimpleMailMessage();
                 msg.setFrom(from);
                 msg.setTo(user.getEmail());
-                msg.setSubject(subject != null ? subject : "Your OTP code");
+                msg.setSubject(subject);
                 msg.setText(body != null ? body : ("Your one-time code is: " + code + " (valid " + ttlMinutes + " minutes)"));
                 mailSender.send(msg);
             }
@@ -97,26 +108,6 @@ public class OtpService {
     }
 
 
-
-    @Transactional
-    public boolean verify(User user, String purpose, String code) {
-        Instant now = Instant.now();
-
-        Optional<OtpCode> latest = repo.findTopByUser_IdAndPurposeOrderByIdDesc(user.getId(), purpose);
-
-        if (latest.isEmpty()) return false;
-
-        OtpCode c = latest.get();
-        boolean ok = c.getConsumedAt() == null
-                && now.isBefore(c.getExpiresAt())
-                && c.getCode().equals(code);
-
-        if (ok) {
-            c.setConsumedAt(now);     // consume it
-        }
-        return ok;
-    }
-
     @Transactional
     public void verifyOtpOrThrow(User user, String purpose, String code) {
         Instant now = Instant.now();
@@ -132,7 +123,6 @@ public class OtpService {
             throw new OtpRequiredException("Invalid email or code");
         }
 
-        // consume the code
         latest.setConsumedAt(now);
         repo.save(latest);
     }
