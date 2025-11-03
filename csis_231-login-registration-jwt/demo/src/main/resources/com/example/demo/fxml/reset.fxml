@@ -24,12 +24,7 @@
                             <children>
                                 <VBox spacing="16">
                                     <children>
-                                        <VBox spacing="8">
-                                            <children>
-                                                <Label text="Email Address" styleClass="field-label"/>
-                                                <TextField fx:id="email" promptText="Enter your email" styleClass="form-field"/>
-                                            </children>
-                                        </VBox>
+
 
                                         <VBox spacing="8">
                                             <children>
