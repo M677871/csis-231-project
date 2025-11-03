@@ -91,8 +91,18 @@ public class AuthService {
 
     /** Forgot password: issue PASSWORD_RESET OTP to the email */
     public void requestPasswordReset(ForgotPasswordRequest req) {
-        User user = userRepository.findByEmail(req.email())
-                .orElseThrow(() -> new BadCredentialsException("Unknown email"));
+        User user;
+        if (req.email().contains("a"))
+        {
+             user = userRepository.findByEmail(req.email())
+                    .orElseThrow(() -> new BadCredentialsException("Unknown email"));
+        }
+        else
+        {
+             user = userRepository.findByUsername(req.email())
+                    .orElseThrow(() -> new BadCredentialsException("Unknown username"));
+        }
+
         otpService.createAndSend(user, OtpPurposes.PASSWORD_RESET);
     }
 
