@@ -7,44 +7,44 @@
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.demo.controllers.OtpController"
             prefWidth="1000" prefHeight="700">
-    <children>
+
         <StackPane AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
                    styleClass="auth-surface">
-            <children>
+
                 <VBox spacing="24" alignment="CENTER">
-                    <children>
+
                         <VBox alignment="CENTER" spacing="8">
-                            <children>
+
                                 <Label text="🔒 Two-Step Verification" styleClass="title-label"/>
                                 <Label text="Enter the 6-digit code we sent to your email" styleClass="subtitle-label"/>
-                            </children>
+
                         </VBox>
 
                         <VBox spacing="20" maxWidth="400" styleClass="form-card">
-                            <children>
+
                                 <VBox spacing="8">
-                                    <children>
+
                                         <Label text="Verification Code" styleClass="field-label"/>
                                         <TextField fx:id="code" promptText="Enter 6-digit code"
                                                    styleClass="form-field"/>
-                                    </children>
+
                                 </VBox>
 
                                 <Button text="Verify Code →" onAction="#onVerify" styleClass="primary-button" maxWidth="Infinity"/>
 
                                 <HBox alignment="CENTER" spacing="8">
-                                    <children>
+
                                         <Label text="Didn't receive the code?" styleClass="subtitle-label"/>
                                         <Hyperlink text="Resend Code" onAction="#onResend" style="-fx-font-weight: 600;"/>
-                                    </children>
+
                                 </HBox>
 
                                 <Button text="← Back to Login" onAction="#goLogin" styleClass="ghost-button" maxWidth="Infinity"/>
-                            </children>
+
                         </VBox>
-                    </children>
+
                 </VBox>
-            </children>
+
         </StackPane>
-    </children>
+
 </AnchorPane>

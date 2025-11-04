@@ -1,54 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.geometry.*?>
+
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.demo.controllers.ResetController"
             prefWidth="1000" prefHeight="700">
-    <children>
+
         <StackPane AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
                    styleClass="auth-surface">
-            <children>
+
                 <VBox spacing="24" alignment="CENTER">
-                    <children>
+
                         <VBox alignment="CENTER" spacing="8">
-                            <children>
+
                                 <Label text="🔄 Reset Your Password" styleClass="title-label"/>
                                 <Label text="Enter the code from your email and choose a new password" styleClass="subtitle-label"/>
-                            </children>
+
                         </VBox>
 
                         <VBox spacing="20" maxWidth="420" styleClass="form-card">
-                            <children>
+
                                 <VBox spacing="16">
-                                    <children>
+
 
 
                                         <VBox spacing="8">
-                                            <children>
+
                                                 <Label text="Verification Code" styleClass="field-label"/>
                                                 <TextField fx:id="code" promptText="Enter 6-digit code" styleClass="form-field"/>
-                                            </children>
+
                                         </VBox>
 
                                         <VBox spacing="8">
-                                            <children>
+
                                                 <Label text="New Password" styleClass="field-label"/>
                                                 <PasswordField fx:id="newPassword" promptText="Enter new password" styleClass="password-field"/>
-                                            </children>
+
                                         </VBox>
-                                    </children>
+
                                 </VBox>
 
                                 <Button text="Change Password →" onAction="#onReset" styleClass="primary-button" maxWidth="Infinity"/>
                                 <Button text="← Back to Login" onAction="#goLogin" styleClass="ghost-button" maxWidth="Infinity"/>
-                            </children>
+
                         </VBox>
-                    </children>
+
                 </VBox>
-            </children>
+
         </StackPane>
-    </children>
+
 </AnchorPane>

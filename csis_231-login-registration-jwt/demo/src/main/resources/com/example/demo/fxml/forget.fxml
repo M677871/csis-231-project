@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.geometry.*?>
+
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.demo.controllers.ForgotController"
             prefWidth="1000" prefHeight="700">
-    <children>
+
         <StackPane AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
                    styleClass="auth-surface">
-            <children>
+
                 <VBox spacing="24" alignment="CENTER">
-                    <children>
+
                         <VBox alignment="CENTER" spacing="8">
-                            <children>
+
                                 <Label text="🔐 Forgot Password?" styleClass="title-label"/>
                                 <Label text="Enter your email or username and we'll send you a reset code" styleClass="subtitle-label"/>
-                            </children>
+
                         </VBox>
 
                         <VBox spacing="20" maxWidth="420" styleClass="form-card">
-                            <children>
+
                                 <VBox spacing="8">
-                                    <children>
+
                                         <Label text="Email Address or Username" styleClass="field-label"/>
                                         <TextField fx:id="emailOrUsername" promptText="Enter your email address or Username"
                                                    styleClass="form-field"/>
-                                    </children>
+
                                 </VBox>
 
                                 <Button text="Send Reset Code →" onAction="#onSend" styleClass="primary-button" maxWidth="Infinity"/>
                                 <Button text="← Back to Login" onAction="#goLogin" styleClass="ghost-button" maxWidth="Infinity"/>
-                            </children>
+
                         </VBox>
-                    </children>
+
                 </VBox>
-            </children>
+
         </StackPane>
-    </children>
+
 </AnchorPane>

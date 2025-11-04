@@ -6,6 +6,12 @@ import com.example.demo.model.User;
 import com.example.demo.security.TokenStore;
 import com.example.demo.util.AlertUtils;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -15,30 +21,41 @@ import java.util.concurrent.CompletableFuture;
 
 public class UserController {
 
-    // table
+    // Table (Users only)
     @FXML private TableView<User> userTable;
-    @FXML private TableColumn<User, Long>   userIdColumn;
-    @FXML private TableColumn<User, String> userNameColumn;
-    @FXML private TableColumn<User, String> userEmailColumn;
-    @FXML private TableColumn<User, String> firstNameColumn;
-    @FXML private TableColumn<User, String> lastNameColumn;
-    @FXML private TableColumn<User, String> phoneColumn;
-    @FXML private TableColumn<User, String> userRoleColumn;
+    @FXML private TableColumn<User, Long>    userIdColumn;
+    @FXML private TableColumn<User, String>  userNameColumn;
+    @FXML private TableColumn<User, String>  userEmailColumn;
+    @FXML private TableColumn<User, String>  firstNameColumn;
+    @FXML private TableColumn<User, String>  lastNameColumn;
+    @FXML private TableColumn<User, String>  phoneColumn;
+    @FXML private TableColumn<User, String>  userRoleColumn;
     @FXML private TableColumn<User, Boolean> activeColumn;
     @FXML private TableColumn<User, Boolean> twoFaColumn;
     @FXML private TableColumn<User, Boolean> emailVerColumn;
 
-    // form
+    // Form
     @FXML private TextField userNameField, userEmailField, firstNameField, lastNameField, phoneField;
     @FXML private PasswordField userPasswordField;
     @FXML private ChoiceBox<String> userRoleChoiceBox;
     @FXML private CheckBox activeCheck, twoFaCheck, emailVerifiedCheck;
 
+    // Toolbar filters
+    @FXML private TextField userSearchField;
+    @FXML private ChoiceBox<String> roleFilter;          // "All Roles", "STUDENT", "INSTRUCTOR", "ADMIN"
+    @FXML private ChoiceBox<String> activeFilterChoice;  // "All", "Active", "Inactive"
+    @FXML private Label userCountLabel;
+
     private final UserApi userApi = new UserApi();
+
+    // Data pipeline (strictly User)
+    private final ObservableList<User> master   = FXCollections.observableArrayList();
+    private final FilteredList<User>   filtered = new FilteredList<>(master, u -> true);
+    private final SortedList<User>     sorted   = new SortedList<>(filtered);
 
     @FXML
     public void initialize() {
-        // columns — match your backend POJO property names exactly
+        // Column value factories
         userIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         userNameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
         userEmailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
@@ -46,13 +63,35 @@ public class UserController {
         lastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
         phoneColumn.setCellValueFactory(new PropertyValueFactory<>("phone"));
         userRoleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
-        activeColumn.setCellValueFactory(new PropertyValueFactory<>("isActive")); // Lombok generates getActive() for Boolean isActive
+        activeColumn.setCellValueFactory(new PropertyValueFactory<>("isActive"));
         twoFaColumn.setCellValueFactory(new PropertyValueFactory<>("twoFactorEnabled"));
         emailVerColumn.setCellValueFactory(new PropertyValueFactory<>("emailVerified"));
 
-        userRoleChoiceBox.getItems().setAll("STUDENT","INSTRUCTOR","ADMIN");
-        userRoleChoiceBox.setValue("STUDENT");
+        // Optional: ✓/✗ render
+        activeColumn.setCellFactory(col -> new TableCell<>() {
+            @Override protected void updateItem(Boolean v, boolean empty) {
+                super.updateItem(v, empty);
+                setText(empty ? null : (Boolean.TRUE.equals(v) ? "✓" : "✗"));
+            }
+        });
+        twoFaColumn.setCellFactory(col -> new TableCell<>() {
+            @Override protected void updateItem(Boolean v, boolean empty) {
+                super.updateItem(v, empty);
+                setText(empty ? null : (Boolean.TRUE.equals(v) ? "✓" : "✗"));
+            }
+        });
+        emailVerColumn.setCellFactory(col -> new TableCell<>() {
+            @Override protected void updateItem(Boolean v, boolean empty) {
+                super.updateItem(v, empty);
+                setText(empty ? null : (Boolean.TRUE.equals(v) ? "✓" : "✗"));
+            }
+        });
 
+        // Sort + show all rows
+        sorted.comparatorProperty().bind(userTable.comparatorProperty());
+        userTable.setItems(sorted);
+
+        // Selection -> form
         userTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, u) -> {
             if (u != null) {
                 userNameField.setText(u.getUsername());
@@ -64,23 +103,84 @@ public class UserController {
                 activeCheck.setSelected(Boolean.TRUE.equals(u.getIsActive()));
                 twoFaCheck.setSelected(Boolean.TRUE.equals(u.getTwoFactorEnabled()));
                 emailVerifiedCheck.setSelected(Boolean.TRUE.equals(u.getEmailVerified()));
-                userPasswordField.clear(); // never show old password
+                userPasswordField.clear();
             }
         });
 
+        // Form role choices
+        userRoleChoiceBox.getItems().setAll("STUDENT","INSTRUCTOR","ADMIN");
+        userRoleChoiceBox.setValue("STUDENT");
+
+        // Toolbar defaults
+        if (roleFilter.getSelectionModel().isEmpty()) {
+            roleFilter.getItems().setAll("All Roles","STUDENT","INSTRUCTOR","ADMIN");
+            roleFilter.getSelectionModel().select("All Roles");
+        }
+        if (activeFilterChoice.getSelectionModel().isEmpty()) {
+            activeFilterChoice.getItems().setAll("All","Active","Inactive");
+            activeFilterChoice.getSelectionModel().select("All");
+        }
+
+        // Live filtering
+        ChangeListener<Object> refilter = (obs, o, n) -> refreshUserFilters();
+        userSearchField.textProperty().addListener(refilter);
+        roleFilter.getSelectionModel().selectedItemProperty().addListener(refilter);
+        activeFilterChoice.getSelectionModel().selectedItemProperty().addListener(refilter);
+
+        // Count updates
+        filtered.addListener((ListChangeListener<User>) c -> updateUserCount());
+
+        // Load data
         loadUsers();
     }
 
     private void loadUsers() {
         CompletableFuture.runAsync(() -> {
             try {
-                List<User> list = userApi.list();
-                Platform.runLater(() -> userTable.getItems().setAll(list));
+                List<User> list = userApi.list(); // USERS ONLY
+                Platform.runLater(() -> {
+                    master.setAll(list);
+                    refreshUserFilters(); // applies defaults and shows all rows
+                    updateUserCount();
+                });
             } catch (Exception ex) {
                 Platform.runLater(() -> AlertUtils.error("Failed to load users: " + ex.getMessage()));
             }
         });
     }
+
+    private void refreshUserFilters() {
+        final String q = safeLower(userSearchField.getText());
+        final String roleSel   = roleFilter.getSelectionModel().getSelectedItem();
+        final String activeSel = activeFilterChoice.getSelectionModel().getSelectedItem();
+
+        filtered.setPredicate(u -> {
+            if (u == null) return false;
+
+            // ✅ Show ALL when search box is empty
+            boolean textOk = q.isEmpty()
+                    || contains(u.getUsername(), q)
+                    || contains(u.getEmail(), q)
+                    || contains(u.getFirstName(), q)
+                    || contains(u.getLastName(), q)
+                    || contains(u.getPhone(), q);
+
+            boolean roleOk = (roleSel == null || "All Roles".equals(roleSel))
+                    || (u.getRole() != null && u.getRole().equalsIgnoreCase(roleSel));
+
+            boolean activeOk = (activeSel == null || "All".equals(activeSel))
+                    || ("Active".equals(activeSel) && Boolean.TRUE.equals(u.getIsActive()))
+                    || ("Inactive".equals(activeSel) && Boolean.FALSE.equals(u.getIsActive()));
+
+            return textOk && roleOk && activeOk;
+        });
+    }
+
+    private void updateUserCount() {
+        userCountLabel.setText(filtered.size() + " items");
+    }
+
+    // ---- CRUD ----
 
     @FXML
     private void onAddUser() {
@@ -107,9 +207,10 @@ public class UserController {
 
                 User created = userApi.create(u);
                 Platform.runLater(() -> {
-                    userTable.getItems().add(created);
+                    master.add(created);
                     clearForm();
-                    AlertUtils.info("User added successfully!");
+                    updateUserCount();
+                    // No need to call refresh; current predicate already shows all when q is empty
                 });
             } catch (Exception ex) {
                 Platform.runLater(() -> AlertUtils.error("Failed to add user: " + ex.getMessage()));
@@ -136,7 +237,7 @@ public class UserController {
                 u.setUsername(username);
                 u.setEmail(email);
                 String pw = userPasswordField.getText();
-                if (pw != null && !pw.isBlank()) u.setPassword(pw); // optional change
+                if (pw != null && !pw.isBlank()) u.setPassword(pw);
 
                 u.setFirstName(trimOrNull(firstNameField.getText()));
                 u.setLastName(trimOrNull(lastNameField.getText()));
@@ -148,10 +249,14 @@ public class UserController {
 
                 User updated = userApi.update(u);
                 Platform.runLater(() -> {
-                    int idx = userTable.getItems().indexOf(selected);
-                    if (idx >= 0) userTable.getItems().set(idx, updated);
+                    for (int i = 0; i < master.size(); i++) {
+                        if (master.get(i).getId().equals(selected.getId())) {
+                            master.set(i, updated);
+                            break;
+                        }
+                    }
                     clearForm();
-                    AlertUtils.info("User updated successfully!");
+                    updateUserCount();
                 });
             } catch (Exception ex) {
                 Platform.runLater(() -> AlertUtils.error("Failed to update user: " + ex.getMessage()));
@@ -167,9 +272,9 @@ public class UserController {
             try {
                 userApi.delete(selected.getId());
                 Platform.runLater(() -> {
-                    userTable.getItems().remove(selected);
+                    master.removeIf(u -> u.getId().equals(selected.getId()));
                     clearForm();
-                    AlertUtils.info("User deleted successfully!");
+                    updateUserCount();
                 });
             } catch (Exception ex) {
                 Platform.runLater(() -> AlertUtils.error("Failed to delete user: " + ex.getMessage()));
@@ -196,6 +301,8 @@ public class UserController {
         s = s.trim();
         return s.isEmpty() ? null : s;
     }
+    private static boolean contains(String s, String q) { return s != null && !q.isEmpty() && s.toLowerCase().contains(q); }
+    private static String safeLower(String s) { return s == null ? "" : s.toLowerCase().trim(); }
 
     @FXML private void backToMain() { Launcher.go("dashboard.fxml", "Dashboard"); }
     @FXML public void onLogout() {
