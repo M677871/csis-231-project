@@ -40,7 +40,7 @@
                                             <ColumnConstraints percentWidth="65"/>
                                         </columnConstraints>
 
-                                            <Label text="Name"  styleClass="field-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                            <Label text="UserName"  styleClass="field-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
                                             <Label fx:id="name" text="" style="-fx-font-weight: 600; -fx-text-fill: #FFFFFF;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
                                             <Label text="Email" styleClass="field-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>

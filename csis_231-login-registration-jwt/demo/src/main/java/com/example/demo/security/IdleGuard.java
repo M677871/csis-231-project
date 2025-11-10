@@ -1,6 +1,7 @@
 package com.example.demo.security;
 
 import com.example.demo.Launcher;
+import com.example.demo.api.ApiClient;
 import com.example.demo.util.AlertUtils;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -22,6 +23,7 @@ public final class IdleGuard {
 
     private static volatile ScheduledFuture<?> task;
     private static volatile long timeoutMillis;
+    private static volatile boolean firing;
 
     public static void attach(Scene scene, Duration idleTimeout) {
         if (scene == null || idleTimeout == null) return;
@@ -44,15 +46,21 @@ public final class IdleGuard {
     }
 
     private static void fireLogout() {
-        try {
-            com.example.demo.api.ApiClient.post("/api/auth/logout", "{}");
-        } catch (Exception ignore) {}
 
-        Platform.runLater(() -> {
-            try { TokenStore.clear(); } catch (Throwable ignored) {}
-            try { AlertUtils.warn("Session expired due to inactivity. Please Login again !"); } catch (Throwable ignored) {}
-            try { Launcher.go("login.fxml", "Login"); } catch (Throwable ignored) {}
-        });
+        if (!TokenStore.hasToken() || firing) return;
+
+        firing = true;
+        try {
+            try { ApiClient.post("/api/auth/logout", "{}"); } catch (Exception ignore) {}
+
+            Platform.runLater(() -> {
+                try { TokenStore.clear(); } catch (Throwable ignored) {}
+                try { AlertUtils.warn("Session expired due to inactivity. Please Login again !"); } catch (Throwable ignored) {}
+                try { Launcher.go("login.fxml", "Login"); } catch (Throwable ignored) {}
+            });
+        } finally {
+            firing = false;
+        }
     }
 
 }

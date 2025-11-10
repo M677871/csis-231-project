@@ -12,7 +12,6 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.Objects;
 
-
 public final class Launcher {
 
     private static Stage stage;
@@ -20,6 +19,8 @@ public final class Launcher {
     private static final String FXML_PREFIX = "/com/example/demo/fxml/";
     private static final String STYLES_PATH = "/com/example/demo/styles.css";
     private static final String ICON_PATH   = "/com/example/demo/icon.png"; // optional
+
+    private static volatile boolean idleAttached; // ensure guard attaches only once
 
     private Launcher() {}
 
@@ -50,19 +51,12 @@ public final class Launcher {
                     scene = new Scene(root);
                     applyGlobalStyles(scene);
                     stage.setScene(scene);
-                   IdleGuard.attach(scene, Duration.ofMinutes(15));
-
-
                 } else {
                     scene.setRoot(root);
-                    IdleGuard.attach(scene, Duration.ofMinutes(15));
                 }
 
-                try {
-                    javafx.scene.Scene s = stage.getScene();
-                    if (s != null) com.example.demo.security.IdleGuard.attach(s, java.time.Duration.ofMinutes(15));
-                } catch (Exception ignored) {}
-
+                // Attach IdleGuard once to the reusable scene
+                attachIdleGuardOnce(stage.getScene());
 
                 if (title != null && !title.isBlank()) {
                     stage.setTitle(title);
@@ -90,6 +84,13 @@ public final class Launcher {
             if (!s.getStylesheets().contains(uri)) {
                 s.getStylesheets().add(uri);
             }
+        }
+    }
+
+    private static synchronized void attachIdleGuardOnce(Scene s) {
+        if (!idleAttached && s != null) {
+            IdleGuard.attach(s, Duration.ofMinutes(15));
+            idleAttached = true;
         }
     }
 }
