@@ -1,7 +1,11 @@
-// LoginRequest.java
+
 package com.csis231.api.auth;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+
+/**
+ * Request body used for username/password authentication.
+ */
 
 @Data
 public class LoginRequest {

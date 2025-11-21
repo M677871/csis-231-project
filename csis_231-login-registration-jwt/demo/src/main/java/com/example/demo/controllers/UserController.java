@@ -67,7 +67,7 @@ public class UserController {
         twoFaColumn.setCellValueFactory(new PropertyValueFactory<>("twoFactorEnabled"));
         emailVerColumn.setCellValueFactory(new PropertyValueFactory<>("emailVerified"));
 
-        // Optional: ✓/✗ render
+
         activeColumn.setCellFactory(col -> new TableCell<>() {
             @Override protected void updateItem(Boolean v, boolean empty) {
                 super.updateItem(v, empty);
@@ -157,7 +157,7 @@ public class UserController {
         filtered.setPredicate(u -> {
             if (u == null) return false;
 
-            // ✅ Show ALL when search box is empty
+
             boolean textOk = q.isEmpty()
                     || contains(u.getUsername(), q)
                     || contains(u.getEmail(), q)

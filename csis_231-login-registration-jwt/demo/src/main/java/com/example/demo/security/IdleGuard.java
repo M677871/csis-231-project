@@ -10,8 +10,28 @@ import java.time.Duration;
 import java.util.concurrent.*;
 import com.example.demo.security.TokenStore;
 
+/**
+ * Global inactivity guard for the desktop client.
+ *
+ * <p>This utility installs listeners on a JavaFX {@link javafx.scene.Scene}
+ * to detect user activity (mouse movement, key presses, etc.) and starts
+ * an inactivity timer. If no interaction happens for the configured timeout,
+ * the user is automatically logged out.</p>
+ *
+ * <p>When the timeout elapses, the guard:</p>
+ * <ul>
+ *   <li>Attempts to call the backend logout endpoint via {@link ApiClient}
+ *       (typically {@code POST /api/auth/logout})</li>
+ *   <li>Clears the stored JWT from {@link TokenStore}</li>
+ *   <li>Shows a warning dialog using {@link AlertUtils} indicating that the
+ *       session has expired due to inactivity</li>
+ *   <li>Navigates back to the login screen using {@link Launcher}</li>
+ * </ul>
+ *
+ * <p>The class is {@code final} and has a private constructor because it is
+ * used purely as a static utility.</p>
+ */
 
-/** Forces logout after NO user interaction for a given timeout. */
 public final class IdleGuard {
     private IdleGuard() {}
 

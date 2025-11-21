@@ -1,24 +1,87 @@
 package com.csis231.api.category;
-import com.csis231.api.category.Category;
-import com.csis231.api.category.CategoryService;
+
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+/**
+ * REST controller exposing CRUD endpoints for {@link Category} entities.
+ *
+ * <p>Base path: {@code /api/categories}</p>
+ */
+
 @RestController
 @RequestMapping("/api/categories")
-public class CategoryController {
+public class CategoryController
+{
     private final CategoryService svc;
-    public CategoryController(CategoryService svc) { this.svc = svc; }
 
-    @GetMapping public List<Category> list() { return svc.list(); }
+    /**
+     * Creates a new {@code CategoryController} with the given service.
+     *
+     * @param svc the {@link CategoryService} to delegate to
+     */
 
-    @GetMapping("/{id}") public Category get(@PathVariable Long id) { return svc.get(id); }
+    public CategoryController(CategoryService svc)
+    {
+        this.svc = svc;
+    }
 
-    @PostMapping public Category create(@RequestBody Category category) { return svc.create(category); }
+    /**
+     * Lists all categories.
+     *
+     * @return list of all {@link Category} entities
+     */
 
-    @PutMapping("/{id}") public Category update(@PathVariable Long id, @RequestBody Category category) {
+    @GetMapping public List<Category> list()
+    {
+        return svc.list();
+    }
+
+    /**
+     * Retrieves a single category by its identifier.
+     *
+     * @param id the ID of the category
+     * @return the matching {@link Category}
+     */
+
+    @GetMapping("/{id}") public Category get(@PathVariable Long id)
+    {
+        return svc.get(id);
+    }
+
+    /**
+     * Creates a new category.
+     *
+     * @param category the category to create
+     * @return the persisted {@link Category}
+     */
+
+    @PostMapping public Category create(@RequestBody Category category)
+    {
+        return svc.create(category);
+    }
+
+    /**
+     * Updates an existing category.
+     *
+     * @param id       the ID of the category to update
+     * @param category an object containing the new name
+     * @return the updated {@link Category}
+     */
+
+    @PutMapping("/{id}") public Category update(@PathVariable Long id, @RequestBody Category category)
+    {
         return svc.update(id, category);
     }
 
-    @DeleteMapping("/{id}") public void delete(@PathVariable Long id) { svc.delete(id); }
+    /**
+     * Deletes a category by its identifier.
+     *
+     * @param id the ID of the category to delete
+     */
+
+    @DeleteMapping("/{id}") public void delete(@PathVariable Long id)
+    {
+        svc.delete(id);
+    }
 }

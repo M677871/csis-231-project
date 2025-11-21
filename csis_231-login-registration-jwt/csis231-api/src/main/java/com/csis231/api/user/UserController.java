@@ -62,7 +62,18 @@ public class UserController {
         return removed ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();
     }
-    // in UserController (or AuthController)
+
+    /**
+     * Returns profile information about the currently authenticated user.
+     *
+     * <p>The username is taken from the {@link Authentication} object and the
+     * corresponding {@link User} is mapped to a {@link com.csis231.api.user.MeResponse}
+     * DTO that is safe to expose to the frontend.</p>
+     *
+     * @param authentication the Spring Security authentication of the current request
+     * @return a {@link com.csis231.api.user.MeResponse} containing basic user data
+     */
+
     @GetMapping("/me")
     public com.csis231.api.user.MeResponse me(Authentication authentication) {
         String username = authentication.getName();

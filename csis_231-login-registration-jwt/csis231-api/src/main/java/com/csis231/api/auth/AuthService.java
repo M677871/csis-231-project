@@ -3,6 +3,7 @@ package com.csis231.api.auth;
 import com.csis231.api.auth.Otp.OtpPurposes;
 import com.csis231.api.auth.Otp.OtpRequiredException;
 import com.csis231.api.auth.Otp.OtpService;
+import com.csis231.api.auth.Otp.OtpVerifyRequest;
 import com.csis231.api.user.User;
 import com.csis231.api.user.UserRepository;
 import jakarta.transaction.Transactional;
@@ -14,6 +15,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+/**
+ * Application service that implements the core authentication and
+ * password recovery logic for the online learning platform.
+ *
+ * <p>It delegates credential checking to Spring Security's
+ * {@link AuthenticationManager}, handles OTP-based two-factor login
+ * via {@link com.csis231.api.auth.Otp.OtpService} and issues JWTs via
+ * {@link JwtUtil}.</p>
+ */
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -24,6 +35,23 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final OtpService otpService;
 
+    /**
+     * Authenticates a user with username and password and optionally
+     * triggers an OTP-based second factor.
+     *
+     * <p>If login requires an OTP, a {@code LOGIN_2FA} OTP is created
+     * and sent, and an {@link com.csis231.api.auth.Otp.OtpRequiredException}
+     * is thrown instead of returning a token. Otherwise an
+     * {@link AuthResponse} containing a JWT is returned.</p>
+     *
+     * @param req the login request with username and password
+     * @return an {@link AuthResponse} containing a JWT and basic user data
+     *         when OTP is not required
+     * @throws BadCredentialsException if the username/password combination is invalid
+     * @throws com.csis231.api.auth.Otp.OtpRequiredException
+     *         if login requires OTP verification
+     */
+
     public AuthResponse login(LoginRequest req) {
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword())
@@ -32,7 +60,6 @@ public class AuthService {
             throw new BadCredentialsException("Invalid username or password");
         }
 
-        // fetch by username first, then email (your frontend sends either)
         User user = userRepository.findByUsername(req.getUsername())
                 .orElseGet(() -> userRepository.findByEmail(req.getUsername())
                         .orElseThrow(() -> new BadCredentialsException("Invalid username or password")));
@@ -58,8 +85,16 @@ public class AuthService {
         );
     }
 
-    /** Verify login OTP → returns AuthResponse with JWT */
-    public AuthResponse verifyOtp(com.csis231.api.auth.Otp.OtpVerifyRequest req) {
+    /**
+     * Verifies a LOGIN_2FA OTP code and issues a JWT on success.
+     *
+     * @param req the OTP verification request containing username or e-mail
+     *            and the OTP code
+     * @return an {@link AuthResponse} containing the JWT and user data
+     * @throws BadCredentialsException if the username/e-mail or code are invalid
+     */
+
+    public AuthResponse verifyOtp(OtpVerifyRequest req) {
         String id = req.getUsername();
         String code = req.getCode();
 
@@ -81,7 +116,15 @@ public class AuthService {
         );
     }
 
-    /** Resend login OTP */
+    /**
+     * Resends a login OTP for the given username or e-mail.
+     *
+     * <p>If the identifier is blank or does not resolve to any user,
+     * this method returns silently.</p>
+     *
+     * @param username the username or e-mail identifying the user
+     */
+
     public void resendOtp(String username) {
         if (username == null || username.isBlank()) return;
         userRepository.findByUsername(username)
@@ -89,7 +132,14 @@ public class AuthService {
                 .ifPresent(u -> otpService.createAndSend(u, OtpPurposes.LOGIN_2FA));
     }
 
-    /** Forgot password: issue PASSWORD_RESET OTP to the email */
+    /**
+     * Starts a password-reset flow by issuing a PASSWORD_RESET OTP.
+     *
+     * @param req request carrying the e-mail (or username, according to the
+     *            implemented logic)
+     * @throws BadCredentialsException if no matching user is found
+     */
+
     public void requestPasswordReset(ForgotPasswordRequest req) {
         User user;
         if (req.email().contains("a"))
@@ -106,20 +156,20 @@ public class AuthService {
         otpService.createAndSend(user, OtpPurposes.PASSWORD_RESET);
     }
 
-    /** Reset password after verifying PASSWORD_RESET OTP */
+    /**
+     * Resets the user's password after successful PASSWORD_RESET OTP
+     * verification.
+     *
+     * @param req request containing the user's e-mail, the OTP code and
+     *            the new password
+     * @throws BadCredentialsException if the e-mail is unknown or the OTP is invalid
+     */
+
     @Transactional
     public void resetPassword(ResetPasswordRequest req) {
         User user = userRepository.findByEmail(req.email())
                 .orElseThrow(() -> new BadCredentialsException("Unknown email"));
         otpService.verifyOtpOrThrow(user, OtpPurposes.PASSWORD_RESET, req.code());
         user.setPassword(passwordEncoder.encode(req.newPassword()));
-    }
-
-    public boolean validateToken(String token) {
-        return jwtUtil.validateToken(token);
-    }
-
-    public String generateTokenFor(String username) {
-        return jwtUtil.generateToken(username);
     }
 }

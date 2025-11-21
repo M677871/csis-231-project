@@ -97,6 +97,13 @@ public class UserService {
         return true;
     }
 
+    /**
+     * Looks up a user by username.
+     *
+     * @param username the username to search for
+     * @return an {@link Optional} containing the user if found, or empty otherwise
+     */
+
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }

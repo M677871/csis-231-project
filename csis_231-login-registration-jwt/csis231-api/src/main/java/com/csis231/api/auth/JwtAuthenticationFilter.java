@@ -14,6 +14,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/**
+ * Servlet filter that extracts a JWT from the {@code Authorization} header
+ * and, if valid, populates the Spring Security {@link SecurityContextHolder}.
+ *
+ * <p>The filter runs once per request and is typically registered in the
+ * Spring Security filter chain before authentication-dependent endpoints.</p>
+ */
+
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -22,6 +30,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    /**
+     * Extracts the JWT from the request, validates it and sets the
+     * {@link org.springframework.security.core.Authentication} in the
+     * security context if the token is valid.
+     *
+     * @param request     the HTTP request
+     * @param response    the HTTP response
+     * @param filterChain the filter chain to continue processing
+     * @throws ServletException in case of general servlet errors
+     * @throws IOException      in case of I/O errors
+     */
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, 

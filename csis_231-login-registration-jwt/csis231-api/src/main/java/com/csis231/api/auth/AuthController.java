@@ -17,6 +17,14 @@ import jakarta.servlet.http.Cookie;
 
 import java.util.Map;
 
+/**
+ * REST controller exposing authentication-related endpoints for the
+ * online learning platform.
+ *
+ * <p>Provides operations for login (with optional OTP-based 2FA),
+ * user registration and password reset via e-mail OTP codes.</p>
+ */
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -27,6 +35,22 @@ public class AuthController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Authenticates a user using username and password.
+     *
+     * <p>If the account requires OTP for login, this method triggers
+     * a {@code LOGIN_2FA} OTP and the controller returns an HTTP
+     * {@code 202 Accepted} response with {@code otpRequired=true} instead
+     * of a token. Otherwise it returns a normal {@link AuthResponse}
+     * containing a JWT.</p>
+     *
+     * @param request the login request containing username and password
+     * @return {@code 200 OK} with {@link AuthResponse} when login succeeds
+     *         without OTP; {@code 202 Accepted} with an OTP payload when
+     *         OTP is required; {@code 401 Unauthorized} on invalid
+     *         credentials; {@code 500 Internal Server Error} on unexpected
+     *         errors
+     */
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
@@ -50,6 +74,20 @@ public class AuthController {
                     .body(Map.of("message", "Something went wrong"));
         }
     }
+
+    /**
+     * Registers a new user account in the online learning platform.
+     *
+     * <p>The method enforces uniqueness of username and e-mail, encodes
+     * the password and persists a new {@link User} entity.</p>
+     *
+     * @param req the registration data (username, e-mail, password and
+     *            optional profile fields)
+     * @return {@code 200 OK} when registration succeeds;
+     *         {@code 409 Conflict} if username or e-mail already exist;
+     *         {@code 400 Bad Request} or {@code 500 Internal Server Error}
+     *         when registration fails for another reason
+     */
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest req) {
@@ -79,6 +117,18 @@ public class AuthController {
         }
     }
 
+    /**
+     * Initiates the "forgot password" flow by issuing a PASSWORD_RESET OTP.
+     *
+     * <p>An e-mail containing a {@code PASSWORD_RESET} OTP is sent to
+     * the supplied address if it belongs to a known user.</p>
+     *
+     * @param req request body containing the user's e-mail address
+     * @return {@code 200 OK} if the reset OTP has been sent;
+     *         {@code 401 Unauthorized} if the e-mail is unknown;
+     *         {@code 400 Bad Request} if the reset request cannot be processed
+     */
+
     @PostMapping("/password/forgot")
     public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest req) {
         try {
@@ -94,8 +144,20 @@ public class AuthController {
         }
     }
 
+    /**
+     * Completes the password reset flow by verifying the OTP and updating
+     * the stored password.
+     *
+     * @param req request body containing e-mail, reset OTP code and the
+     *            new password
+     * @return {@code 200 OK} when the password is successfully updated;
+     *         {@code 401 Unauthorized} if e-mail or code are invalid;
+     *         {@code 400 Bad Request} if the password cannot be reset
+     */
+
     @PostMapping("/password/reset")
-    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest req) {
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest req)
+    {
         try {
             authService.resetPassword(req);
             return ResponseEntity.ok(Map.of("message", "Password updated"));
@@ -108,5 +170,4 @@ public class AuthController {
                     .body(Map.of("message", "Could not reset password"));
         }
     }
-
 }

@@ -14,6 +14,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Domain service responsible for generating, storing and validating
+ * one-time passwords (OTP) for different authentication flows in the
+ * online learning platform.
+ *
+ * <p>This service coordinates the persistence of {@link OtpCode} entities
+ * and the delivery of codes via mail, and encapsulates all rules related to
+ * OTP creation, expiration, reuse and invalidation.</p>
+ */
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -80,31 +90,6 @@ public class OtpService {
 
         log.info("OTP for user={} purpose={} CODE={}", user.getUsername(), purpose, code);
         return code;
-    }
-
-
-    @Transactional
-    public void sendPasswordResetOtp(User user) {
-        int ttlMinutes = 10;
-        String code = createAndSend(user, OtpPurposes.PASSWORD_RESET, ttlMinutes,
-                "Password Reset Code",
-                null );
-
-
-        try {
-            if (from != null && !from.isBlank() && user.getEmail() != null) {
-                SimpleMailMessage msg = new SimpleMailMessage();
-                msg.setFrom(from);
-                msg.setTo(user.getEmail());
-                msg.setSubject("Password Reset Code");
-                msg.setText("Use this code to reset your password (valid " + ttlMinutes + " minutes): " + code);
-                mailSender.send(msg);
-            }
-        } catch (Exception ex) {
-            log.warn("Could not send password reset email to {} (will still allow reset with code): {}", user.getEmail(), ex.toString());
-        }
-
-        log.info("Password reset OTP for user={} CODE={}", user.getUsername(), code);
     }
 
 
