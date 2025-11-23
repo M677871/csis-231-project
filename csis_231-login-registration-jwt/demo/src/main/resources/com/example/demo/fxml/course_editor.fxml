@@ -39,8 +39,8 @@
                                 <Label text="Title" styleClass="field-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
                                 <TextField fx:id="titleField" promptText="Course title" styleClass="rounded-text-field" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                                <Label text="Category ID" styleClass="field-label" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
-                                <TextField fx:id="categoryField" promptText="e.g. 1" styleClass="rounded-text-field" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+                                <Label text="Category" styleClass="field-label" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                                <ComboBox fx:id="categoryChoiceBox" promptText="Choose category" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
 
                                 <Label text="Description" styleClass="field-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                                 <TextArea fx:id="descriptionArea" promptText="Description" prefRowCount="3" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="3"/>

@@ -27,7 +27,7 @@ import java.util.concurrent.CompletableFuture;
 public class CourseEditorController {
     @FXML private TextField titleField;
     @FXML private TextArea descriptionArea;
-    @FXML private TextField categoryField;
+    @FXML private ComboBox<com.example.demo.model.Category> categoryChoiceBox;
     @FXML private CheckBox publishedCheck;
     @FXML private Label courseIdLabel;
     @FXML private Button saveButton;
@@ -51,6 +51,7 @@ public class CourseEditorController {
     private final CourseApi courseApi = new CourseApi();
     private final QuizApi quizApi = new QuizApi();
     private final AuthApi authApi = new AuthApi();
+    private final com.example.demo.admin.CategoryApi categoryApi = new com.example.demo.admin.CategoryApi();
     private CourseDto activeCourse;
     private CourseDetailDto activeDetail;
     private final ObservableList<CourseMaterialDto> materials = FXCollections.observableArrayList();
@@ -82,6 +83,7 @@ public class CourseEditorController {
         quizTable.setItems(quizzes);
 
         loadCourse();
+        loadCategories();
     }
 
     private void loadCourse() {
@@ -109,7 +111,7 @@ public class CourseEditorController {
         courseIdLabel.setText("New course");
         titleField.clear();
         descriptionArea.clear();
-        categoryField.clear();
+        categoryChoiceBox.getSelectionModel().clearSelection();
         publishedCheck.setSelected(true);
         materials.clear();
         quizzes.clear();
@@ -120,7 +122,14 @@ public class CourseEditorController {
         courseIdLabel.setText("Course #" + detail.getId());
         titleField.setText(detail.getTitle());
         descriptionArea.setText(detail.getDescription());
-        categoryField.setText(detail.getCategoryId() != null ? detail.getCategoryId().toString() : "");
+        if (detail.getCategoryId() != null) {
+            categoryChoiceBox.getItems().stream()
+                    .filter(c -> detail.getCategoryId().equals(c.getId()))
+                    .findFirst()
+                    .ifPresent(c -> categoryChoiceBox.getSelectionModel().select(c));
+        } else {
+            categoryChoiceBox.getSelectionModel().clearSelection();
+        }
         publishedCheck.setSelected(Boolean.TRUE.equals(detail.getPublished()));
         materials.setAll(detail.getMaterials() != null ? detail.getMaterials() : List.of());
         quizzes.setAll(detail.getQuizzes() != null ? detail.getQuizzes() : List.of());
@@ -131,10 +140,9 @@ public class CourseEditorController {
         String title = trim(titleField.getText());
         if (title.isEmpty()) { AlertUtils.warn("Title is required."); return; }
         Long categoryId = null;
-        if (categoryField.getText() != null && !categoryField.getText().isBlank()) {
-            try { categoryId = Long.parseLong(categoryField.getText().trim()); } catch (NumberFormatException e) {
-                AlertUtils.warn("Category ID must be numeric."); return;
-            }
+        var selectedCategory = categoryChoiceBox.getSelectionModel().getSelectedItem();
+        if (selectedCategory != null) {
+            categoryId = selectedCategory.getId();
         }
         CourseRequest req = new CourseRequest(
                 title,
@@ -318,6 +326,32 @@ public class CourseEditorController {
             );
         });
         return dialog;
+    }
+
+    private void loadCategories() {
+        CompletableFuture.runAsync(() -> {
+            try {
+                var page = categoryApi.list(0, 100);
+                var items = page != null && page.getContent() != null ? page.getContent() : List.<com.example.demo.model.Category>of();
+                Platform.runLater(() -> {
+                    categoryChoiceBox.getItems().setAll(items);
+                    categoryChoiceBox.setCellFactory(listView -> new ListCell<>() {
+                        @Override protected void updateItem(com.example.demo.model.Category item, boolean empty) {
+                            super.updateItem(item, empty);
+                            setText(empty || item == null ? null : item.getName() + " (ID " + item.getId() + ")");
+                        }
+                    });
+                    categoryChoiceBox.setButtonCell(new ListCell<>() {
+                        @Override protected void updateItem(com.example.demo.model.Category item, boolean empty) {
+                            super.updateItem(item, empty);
+                            setText(empty || item == null ? null : item.getName());
+                        }
+                    });
+                });
+            } catch (Exception ex) {
+                Platform.runLater(() -> ErrorDialog.showError("Failed to load categories: " + ex.getMessage()));
+            }
+        });
     }
 
     private void onViewResults(QuizSummaryDto quiz) {

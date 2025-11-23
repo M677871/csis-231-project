@@ -85,6 +85,8 @@ public class DashboardController {
  */
 
     @FXML private void openCategories() { Launcher.go("category.fxml", "Categories"); }
+    @FXML private void openCourses()    { Launcher.go("course_catalog.fxml", "Courses"); }
+    @FXML private void openEnrollments(){ Launcher.go("admin_enrollments.fxml", "Enrollments"); }
 
     /**
      * Logs the user out by clearing the stored JWT and returning to the login screen.

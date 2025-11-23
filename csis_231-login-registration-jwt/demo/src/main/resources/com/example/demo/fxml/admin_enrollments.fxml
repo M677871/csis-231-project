@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.demo.admin.AdminEnrollmentsController"
+            prefWidth="1200" prefHeight="780"
+            styleClass="glass-pane">
+    <top>
+        <HBox spacing="16" alignment="CENTER_LEFT" styleClass="topbar">
+            <children>
+                <Button text="← Back" onAction="#backToDashboard" styleClass="ghost-button"/>
+                <Label text="Student Enrollments" style="-fx-font-size: 22px; -fx-font-weight: 900; -fx-text-fill: #FFFFFF;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Logout" onAction="#onLogout" styleClass="ghost-button"/>
+            </children>
+            <padding><Insets top="16" bottom="16" left="24" right="24"/></padding>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox spacing="16" style="-fx-padding: 24;">
+            <children>
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <Label text="Student ID" styleClass="field-label"/>
+                    <TextField fx:id="studentIdField" promptText="Enter student ID" styleClass="rounded-text-field" prefWidth="200"/>
+                    <Button text="Load" fx:id="loadButton" onAction="#onLoad" styleClass="primary-button"/>
+                    <Label fx:id="statusLabel" text="" styleClass="muted"/>
+                </HBox>
+
+                <TableView fx:id="enrollmentTable" prefHeight="640">
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                    </columnResizePolicy>
+                    <columns>
+                        <TableColumn fx:id="courseIdColumn" text="Course ID" prefWidth="120"/>
+                        <TableColumn fx:id="courseTitleColumn" text="Course Title" prefWidth="320"/>
+                        <TableColumn fx:id="statusColumn" text="Status" prefWidth="120"/>
+                        <TableColumn fx:id="enrolledAtColumn" text="Enrolled At" prefWidth="220"/>
+                    </columns>
+                    <placeholder><Label text="No enrollments"/></placeholder>
+                </TableView>
+            </children>
+        </VBox>
+    </center>
+</BorderPane>
