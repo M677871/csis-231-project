@@ -5,7 +5,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.demo.controllers.DashboardController"
+            fx:controller="com.example.demo.admin.DashboardController"
             prefWidth="1280" prefHeight="800"
             styleClass="glass-pane">
     <top>

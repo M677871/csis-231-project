@@ -15,7 +15,11 @@ module com.example.demo {
     requires jdk.jfr;
 
 
-    opens com.example.demo.controllers to javafx.fxml;
+    opens com.example.demo.auth to javafx.fxml;
+    opens com.example.demo.admin to javafx.fxml;
+    opens com.example.demo.instructor to javafx.fxml;
+    opens com.example.demo.student to javafx.fxml;
+    opens com.example.demo.common to javafx.fxml;
     opens com.example.demo.model to com.fasterxml.jackson.databind, javafx.base;
 
     exports com.example.demo;

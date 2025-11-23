@@ -1,7 +1,9 @@
 package com.csis231.api.category;
 
+import com.csis231.api.common.BadRequestException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 /**
  * REST controller exposing CRUD endpoints for {@link Category} entities.
@@ -32,9 +34,13 @@ public class CategoryController
      * @return list of all {@link Category} entities
      */
 
-    @GetMapping public List<Category> list()
+    @GetMapping public Page<Category> list(@RequestParam(defaultValue = "0") int page,
+                                           @RequestParam(defaultValue = "10") int size)
     {
-        return svc.list();
+        if (size <= 0) {
+            throw new BadRequestException("Size must be greater than zero");
+        }
+        return svc.list(PageRequest.of(Math.max(0, page), size));
     }
 
     /**

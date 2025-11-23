@@ -1,6 +1,6 @@
 package com.example.demo;
 
-import com.example.demo.security.IdleGuard;
+import com.example.demo.common.IdleGuard;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

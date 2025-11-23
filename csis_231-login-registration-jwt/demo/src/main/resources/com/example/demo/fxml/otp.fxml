@@ -5,7 +5,7 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.demo.controllers.OtpController"
+            fx:controller="com.example.demo.auth.OtpController"
             prefWidth="1000" prefHeight="700">
 
         <StackPane AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"

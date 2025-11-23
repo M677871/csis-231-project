@@ -1,14 +1,14 @@
-
 package com.csis231.api.user;
 
+import com.csis231.api.common.BadRequestException;
+import com.csis231.api.common.ResourceNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-        import java.util.List;
-import java.util.Optional;
 
 /**
  * REST controller exposing CRUD endpoints for {@link User} entities.
@@ -27,16 +27,19 @@ public class UserController {
 
     /** Lists all users. */
     @GetMapping
-    public List<User> list() {
-        return userService.getAllUsers();
+    public Page<User> list(@RequestParam(defaultValue = "0") int page,
+                           @RequestParam(defaultValue = "10") int size) {
+        if (size <= 0) {
+            throw new BadRequestException("Size must be greater than zero");
+        }
+        return userService.getUsers(PageRequest.of(Math.max(0, page), size));
     }
 
     /** Retrieves a user by ID. */
     @GetMapping("/{id}")
-    public ResponseEntity<User> get(@PathVariable Long id) {
-        Optional<User> user = userService.getUser(id);
-        return user.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public User get(@PathVariable Long id) {
+        return userService.getUser(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
     }
 
     /** Creates a new user. Expects a complete User in the body. */
@@ -48,19 +51,17 @@ public class UserController {
 
     /** Updates an existing user. Only non-null fields will be updated. */
     @PutMapping("/{id}")
-    public ResponseEntity<User> update(@PathVariable Long id,
+    public User update(@PathVariable Long id,
                                        @Valid @RequestBody User user) {
-        Optional<User> updated = userService.updateUser(id, user);
-        return updated.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        return userService.updateUser(id, user)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
     }
 
     /** Deletes a user by ID. Returns 204 on success or 404 if not found. */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        boolean removed = userService.deleteUser(id);
-        return removed ? ResponseEntity.noContent().build()
-                : ResponseEntity.notFound().build();
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -78,7 +79,7 @@ public class UserController {
     public com.csis231.api.user.MeResponse me(Authentication authentication) {
         String username = authentication.getName();
         User u = userService.findByUsername(username)
-                .orElseThrow(() -> new IllegalStateException("Authenticated user not found: " + username));
+                .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found: " + username));
 
         return new com.csis231.api.user.MeResponse(
                 u.getId(),

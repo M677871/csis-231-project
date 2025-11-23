@@ -7,7 +7,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.demo.controllers.CategoryController"
+            fx:controller="com.example.demo.admin.CategoryController"
             prefWidth="1280" prefHeight="800"
             styleClass="glass-pane">
 

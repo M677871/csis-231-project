@@ -1,6 +1,11 @@
 package com.csis231.api.user;
 
+import com.csis231.api.common.BadRequestException;
+import com.csis231.api.common.ConflictException;
+import com.csis231.api.common.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,11 +28,19 @@ public class UserService {
     }
 
     /** Returns all users. */
+    @Transactional(readOnly = true)
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
+    /** Returns a paginated list of users. */
+    @Transactional(readOnly = true)
+    public Page<User> getUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
+    }
+
     /** Retrieves a user by ID. */
+    @Transactional(readOnly = true)
     public Optional<User> getUser(Long id) {
         return userRepository.findById(id);
     }
@@ -39,11 +52,16 @@ public class UserService {
      */
     @Transactional
     public User createUser(User user) {
+        if (user == null || user.getUsername() == null || user.getUsername().isBlank()
+                || user.getEmail() == null || user.getEmail().isBlank()
+                || user.getPassword() == null || user.getPassword().isBlank()) {
+            throw new BadRequestException("Username, email and password are required");
+        }
         if (userRepository.existsByUsername(user.getUsername())) {
-            throw new IllegalArgumentException("Username already in use");
+            throw new ConflictException("Username already in use");
         }
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new IllegalArgumentException("Email already in use");
+            throw new ConflictException("Email already in use");
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
@@ -56,18 +74,21 @@ public class UserService {
      */
     @Transactional
     public Optional<User> updateUser(Long id, User updated) {
+        if (updated == null) {
+            throw new BadRequestException("User payload is required");
+        }
         return userRepository.findById(id).map(existing -> {
             // username change
             if (updated.getUsername() != null && !updated.getUsername().equals(existing.getUsername())) {
                 if (userRepository.existsByUsername(updated.getUsername())) {
-                    throw new IllegalArgumentException("Username already in use");
+                    throw new ConflictException("Username already in use");
                 }
                 existing.setUsername(updated.getUsername());
             }
             // email change
             if (updated.getEmail() != null && !updated.getEmail().equals(existing.getEmail())) {
                 if (userRepository.existsByEmail(updated.getEmail())) {
-                    throw new IllegalArgumentException("Email already in use");
+                    throw new ConflictException("Email already in use");
                 }
                 existing.setEmail(updated.getEmail());
             }
@@ -91,7 +112,7 @@ public class UserService {
     @Transactional
     public boolean deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
-            return false;
+            throw new ResourceNotFoundException("User not found: " + id);
         }
         userRepository.deleteById(id);
         return true;
@@ -104,6 +125,7 @@ public class UserService {
      * @return an {@link Optional} containing the user if found, or empty otherwise
      */
 
+    @Transactional(readOnly = true)
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }

@@ -1,12 +1,14 @@
 package com.csis231.api.auth;
 
-import com.csis231.api.auth.Otp.OtpPurposes;
-import com.csis231.api.auth.Otp.OtpRequiredException;
-import com.csis231.api.auth.Otp.OtpService;
-import com.csis231.api.auth.Otp.OtpVerifyRequest;
+import com.csis231.api.common.BadRequestException;
+import com.csis231.api.common.UnauthorizedException;
+import com.csis231.api.jwt.JwtUtil;
+import com.csis231.api.otp.OtpPurposes;
+import com.csis231.api.otp.OtpRequiredException;
+import com.csis231.api.otp.OtpService;
+import com.csis231.api.otp.OtpVerifyRequest;
 import com.csis231.api.user.User;
 import com.csis231.api.user.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -14,6 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Application service that implements the core authentication and
@@ -21,7 +24,7 @@ import org.springframework.stereotype.Service;
  *
  * <p>It delegates credential checking to Spring Security's
  * {@link AuthenticationManager}, handles OTP-based two-factor login
- * via {@link com.csis231.api.auth.Otp.OtpService} and issues JWTs via
+ * via {@link com.csis231.api.otp.OtpService} and issues JWTs via
  * {@link JwtUtil}.</p>
  */
 
@@ -40,7 +43,7 @@ public class AuthService {
      * triggers an OTP-based second factor.
      *
      * <p>If login requires an OTP, a {@code LOGIN_2FA} OTP is created
-     * and sent, and an {@link com.csis231.api.auth.Otp.OtpRequiredException}
+     * and sent, and an {@link com.csis231.api.otp.OtpRequiredException}
      * is thrown instead of returning a token. Otherwise an
      * {@link AuthResponse} containing a JWT is returned.</p>
      *
@@ -48,11 +51,16 @@ public class AuthService {
      * @return an {@link AuthResponse} containing a JWT and basic user data
      *         when OTP is not required
      * @throws BadCredentialsException if the username/password combination is invalid
-     * @throws com.csis231.api.auth.Otp.OtpRequiredException
+     * @throws com.csis231.api.otp.OtpRequiredException
      *         if login requires OTP verification
      */
 
     public AuthResponse login(LoginRequest req) {
+        if (req == null || req.getUsername() == null || req.getUsername().isBlank()
+                || req.getPassword() == null || req.getPassword().isBlank()) {
+            throw new BadRequestException("Username and password are required");
+        }
+
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword())
         );
@@ -95,6 +103,11 @@ public class AuthService {
      */
 
     public AuthResponse verifyOtp(OtpVerifyRequest req) {
+        if (req == null || req.getUsername() == null || req.getUsername().isBlank()
+                || req.getCode() == null || req.getCode().isBlank()) {
+            throw new BadRequestException("Username and OTP code are required");
+        }
+
         String id = req.getUsername();
         String code = req.getCode();
 
@@ -126,7 +139,9 @@ public class AuthService {
      */
 
     public void resendOtp(String username) {
-        if (username == null || username.isBlank()) return;
+        if (username == null || username.isBlank()) {
+            throw new BadRequestException("Username is required to resend OTP");
+        }
         userRepository.findByUsername(username)
                 .or(() -> userRepository.findByEmail(username))
                 .ifPresent(u -> otpService.createAndSend(u, OtpPurposes.LOGIN_2FA));
@@ -141,17 +156,13 @@ public class AuthService {
      */
 
     public void requestPasswordReset(ForgotPasswordRequest req) {
-        User user;
-        if (req.email().contains("a"))
-        {
-             user = userRepository.findByEmail(req.email())
-                    .orElseThrow(() -> new BadCredentialsException("Unknown email"));
+        if (req == null || req.email() == null || req.email().isBlank()) {
+            throw new BadRequestException("Email is required");
         }
-        else
-        {
-             user = userRepository.findByUsername(req.email())
-                    .orElseThrow(() -> new BadCredentialsException("Unknown username"));
-        }
+
+        User user = userRepository.findByEmail(req.email())
+                .or(() -> userRepository.findByUsername(req.email()))
+                .orElseThrow(() -> new UnauthorizedException("Unknown user"));
 
         otpService.createAndSend(user, OtpPurposes.PASSWORD_RESET);
     }
@@ -167,8 +178,13 @@ public class AuthService {
 
     @Transactional
     public void resetPassword(ResetPasswordRequest req) {
+        if (req == null || req.email() == null || req.email().isBlank()
+                || req.code() == null || req.code().isBlank()
+                || req.newPassword() == null || req.newPassword().isBlank()) {
+            throw new BadRequestException("Email, OTP code and new password are required");
+        }
         User user = userRepository.findByEmail(req.email())
-                .orElseThrow(() -> new BadCredentialsException("Unknown email"));
+                .orElseThrow(() -> new UnauthorizedException("Unknown email"));
         otpService.verifyOtpOrThrow(user, OtpPurposes.PASSWORD_RESET, req.code());
         user.setPassword(passwordEncoder.encode(req.newPassword()));
     }

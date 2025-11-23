@@ -1,6 +1,6 @@
 package com.csis231.api.config;
 
-import com.csis231.api.auth.JwtAuthenticationFilter;
+import com.csis231.api.jwt.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

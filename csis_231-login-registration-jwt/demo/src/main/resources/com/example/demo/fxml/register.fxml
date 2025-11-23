@@ -6,7 +6,7 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.demo.controllers.RegisterController"
+            fx:controller="com.example.demo.auth.RegisterController"
             prefWidth="1100" prefHeight="750">
 
         <StackPane AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
