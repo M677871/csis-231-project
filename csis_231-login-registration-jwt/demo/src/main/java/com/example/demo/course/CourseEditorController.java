@@ -369,7 +369,14 @@ public class CourseEditorController {
 
     @FXML
     private void onBack() {
-        Launcher.go("instructor_dashboard.fxml", "Instructor Dashboard");
+        var me = SessionStore.getMe();
+        if (me != null && "ADMIN".equalsIgnoreCase(me.getRole())) {
+            Launcher.go("dashboard.fxml", "Admin Dashboard");
+        } else if (me != null && "INSTRUCTOR".equalsIgnoreCase(me.getRole())) {
+            Launcher.go("instructor_dashboard.fxml", "Instructor Dashboard");
+        } else {
+            Launcher.go("student_dashboard.fxml", "Student Dashboard");
+        }
     }
 
     @FXML

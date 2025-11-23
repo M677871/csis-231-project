@@ -133,7 +133,7 @@ public class CourseDetailController {
         if (me != null && "INSTRUCTOR".equalsIgnoreCase(me.getRole())) {
             Launcher.go("instructor_dashboard.fxml", "Instructor Dashboard");
         } else if (me != null && "ADMIN".equalsIgnoreCase(me.getRole())) {
-            Launcher.go("dashboard.fxml", "Dashboard");
+            Launcher.go("dashboard.fxml", "Admin Dashboard");
         } else {
             Launcher.go("student_dashboard.fxml", "Student Dashboard");
         }

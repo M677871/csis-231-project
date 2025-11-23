@@ -154,6 +154,8 @@ public class CourseCatalogController {
         String role = me != null ? me.getRole() : null;
         if ("INSTRUCTOR".equalsIgnoreCase(role)) {
             Launcher.go("instructor_dashboard.fxml", "Instructor Dashboard");
+        } else if ("ADMIN".equalsIgnoreCase(role)) {
+            Launcher.go("dashboard.fxml", "Admin Dashboard");
         } else if ("STUDENT".equalsIgnoreCase(role)) {
             Launcher.go("student_dashboard.fxml", "Student Dashboard");
         } else {
