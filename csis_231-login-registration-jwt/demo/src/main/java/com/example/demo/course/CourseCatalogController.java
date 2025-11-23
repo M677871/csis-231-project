@@ -1,0 +1,163 @@
+package com.example.demo.course;
+
+import com.example.demo.Launcher;
+import com.example.demo.auth.AuthApi;
+import com.example.demo.common.AlertUtils;
+import com.example.demo.common.ApiException;
+import com.example.demo.common.ErrorDialog;
+import com.example.demo.common.SessionStore;
+import com.example.demo.model.CourseDto;
+import com.example.demo.model.EnrollmentRequest;
+import com.example.demo.model.MeResponse;
+import com.example.demo.student.EnrollmentApi;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+
+import java.util.concurrent.CompletableFuture;
+
+/**
+ * Course catalog screen shared by students and instructors.
+ */
+public class CourseCatalogController {
+    @FXML private TableView<CourseDto> courseTable;
+    @FXML private TableColumn<CourseDto, String> titleColumn;
+    @FXML private TableColumn<CourseDto, String> instructorColumn;
+    @FXML private TableColumn<CourseDto, Boolean> publishedColumn;
+    @FXML private TableColumn<CourseDto, Void> actionColumn;
+    @FXML private TextField searchField;
+    @FXML private Button refreshButton;
+    @FXML private Label statusLabel;
+
+    private final CourseApi courseApi = new CourseApi();
+    private final EnrollmentApi enrollmentApi = new EnrollmentApi();
+    private final AuthApi authApi = new AuthApi();
+    private final ObservableList<CourseDto> courses = FXCollections.observableArrayList();
+    private MeResponse me;
+
+    @FXML
+    public void initialize() {
+        titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
+        instructorColumn.setCellValueFactory(new PropertyValueFactory<>("instructorName"));
+        publishedColumn.setCellValueFactory(new PropertyValueFactory<>("published"));
+        publishedColumn.setCellFactory(col -> new TableCell<>() {
+            @Override protected void updateItem(Boolean v, boolean empty) {
+                super.updateItem(v, empty);
+                setText(empty ? null : (Boolean.TRUE.equals(v) ? "Published" : "Draft"));
+            }
+        });
+
+        actionColumn.setCellFactory(col -> new TableCell<>() {
+            private final Button primary = new Button();
+            {
+                primary.getStyleClass().add("primary-button");
+                primary.setOnAction(e -> {
+                    CourseDto course = getTableView().getItems().get(getIndex());
+                    onAction(course);
+                });
+            }
+            @Override protected void updateItem(Void v, boolean empty) {
+                super.updateItem(v, empty);
+                if (empty || getIndex() >= getTableView().getItems().size()) {
+                    setGraphic(null);
+                    return;
+                }
+                primary.setText(isStudent() ? "Enroll" : "Edit");
+                setGraphic(primary);
+            }
+        });
+
+        courseTable.setItems(courses);
+
+        if (searchField != null) {
+            searchField.textProperty().addListener((obs, o, n) -> loadCourses());
+        }
+        loadMeAndCourses();
+    }
+
+    private void loadMeAndCourses() {
+        CompletableFuture.runAsync(() -> {
+            try {
+                MeResponse cached = SessionStore.getMe();
+                me = cached != null ? cached : authApi.me();
+                if (cached == null) SessionStore.setMe(me);
+                loadCourses();
+            } catch (Exception ex) {
+                Platform.runLater(() -> ErrorDialog.showError("Failed to load profile: " + ex.getMessage()));
+            }
+        });
+    }
+
+    private void loadCourses() {
+        String search = searchField != null ? searchField.getText() : null;
+        CompletableFuture.runAsync(() -> {
+            try {
+                var page = courseApi.listPublished(0, 50, null, search);
+                var items = page != null && page.getContent() != null
+                        ? page.getContent()
+                        : java.util.List.<CourseDto>of();
+                Platform.runLater(() -> {
+                    courses.setAll(items);
+                    statusLabel.setText(items.size() + " courses");
+                });
+            } catch (ApiException ex) {
+                Platform.runLater(() -> ErrorDialog.showError(ex.getMessage(), ex.getErrorCode()));
+            } catch (Exception ex) {
+                Platform.runLater(() -> ErrorDialog.showError("Failed to load courses: " + ex.getMessage()));
+            }
+        });
+    }
+
+    private void onAction(CourseDto course) {
+        if (isStudent()) {
+            doEnroll(course);
+        } else {
+            SessionStore.setActiveCourse(course);
+            Launcher.go("course_editor.fxml", "Edit Course");
+        }
+    }
+
+    private void doEnroll(CourseDto course) {
+        if (course == null) return;
+        CompletableFuture.runAsync(() -> {
+            try {
+                enrollmentApi.enroll(new EnrollmentRequest(null, course.getId()));
+                Platform.runLater(() -> AlertUtils.info("Enrolled in " + course.getTitle()));
+            } catch (ApiException ex) {
+                Platform.runLater(() -> ErrorDialog.showError(ex.getMessage(), ex.getErrorCode()));
+            } catch (Exception ex) {
+                Platform.runLater(() -> ErrorDialog.showError("Failed to enroll: " + ex.getMessage()));
+            }
+        });
+    }
+
+    private boolean isStudent() {
+        return me != null && "STUDENT".equalsIgnoreCase(me.getRole());
+    }
+
+    @FXML
+    private void onOpenCourseDetail() {
+        CourseDto selected = courseTable.getSelectionModel().getSelectedItem();
+        if (selected == null) { AlertUtils.warn("Select a course first."); return; }
+        SessionStore.setActiveCourse(selected);
+        Launcher.go("course_detail.fxml", "Course Detail");
+    }
+
+    @FXML
+    private void onRefresh() { loadCourses(); }
+
+    @FXML
+    private void onBack() {
+        String role = me != null ? me.getRole() : null;
+        if ("INSTRUCTOR".equalsIgnoreCase(role)) {
+            Launcher.go("instructor_dashboard.fxml", "Instructor Dashboard");
+        } else if ("STUDENT".equalsIgnoreCase(role)) {
+            Launcher.go("student_dashboard.fxml", "Student Dashboard");
+        } else {
+            Launcher.go("dashboard.fxml", "Dashboard");
+        }
+    }
+}

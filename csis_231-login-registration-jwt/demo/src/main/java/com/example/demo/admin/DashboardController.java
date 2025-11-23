@@ -5,6 +5,7 @@ import com.example.demo.auth.AuthApi;
 import com.example.demo.common.AlertUtils;
 import com.example.demo.common.ApiException;
 import com.example.demo.common.ErrorDialog;
+import com.example.demo.common.SessionStore;
 import com.example.demo.common.TokenStore;
 import com.example.demo.model.MeResponse;
 import javafx.application.Platform;
@@ -56,6 +57,7 @@ public class DashboardController {
                     return;
                 }
                 MeResponse me = authApi.me(); // your tolerant/profile call
+                SessionStore.setMe(me);
                 String full = (me.getFirstName() == null ? "" : me.getFirstName());
                 if (me.getLastName() != null && !me.getLastName().isBlank()) full += (full.isBlank() ? "" : " ") + me.getLastName();
                 if (full.isBlank()) full = me.getUsername();
@@ -91,6 +93,7 @@ public class DashboardController {
     @FXML
     public void onLogout() {
         TokenStore.clear();
+        SessionStore.clearAll();
         Launcher.go("login.fxml", "Login");
     }
 }

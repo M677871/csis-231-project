@@ -4,6 +4,7 @@ import com.csis231.api.jwt.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -63,6 +64,17 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/otp/**").permitAll()
                         .requestMatchers("/api/auth/password/forgot",
                                 "/api/auth/password/reset").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/courses/**").permitAll()
+
+                        // --- Role-scoped domains ---
+                        .requestMatchers(HttpMethod.POST, "/api/courses/**").hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/courses/**").hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/courses/**").hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers("/api/instructor/**", "/api/instructors/**").hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers("/api/student/**", "/api/students/**").hasAnyRole("STUDENT", "ADMIN", "INSTRUCTOR")
+                        .requestMatchers("/api/enrollments/**").authenticated()
+                        .requestMatchers("/api/materials/**", "/api/courses/*/materials").authenticated()
+                        .requestMatchers("/api/quizzes/**").authenticated()
 
                         // --- Role-scoped domains (unchanged) ---
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

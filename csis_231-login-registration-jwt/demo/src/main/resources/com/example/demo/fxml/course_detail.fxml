@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.demo.course.CourseDetailController"
+            prefWidth="1100" prefHeight="780"
+            styleClass="glass-pane">
+    <top>
+        <HBox spacing="16" alignment="CENTER_LEFT" styleClass="topbar">
+            <children>
+                <Button text="← Back" onAction="#onBack" styleClass="ghost-button"/>
+                <Label text="Course Detail" style="-fx-font-size: 22px; -fx-font-weight: 900; -fx-text-fill: #FFFFFF;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+            </children>
+            <padding><Insets top="16" bottom="16" left="24" right="24"/></padding>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox spacing="20" style="-fx-padding: 24;">
+            <children>
+                <VBox spacing="8" styleClass="card">
+                    <Label fx:id="titleLabel" text="Course" styleClass="title-label"/>
+                    <Label fx:id="descriptionLabel" text="" wrapText="true" styleClass="muted"/>
+                    <HBox spacing="16">
+                        <Label text="Instructor:" styleClass="field-label"/>
+                        <Label fx:id="instructorLabel" text=""/>
+                        <Label text="Status:" styleClass="field-label"/>
+                        <Label fx:id="publishedLabel" text=""/>
+                    </HBox>
+                </VBox>
+
+                <VBox spacing="12" styleClass="management-card">
+                    <Label text="Materials" styleClass="title-label"/>
+                    <TableView fx:id="materialTable" prefHeight="260">
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                        </columnResizePolicy>
+                        <columns>
+                            <TableColumn fx:id="materialTitleColumn" text="Title" prefWidth="280"/>
+                            <TableColumn fx:id="materialTypeColumn" text="Type" prefWidth="140"/>
+                            <TableColumn fx:id="materialUrlColumn" text="URL" prefWidth="320"/>
+                        </columns>
+                        <placeholder><Label text="No materials yet"/></placeholder>
+                    </TableView>
+                </VBox>
+
+                <VBox spacing="12" styleClass="management-card">
+                    <Label text="Quizzes" styleClass="title-label"/>
+                    <TableView fx:id="quizTable" prefHeight="220">
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                        </columnResizePolicy>
+                        <columns>
+                            <TableColumn fx:id="quizNameColumn" text="Quiz" prefWidth="320"/>
+                            <TableColumn fx:id="quizQuestionsColumn" text="Questions" prefWidth="120"/>
+                            <TableColumn fx:id="quizActionColumn" text="Action" prefWidth="160"/>
+                        </columns>
+                        <placeholder><Label text="No quizzes yet"/></placeholder>
+                    </TableView>
+                </VBox>
+            </children>
+        </VBox>
+    </center>
+</BorderPane>

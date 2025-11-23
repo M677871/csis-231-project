@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.demo.course.CourseEditorController"
+            prefWidth="1200" prefHeight="840"
+            styleClass="glass-pane">
+    <top>
+        <HBox spacing="16" alignment="CENTER_LEFT" styleClass="topbar">
+            <children>
+                <Button text="← Back" onAction="#onBack" styleClass="ghost-button"/>
+                <Label text="Course Editor" style="-fx-font-size: 22px; -fx-font-weight: 900; -fx-text-fill: #FFFFFF;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="courseIdLabel" text="New course" styleClass="muted"/>
+                <Button text="Logout" onAction="#onLogout" styleClass="ghost-button"/>
+            </children>
+            <padding><Insets top="16" bottom="16" left="24" right="24"/></padding>
+        </HBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="content-scroll">
+            <content>
+                <VBox spacing="20" style="-fx-padding: 24;">
+                    <children>
+                        <VBox spacing="12" styleClass="card">
+                            <Label text="Details" styleClass="title-label"/>
+                            <GridPane hgap="12" vgap="10">
+                                <columnConstraints>
+                                    <ColumnConstraints percentWidth="20"/>
+                                    <ColumnConstraints percentWidth="30"/>
+                                    <ColumnConstraints percentWidth="20"/>
+                                    <ColumnConstraints percentWidth="30"/>
+                                </columnConstraints>
+
+                                <Label text="Title" styleClass="field-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                <TextField fx:id="titleField" promptText="Course title" styleClass="rounded-text-field" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                                <Label text="Category ID" styleClass="field-label" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                                <TextField fx:id="categoryField" promptText="e.g. 1" styleClass="rounded-text-field" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+                                <Label text="Description" styleClass="field-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                <TextArea fx:id="descriptionArea" promptText="Description" prefRowCount="3" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+
+                                <CheckBox fx:id="publishedCheck" text="Published" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                            </GridPane>
+
+                            <HBox spacing="12">
+                                <Button fx:id="saveButton" text="Save Course" onAction="#onSaveCourse" styleClass="primary-button"/>
+                                <Button text="Delete" onAction="#onDeleteCourse" styleClass="danger-button"/>
+                            </HBox>
+                        </VBox>
+
+                        <VBox spacing="12" styleClass="management-card">
+                            <Label text="Materials" styleClass="title-label"/>
+                            <GridPane hgap="10" vgap="10">
+                                <columnConstraints>
+                                    <ColumnConstraints percentWidth="30"/>
+                                    <ColumnConstraints percentWidth="20"/>
+                                    <ColumnConstraints percentWidth="40"/>
+                                    <ColumnConstraints percentWidth="10"/>
+                                </columnConstraints>
+                                <TextField fx:id="materialTitleField" promptText="Title" styleClass="rounded-text-field" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                                <TextField fx:id="materialTypeField" promptText="Type" styleClass="rounded-text-field" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                                <TextField fx:id="materialUrlField" promptText="URL" styleClass="rounded-text-field" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                                <TextField fx:id="materialMetaField" promptText="Metadata (JSON or note)" styleClass="rounded-text-field" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="3"/>
+                                <Button text="Add" onAction="#onAddMaterial" styleClass="secondary-button" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+                            </GridPane>
+
+                            <TableView fx:id="materialTable" prefHeight="260">
+                                <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                </columnResizePolicy>
+                                <columns>
+                                    <TableColumn fx:id="materialTitleColumn" text="Title" prefWidth="260"/>
+                                    <TableColumn fx:id="materialTypeColumn" text="Type" prefWidth="120"/>
+                                    <TableColumn fx:id="materialUrlColumn" text="URL" prefWidth="320"/>
+                                </columns>
+                                <placeholder><Label text="No materials yet"/></placeholder>
+                            </TableView>
+                            <Button text="Delete Selected" onAction="#onDeleteMaterial" styleClass="danger-button"/>
+                        </VBox>
+
+                        <VBox spacing="12" styleClass="management-card">
+                            <HBox spacing="12" alignment="CENTER_LEFT">
+                                <Label text="Quizzes" styleClass="title-label"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Button text="Create Quiz" onAction="#onCreateQuiz" styleClass="primary-button"/>
+                            </HBox>
+
+                            <TableView fx:id="quizTable" prefHeight="240">
+                                <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                </columnResizePolicy>
+                                <columns>
+                                    <TableColumn fx:id="quizNameColumn" text="Quiz" prefWidth="320"/>
+                                    <TableColumn fx:id="quizQuestionsColumn" text="Questions" prefWidth="140"/>
+                                    <TableColumn fx:id="quizActionColumn" text="Actions" prefWidth="160"/>
+                                </columns>
+                                <placeholder><Label text="No quizzes yet"/></placeholder>
+                            </TableView>
+                        </VBox>
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>

@@ -326,6 +326,7 @@ public class UserController {
     @FXML private void backToMain() { Launcher.go("dashboard.fxml", "Dashboard"); }
     @FXML public void onLogout() {
         TokenStore.clear();
+        SessionStore.clearAll();
         Launcher.go("login.fxml", "Login");
     }
 }

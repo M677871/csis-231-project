@@ -182,6 +182,7 @@ public class CategoryController {
     @FXML private void backToMain() { Launcher.go("dashboard.fxml", "Dashboard"); }
     @FXML public void onLogout() {
         TokenStore.clear();
+        SessionStore.clearAll();
         Launcher.go("login.fxml", "Login");
     }
 }

@@ -4,8 +4,10 @@ import com.example.demo.Launcher;
 import com.example.demo.common.AlertUtils;
 import com.example.demo.common.ApiException;
 import com.example.demo.common.ErrorDialog;
+import com.example.demo.common.SessionStore;
 import com.example.demo.model.AuthResponse;
 import com.example.demo.model.LoginRequest;
+import com.example.demo.model.MeResponse;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -64,7 +66,9 @@ public class LoginController {
                 return;
             }
 
-            navigateByRole(res.getRole());
+            MeResponse me = authApi.me();
+            SessionStore.setMe(me);
+            navigateByRole(me.getRole());
         } catch (ApiException ex) {
             ErrorDialog.showError(ex.getMessage(), ex.getErrorCode());
         } catch (Exception ex) {
