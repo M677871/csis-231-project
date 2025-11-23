@@ -2,13 +2,18 @@ package com.example.demo.common;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.demo.common.PageResponse;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Shared HTTP client that adds auth headers, parses JSON and normalizes errors.
@@ -38,6 +43,7 @@ public class ApiClient {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(toJson(payload)))
                 .build();
+
         return send(request, null);
     }
 
@@ -122,7 +128,75 @@ public class ApiClient {
         try {
             return MAPPER.readValue(body, typeRef);
         } catch (Exception e) {
+            // TEMPORARY DEBUG LOGGING
+            System.err.println("=== JSON PARSE ERROR ===");
+            System.err.println("Target type: " + typeRef.getType());
+            System.err.println("Raw response body:");
+            System.err.println(body);
+            System.err.println("========================");
             throw new ApiException(0, "Could not parse response", null, e);
         }
     }
+    /**
+     * Helper for paginated endpoints (Page<T> style JSON).
+     * It parses the page envelope manually and maps each item to the given itemClass.
+     */
+    public <T> PageResponse<T> getPage(String path, Class<T> itemClass) {
+        HttpRequest request = baseRequest(path)
+                .GET()
+                .build();
+
+        try {
+            HttpResponse<String> response =
+                    CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+
+            int status = response.statusCode();
+            String body = response.body();
+
+            if (status < 200 || status >= 300) {
+                // Try to parse the standard error shape
+                ErrorResponse err = null;
+                try {
+                    err = MAPPER.readValue(body, ErrorResponse.class);
+                } catch (Exception ignore) {
+                    // fall back to generic message
+                }
+
+                String message = (err != null && err.getMessage() != null)
+                        ? err.getMessage()
+                        : ("Request failed with HTTP status " + status);
+                String code = (err != null ? err.getCode() : null);
+
+                throw new ApiException(status, message, code);
+            }
+
+            // ✅ Manually parse the page JSON
+            JsonNode root = MAPPER.readTree(body);
+
+            PageResponse<T> page = new PageResponse<>();
+            page.setNumber(root.path("number").asInt());
+            page.setSize(root.path("size").asInt());
+            page.setTotalElements(root.path("totalElements").asLong());
+            page.setTotalPages(root.path("totalPages").asInt());
+            page.setFirst(root.path("first").asBoolean());
+            page.setLast(root.path("last").asBoolean());
+
+            List<T> items = new ArrayList<>();
+            JsonNode contentNode = root.path("content");
+            if (contentNode.isArray()) {
+                for (JsonNode node : contentNode) {
+                    T item = MAPPER.treeToValue(node, itemClass);
+                    items.add(item);
+                }
+            }
+            page.setContent(items);
+
+            return page;
+        } catch (IOException | InterruptedException e) {
+            throw new ApiException(0, "Request failed: " + e.getMessage(), null, e);
+        } catch (Exception e) {
+            throw new ApiException(0, "Could not parse page response", null, e);
+        }
+    }
+
 }

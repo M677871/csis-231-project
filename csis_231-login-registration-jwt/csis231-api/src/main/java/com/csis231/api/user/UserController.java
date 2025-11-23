@@ -1,6 +1,7 @@
 package com.csis231.api.user;
 
 import com.csis231.api.common.BadRequestException;
+import com.csis231.api.common.PagedResponse;
 import com.csis231.api.common.ResourceNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +28,15 @@ public class UserController {
 
     /** Lists all users. */
     @GetMapping
-    public Page<User> list(@RequestParam(defaultValue = "0") int page,
-                           @RequestParam(defaultValue = "10") int size) {
+    public PagedResponse<User> list(@RequestParam(defaultValue = "0") int page,
+                                    @RequestParam(defaultValue = "10") int size) {
         if (size <= 0) {
             throw new BadRequestException("Size must be greater than zero");
         }
-        return userService.getUsers(PageRequest.of(Math.max(0, page), size));
-    }
 
+        var springPage = userService.getUsers(PageRequest.of(Math.max(0, page), size));
+        return PagedResponse.fromPage(springPage);
+    }
     /** Retrieves a user by ID. */
     @GetMapping("/{id}")
     public User get(@PathVariable Long id) {

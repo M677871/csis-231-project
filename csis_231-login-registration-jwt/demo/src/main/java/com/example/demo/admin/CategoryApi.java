@@ -2,6 +2,7 @@ package com.example.demo.admin;
 
 import com.example.demo.common.ApiClient;
 import com.example.demo.common.ApiResponse;
+import com.example.demo.common.PageResponse;
 import com.example.demo.common.PagedResponse;
 import com.example.demo.model.Category;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -12,11 +13,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 public class CategoryApi {
     private final ApiClient client = new ApiClient();
 
-    public PagedResponse<Category> list(int page, int size) {
+    public PageResponse<Category> list(int page, int size) {
         String path = "/api/categories?page=" + page + "&size=" + size;
-        ApiResponse<PagedResponse<Category>> resp = client.get(path, new TypeReference<PagedResponse<Category>>() {});
-        return resp.getBody();
+        return client.getPage(path, Category.class);
     }
+
 
     public Category create(String name) {
         Category body = new Category();

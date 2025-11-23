@@ -2,6 +2,7 @@ package com.example.demo.admin;
 
 import com.example.demo.common.ApiClient;
 import com.example.demo.common.ApiResponse;
+import com.example.demo.common.PageResponse;
 import com.example.demo.common.PagedResponse;
 import com.example.demo.model.User;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -12,11 +13,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 public class UserApi {
     private final ApiClient client = new ApiClient();
 
-    public PagedResponse<User> list(int page, int size) {
+    public PageResponse<User> list(int page, int size) {
         String path = "/api/csis-users?page=" + page + "&size=" + size;
-        ApiResponse<PagedResponse<User>> resp = client.get(path, new TypeReference<PagedResponse<User>>() {});
-        return resp.getBody();
+        return client.getPage(path, User.class);
     }
+
 
     public User get(Long id) {
         return client.get("/api/csis-users/" + id, new TypeReference<User>() {}).getBody();

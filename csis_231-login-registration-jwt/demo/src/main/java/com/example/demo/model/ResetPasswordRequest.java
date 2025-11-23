@@ -1,5 +1,7 @@
 package com.example.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Request body used by the client to complete the password-reset flow.
  *
@@ -7,5 +9,8 @@ package com.example.demo.model;
  * @param token           the password-reset code (OTP) received by the user
  * @param newPassword     the new password that should be stored for this account
  */
-
-public record ResetPasswordRequest(String emailOrUsername, String token, String newPassword) {}
+public record ResetPasswordRequest(
+        String emailOrUsername,
+        @JsonProperty("code") String token,
+        String newPassword
+) {}

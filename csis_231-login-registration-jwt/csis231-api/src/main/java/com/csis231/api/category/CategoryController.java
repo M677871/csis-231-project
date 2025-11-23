@@ -1,6 +1,7 @@
 package com.csis231.api.category;
 
 import com.csis231.api.common.BadRequestException;
+import com.csis231.api.common.PagedResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
@@ -34,15 +35,16 @@ public class CategoryController
      * @return list of all {@link Category} entities
      */
 
-    @GetMapping public Page<Category> list(@RequestParam(defaultValue = "0") int page,
-                                           @RequestParam(defaultValue = "10") int size)
-    {
+    @GetMapping
+    public PagedResponse<Category> list(@RequestParam(defaultValue = "0") int page,
+                                        @RequestParam(defaultValue = "10") int size) {
         if (size <= 0) {
             throw new BadRequestException("Size must be greater than zero");
         }
-        return svc.list(PageRequest.of(Math.max(0, page), size));
-    }
 
+        var springPage = svc.list(PageRequest.of(Math.max(0, page), size));
+        return PagedResponse.fromPage(springPage);
+    }
     /**
      * Retrieves a single category by its identifier.
      *

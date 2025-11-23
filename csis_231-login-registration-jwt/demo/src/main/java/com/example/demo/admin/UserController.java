@@ -1,11 +1,7 @@
 package com.example.demo.admin;
 
 import com.example.demo.Launcher;
-import com.example.demo.common.AlertUtils;
-import com.example.demo.common.ApiException;
-import com.example.demo.common.ErrorDialog;
-import com.example.demo.common.PagedResponse;
-import com.example.demo.common.TokenStore;
+import com.example.demo.common.*;
 import com.example.demo.model.User;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -141,7 +137,7 @@ public class UserController {
     private void loadUsers() {
         CompletableFuture.runAsync(() -> {
             try {
-                PagedResponse<User> response = userApi.list(0, 50);
+                PageResponse<User> response = userApi.list(0, 50);
                 List<User> list = response != null && response.getContent() != null
                         ? response.getContent()
                         : Collections.emptyList();

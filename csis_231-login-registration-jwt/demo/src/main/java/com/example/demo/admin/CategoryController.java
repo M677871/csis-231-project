@@ -1,11 +1,7 @@
 package com.example.demo.admin;
 
 import com.example.demo.Launcher;
-import com.example.demo.common.AlertUtils;
-import com.example.demo.common.ApiException;
-import com.example.demo.common.ErrorDialog;
-import com.example.demo.common.PagedResponse;
-import com.example.demo.common.TokenStore;
+import com.example.demo.common.*;
 import com.example.demo.model.Category;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -81,7 +77,7 @@ public class CategoryController {
     private void loadCategories() {
         CompletableFuture.runAsync(() -> {
             try {
-                PagedResponse<Category> response = categoryApi.list(0, 50);
+                PageResponse<Category> response = categoryApi.list(0, 50);
                 List<Category> list = response != null && response.getContent() != null
                         ? response.getContent()
                         : Collections.emptyList();

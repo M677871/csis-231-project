@@ -46,7 +46,7 @@ public class ResetController {
      *
      * <p>Reads the reset code and new password from the UI, checks that both
      * are non-empty, and calls
-     * {@link com.example.demo.auth.AuthApi#resetWithCode(String, String, String)}
+     * {@link com.example.demo.auth.AuthApi#(String, String, String)}
      * with the stored e-mail and entered values.</p>
      *
      * <p>On success, an information dialog is shown and the user is
