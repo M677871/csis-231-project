@@ -18,6 +18,23 @@ public class UserApi {
         return client.getPage(path, User.class);
     }
 
+    /**
+     * Finds first user whose username or email matches the given identifier.
+     * Scans first 200 results to avoid backend changes.
+     */
+    public java.util.Optional<User> findByIdentifier(String identifier) {
+        if (identifier == null || identifier.isBlank()) return java.util.Optional.empty();
+        try {
+            PageResponse<User> page = client.getPage("/api/csis-users?page=0&size=200", User.class);
+            if (page != null && page.getContent() != null) {
+                return page.getContent().stream()
+                        .filter(u -> identifier.equalsIgnoreCase(u.getUsername()) || identifier.equalsIgnoreCase(u.getEmail()))
+                        .findFirst();
+            }
+        } catch (Exception ignored) {}
+        return java.util.Optional.empty();
+    }
+
 
     public User get(Long id) {
         return client.get("/api/csis-users/" + id, new TypeReference<User>() {}).getBody();

@@ -95,7 +95,7 @@ public class ApiClient {
                 ErrorResponse err = parseBody(response.body(), new TypeReference<ErrorResponse>() {});
                 String message = err != null && err.getMessage() != null
                         ? err.getMessage()
-                        : "Request failed";
+                        : (response.body() != null && !response.body().isBlank() ? response.body() : "Request failed");
                 String code = err != null ? err.getCode() : null;
                 throw new ApiException(status, message, code);
             }
@@ -136,7 +136,8 @@ public class ApiClient {
             System.err.println("Raw response body:");
             System.err.println(body);
             System.err.println("========================");
-            throw new ApiException(0, "Could not parse response", null, e);
+            String snippet = body.length() > 400 ? body.substring(0, 400) + "..." : body;
+            throw new ApiException(0, "Unexpected response format: " + snippet, null, e);
         }
     }
     /**

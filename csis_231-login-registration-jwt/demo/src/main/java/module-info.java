@@ -21,7 +21,7 @@ module com.example.demo {
     opens com.example.demo.admin to javafx.fxml;
     opens com.example.demo.instructor to javafx.fxml;
     opens com.example.demo.student to javafx.fxml;
-    opens com.example.demo.common to javafx.fxml;
+    opens com.example.demo.common to javafx.fxml, com.fasterxml.jackson.databind;
     opens com.example.demo.course to javafx.fxml;
     opens com.example.demo.quiz to javafx.fxml;
 
