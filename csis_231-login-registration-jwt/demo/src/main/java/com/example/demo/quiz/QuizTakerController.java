@@ -127,7 +127,7 @@ public class QuizTakerController {
                 Platform.runLater(() -> {
                     AlertUtils.info("Score: " + resp.getScore() + "/" + resp.getTotalQuestions()
                             + " (" + Math.round(resp.getPercentage()) + "%)");
-                    Launcher.go("student_dashboard.fxml", "Student Dashboard");
+                    navigateHome();
                 });
             } catch (ApiException ex) {
                 Platform.runLater(() -> ErrorDialog.showError(ex.getMessage(), ex.getErrorCode()));
@@ -140,5 +140,16 @@ public class QuizTakerController {
     }
 
     @FXML
-    private void onBack() { Launcher.go("student_dashboard.fxml", "Student Dashboard"); }
+    private void onBack() { navigateHome(); }
+
+    private void navigateHome() {
+        String role = SessionStore.currentRole();
+        if ("ADMIN".equalsIgnoreCase(role)) {
+            Launcher.go("dashboard.fxml", "Admin Dashboard");
+        } else if ("INSTRUCTOR".equalsIgnoreCase(role)) {
+            Launcher.go("instructor_dashboard.fxml", "Instructor Dashboard");
+        } else {
+            Launcher.go("student_dashboard.fxml", "Student Dashboard");
+        }
+    }
 }
