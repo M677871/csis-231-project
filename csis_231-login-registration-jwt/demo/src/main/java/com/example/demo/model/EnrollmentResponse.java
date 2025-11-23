@@ -8,6 +8,8 @@ import java.time.Instant;
 public class EnrollmentResponse {
     private Long id;
     private Long studentUserId;
+    private String studentUsername;
+    private String studentEmail;
     private Long courseId;
     private String courseTitle;
     private String status;
@@ -18,6 +20,12 @@ public class EnrollmentResponse {
 
     public Long getStudentUserId() { return studentUserId; }
     public void setStudentUserId(Long studentUserId) { this.studentUserId = studentUserId; }
+
+    public String getStudentUsername() { return studentUsername; }
+    public void setStudentUsername(String studentUsername) { this.studentUsername = studentUsername; }
+
+    public String getStudentEmail() { return studentEmail; }
+    public void setStudentEmail(String studentEmail) { this.studentEmail = studentEmail; }
 
     public Long getCourseId() { return courseId; }
     public void setCourseId(Long courseId) { this.courseId = courseId; }

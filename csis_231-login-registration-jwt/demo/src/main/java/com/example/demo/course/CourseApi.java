@@ -59,4 +59,9 @@ public class CourseApi {
         ApiResponse<CourseDto[]> resp = client.get("/api/instructors/" + userId + "/courses", new TypeReference<CourseDto[]>() {});
         return resp.getBody();
     }
+
+    public EnrollmentResponse[] listCourseEnrollments(Long courseId) {
+        ApiResponse<EnrollmentResponse[]> resp = client.get("/api/courses/" + courseId + "/enrollments", new TypeReference<EnrollmentResponse[]>() {});
+        return resp.getBody();
+    }
 }

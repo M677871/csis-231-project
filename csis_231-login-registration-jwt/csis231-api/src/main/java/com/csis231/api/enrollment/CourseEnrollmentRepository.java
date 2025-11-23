@@ -13,6 +13,7 @@ import java.util.Optional;
 public interface CourseEnrollmentRepository extends JpaRepository<CourseEnrollment, Long> {
     boolean existsByStudent_IdAndCourse_Id(Long studentId, Long courseId);
     List<CourseEnrollment> findByStudent_Id(Long studentId);
+    List<CourseEnrollment> findByCourse_Id(Long courseId);
     long countByCourse_Id(Long courseId);
     Optional<CourseEnrollment> findByStudent_IdAndCourse_Id(Long studentId, Long courseId);
 }

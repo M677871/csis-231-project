@@ -35,6 +35,16 @@ public class UserApi {
         return java.util.Optional.empty();
     }
 
+    public java.util.List<User> listInstructors(int pageSize) {
+        PageResponse<User> page = client.getPage("/api/csis-users?page=0&size=" + pageSize, User.class);
+        if (page != null && page.getContent() != null) {
+            return page.getContent().stream()
+                    .filter(u -> "INSTRUCTOR".equalsIgnoreCase(u.getRole()))
+                    .toList();
+        }
+        return java.util.List.of();
+    }
+
 
     public User get(Long id) {
         return client.get("/api/csis-users/" + id, new TypeReference<User>() {}).getBody();

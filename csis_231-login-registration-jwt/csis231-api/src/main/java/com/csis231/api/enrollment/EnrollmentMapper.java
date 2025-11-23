@@ -11,6 +11,8 @@ public final class EnrollmentMapper {
         return new EnrollmentResponse(
                 enrollment.getId(),
                 enrollment.getStudent() != null ? enrollment.getStudent().getId() : null,
+                enrollment.getStudent() != null ? enrollment.getStudent().getUsername() : null,
+                enrollment.getStudent() != null ? enrollment.getStudent().getEmail() : null,
                 enrollment.getCourse() != null ? enrollment.getCourse().getId() : null,
                 enrollment.getCourse() != null ? enrollment.getCourse().getTitle() : null,
                 enrollment.getStatus(),

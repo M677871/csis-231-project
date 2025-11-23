@@ -6,7 +6,7 @@
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.demo.admin.AdminEnrollmentsController"
-            prefWidth="1200" prefHeight="780"
+            prefWidth="1200" prefHeight="820"
             styleClass="glass-pane">
     <top>
         <HBox spacing="16" alignment="CENTER_LEFT" styleClass="topbar">
@@ -21,49 +21,60 @@
     </top>
 
     <center>
-        <VBox spacing="16" style="-fx-padding: 24;">
-            <children>
-                <HBox spacing="12" alignment="CENTER_LEFT">
-                    <Label text="Student username/email" styleClass="field-label"/>
-                    <TextField fx:id="studentIdentifierField" promptText="Enter username or email" styleClass="rounded-text-field" prefWidth="240"/>
-                    <Button text="Load Enrollments" fx:id="loadStudentButton" onAction="#onLoadStudent" styleClass="primary-button"/>
-                    <Label fx:id="studentStatusLabel" text="" styleClass="muted"/>
-                </HBox>
+        <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="content-scroll">
+            <content>
+                <VBox spacing="18" style="-fx-padding: 24;">
+                    <children>
+                        <Label text="Student Enrollments" styleClass="title-label"/>
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <Label text="Student username/email" styleClass="field-label"/>
+                            <TextField fx:id="studentIdentifierField" promptText="Enter username or email" styleClass="rounded-text-field" prefWidth="260"/>
+                            <Button text="Load Enrollments" fx:id="loadStudentButton" onAction="#onLoadStudent" styleClass="primary-button"/>
+                            <Label fx:id="studentStatusLabel" text="" styleClass="muted"/>
+                        </HBox>
 
-                <TableView fx:id="enrollmentTable" prefHeight="300">
-                    <columnResizePolicy>
-                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-                    </columnResizePolicy>
-                    <columns>
-                        <TableColumn fx:id="courseIdColumn" text="Course ID" prefWidth="120"/>
-                        <TableColumn fx:id="courseTitleColumn" text="Course Title" prefWidth="320"/>
-                        <TableColumn fx:id="statusColumn" text="Status" prefWidth="120"/>
-                        <TableColumn fx:id="enrolledAtColumn" text="Enrolled At" prefWidth="220"/>
-                    </columns>
-                    <placeholder><Label text="No enrollments"/></placeholder>
-                </TableView>
+                        <TableView fx:id="enrollmentTable" prefHeight="260">
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                            </columnResizePolicy>
+                            <columns>
+                                <TableColumn fx:id="courseIdColumn" text="Course ID" prefWidth="100"/>
+                                <TableColumn fx:id="courseTitleColumn" text="Course Title" prefWidth="200"/>
+                                <TableColumn fx:id="studentNameColumn" text="Student" prefWidth="160"/>
+                                <TableColumn fx:id="studentEmailColumn" text="Email" prefWidth="200"/>
+                                <TableColumn fx:id="statusColumn" text="Status" prefWidth="120"/>
+                                <TableColumn fx:id="enrolledAtColumn" text="Enrolled At" prefWidth="180"/>
+                            </columns>
+                            <placeholder><Label text="No enrollments"/></placeholder>
+                        </TableView>
 
-                <Separator/>
+                        <Separator/>
+                        <Label text="Instructor Courses &amp; Enrollments" styleClass="title-label"/>
 
-                <HBox spacing="12" alignment="CENTER_LEFT">
-                    <Label text="Instructor username/email" styleClass="field-label"/>
-                    <TextField fx:id="instructorIdentifierField" promptText="Enter username or email" styleClass="rounded-text-field" prefWidth="240"/>
-                    <Button text="Load Courses" fx:id="loadInstructorButton" onAction="#onLoadInstructor" styleClass="secondary-button"/>
-                    <Label fx:id="instructorStatusLabel" text="" styleClass="muted"/>
-                </HBox>
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <Label text="Instructor" styleClass="field-label"/>
+                            <ComboBox fx:id="instructorPicker" promptText="Select instructor" prefWidth="240"/>
+                            <Label text="Course name" styleClass="field-label"/>
+                            <TextField fx:id="courseNameField" promptText="Exact course title" styleClass="rounded-text-field" prefWidth="240"/>
+                            <Button text="Load Courses" fx:id="loadInstructorButton" onAction="#onLoadInstructor" styleClass="secondary-button"/>
+                            <Button text="Load Enrollments" fx:id="loadCourseEnrollmentsButton" onAction="#onLoadCourseEnrollments" styleClass="primary-button"/>
+                            <Label fx:id="instructorStatusLabel" text="" styleClass="muted"/>
+                        </HBox>
 
-                <TableView fx:id="instructorCourseTable" prefHeight="300">
-                    <columnResizePolicy>
-                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-                    </columnResizePolicy>
-                    <columns>
-                        <TableColumn fx:id="instructorCourseIdColumn" text="Course ID" prefWidth="120"/>
-                        <TableColumn fx:id="instructorCourseTitleColumn" text="Course Title" prefWidth="320"/>
-                        <TableColumn fx:id="instructorCoursePublishedColumn" text="Published" prefWidth="140"/>
-                    </columns>
-                    <placeholder><Label text="No courses"/></placeholder>
-                </TableView>
-            </children>
-        </VBox>
+                        <TableView fx:id="instructorCourseTable" prefHeight="220">
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                            </columnResizePolicy>
+                            <columns>
+                                <TableColumn fx:id="instructorCourseIdColumn" text="Course ID" prefWidth="120"/>
+                                <TableColumn fx:id="instructorCourseTitleColumn" text="Course Title" prefWidth="320"/>
+                                <TableColumn fx:id="instructorCoursePublishedColumn" text="Published" prefWidth="120"/>
+                            </columns>
+                            <placeholder><Label text="No courses"/></placeholder>
+                        </TableView>
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
     </center>
 </BorderPane>

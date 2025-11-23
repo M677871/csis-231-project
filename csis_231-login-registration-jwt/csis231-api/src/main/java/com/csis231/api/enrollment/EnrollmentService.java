@@ -71,6 +71,25 @@ public class EnrollmentService {
     }
 
     @Transactional(readOnly = true)
+    public List<CourseEnrollment> findByCourse(Long courseId, User actor) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found: " + courseId));
+
+        if (actor == null) throw new UnauthorizedException("Authentication required");
+        if (actor.getRole() == User.Role.ADMIN) {
+            return enrollmentRepository.findByCourse_Id(courseId);
+        }
+        if (actor.getRole() == User.Role.INSTRUCTOR) {
+            if (course.getInstructor() != null && course.getInstructor().getId() != null
+                    && course.getInstructor().getId().equals(actor.getId())) {
+                return enrollmentRepository.findByCourse_Id(courseId);
+            }
+            throw new UnauthorizedException("You can only view enrollments for your courses");
+        }
+        throw new UnauthorizedException("Only instructors or admins can view course enrollments");
+    }
+
+    @Transactional(readOnly = true)
     public long countForCourse(Long courseId) {
         return enrollmentRepository.countByCourse_Id(courseId);
     }

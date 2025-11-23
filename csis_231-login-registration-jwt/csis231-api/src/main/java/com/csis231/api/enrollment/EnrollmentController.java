@@ -41,6 +41,14 @@ public class EnrollmentController {
                 .collect(Collectors.toList());
     }
 
+    @GetMapping("/courses/{courseId}/enrollments")
+    public List<EnrollmentResponse> enrollmentsForCourse(@PathVariable Long courseId, Authentication authentication) {
+        User actor = resolveUser(authentication);
+        return enrollmentService.findByCourse(courseId, actor).stream()
+                .map(EnrollmentMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
     private User resolveUser(Authentication authentication) {
         if (authentication == null || authentication.getName() == null) {
             throw new UnauthorizedException("Authentication required");

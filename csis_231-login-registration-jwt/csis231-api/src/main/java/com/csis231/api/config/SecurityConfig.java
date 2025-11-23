@@ -64,6 +64,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/otp/**").permitAll()
                         .requestMatchers("/api/auth/password/forgot",
                                 "/api/auth/password/reset").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/courses/*/enrollments").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/courses/**").permitAll()
 
                         // --- Role-scoped domains ---

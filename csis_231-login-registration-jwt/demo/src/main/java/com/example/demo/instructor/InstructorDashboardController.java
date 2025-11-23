@@ -8,6 +8,7 @@ import com.example.demo.common.ErrorDialog;
 import com.example.demo.common.SessionStore;
 import com.example.demo.common.TokenStore;
 import com.example.demo.course.CourseApi;
+import com.example.demo.model.EnrollmentResponse;
 import com.example.demo.model.CourseDto;
 import com.example.demo.model.InstructorDashboardResponse;
 import com.example.demo.model.MeResponse;
@@ -39,7 +40,14 @@ public class InstructorDashboardController {
     @FXML private TableColumn<CourseDto, String> createdColumn;
     @FXML private TableColumn<CourseDto, Void> actionsColumn;
 
+    @FXML private TableView<EnrollmentResponse> enrollmentTable;
+    @FXML private TableColumn<EnrollmentResponse, String> enrollStudentColumn;
+    @FXML private TableColumn<EnrollmentResponse, String> enrollEmailColumn;
+    @FXML private TableColumn<EnrollmentResponse, String> enrollStatusColumn;
+    @FXML private TableColumn<EnrollmentResponse, String> enrollDateColumn;
+
     private final ObservableList<CourseDto> courses = FXCollections.observableArrayList();
+    private final ObservableList<EnrollmentResponse> enrollments = FXCollections.observableArrayList();
     private final CourseApi courseApi = new CourseApi();
     private final DashboardApi dashboardApi = new DashboardApi();
     private final AuthApi authApi = new AuthApi();
@@ -81,6 +89,12 @@ public class InstructorDashboardController {
             }
         });
         courseTable.setItems(courses);
+
+        enrollStudentColumn.setCellValueFactory(new PropertyValueFactory<>("studentUsername"));
+        enrollEmailColumn.setCellValueFactory(new PropertyValueFactory<>("studentEmail"));
+        enrollStatusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+        enrollDateColumn.setCellValueFactory(new PropertyValueFactory<>("enrolledAt"));
+        enrollmentTable.setItems(enrollments);
 
         loadMeAndDashboard();
     }
@@ -124,6 +138,7 @@ public class InstructorDashboardController {
             lastCourseLabel.setText("No courses yet");
         }
         courses.setAll(resp.getCourses() != null ? resp.getCourses() : java.util.List.of());
+        enrollments.clear();
     }
 
     private void onOpenCourse(CourseDto course) {
@@ -134,6 +149,26 @@ public class InstructorDashboardController {
     private void onEditCourse(CourseDto course) {
         SessionStore.setActiveCourse(course);
         Launcher.go("course_editor.fxml", "Course Editor");
+    }
+
+    @FXML
+    private void onViewEnrollments() {
+        CourseDto selected = courseTable.getSelectionModel().getSelectedItem();
+        if (selected == null) { AlertUtils.warn("Select a course first."); return; }
+        loadEnrollmentsForCourse(selected.getId());
+    }
+
+    private void loadEnrollmentsForCourse(Long courseId) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                EnrollmentResponse[] resp = courseApi.listCourseEnrollments(courseId);
+                Platform.runLater(() -> enrollments.setAll(resp != null ? java.util.Arrays.asList(resp) : java.util.List.of()));
+            } catch (ApiException ex) {
+                Platform.runLater(() -> ErrorDialog.showError(ex.getMessage(), ex.getErrorCode()));
+            } catch (Exception ex) {
+                Platform.runLater(() -> ErrorDialog.showError("Failed to load enrollments: " + ex.getMessage()));
+            }
+        });
     }
 
     @FXML
