@@ -7,6 +7,7 @@ import com.example.demo.common.ApiException;
 import com.example.demo.common.ErrorDialog;
 import com.example.demo.common.SessionStore;
 import com.example.demo.common.TokenStore;
+import com.example.demo.common.TableUtils;
 import com.example.demo.course.CourseApi;
 import com.example.demo.model.EnrollmentResponse;
 import com.example.demo.model.CourseDto;
@@ -89,12 +90,14 @@ public class InstructorDashboardController {
             }
         });
         courseTable.setItems(courses);
+        TableUtils.style(courseTable, titleColumn, publishedColumn, createdColumn, actionsColumn);
 
         enrollStudentColumn.setCellValueFactory(new PropertyValueFactory<>("studentUsername"));
         enrollEmailColumn.setCellValueFactory(new PropertyValueFactory<>("studentEmail"));
         enrollStatusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
         enrollDateColumn.setCellValueFactory(new PropertyValueFactory<>("enrolledAt"));
         enrollmentTable.setItems(enrollments);
+        TableUtils.style(enrollmentTable, enrollStudentColumn, enrollEmailColumn, enrollStatusColumn, enrollDateColumn);
 
         loadMeAndDashboard();
     }

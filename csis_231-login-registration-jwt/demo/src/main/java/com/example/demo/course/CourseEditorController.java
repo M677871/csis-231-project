@@ -7,6 +7,7 @@ import com.example.demo.common.ApiException;
 import com.example.demo.common.ErrorDialog;
 import com.example.demo.common.SessionStore;
 import com.example.demo.common.TokenStore;
+import com.example.demo.common.TableUtils;
 import com.example.demo.model.*;
 import com.example.demo.quiz.QuizApi;
 import javafx.application.Platform;
@@ -81,6 +82,8 @@ public class CourseEditorController {
             }
         });
         quizTable.setItems(quizzes);
+        TableUtils.style(materialTable, materialTitleColumn, materialTypeColumn, materialUrlColumn);
+        TableUtils.style(quizTable, quizNameColumn, quizQuestionsColumn, quizActionColumn);
 
         loadCourse();
         loadCategories();

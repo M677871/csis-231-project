@@ -6,6 +6,7 @@ import com.example.demo.common.ApiException;
 import com.example.demo.common.ErrorDialog;
 import com.example.demo.common.SessionStore;
 import com.example.demo.common.TokenStore;
+import com.example.demo.common.TableUtils;
 import com.example.demo.dashboard.DashboardApi;
 import com.example.demo.model.*;
 import javafx.application.Platform;
@@ -64,6 +65,7 @@ public class StudentDashboardController {
             }
         });
         enrolledTable.setItems(enrolledCourses);
+        TableUtils.style(enrolledTable, courseTitleColumn, courseActionColumn);
 
         quizNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         quizQuestionColumn.setCellValueFactory(new PropertyValueFactory<>("questionCount"));
@@ -79,6 +81,7 @@ public class StudentDashboardController {
             }
         });
         quizTable.setItems(upcomingQuizzes);
+        TableUtils.style(quizTable, quizNameColumn, quizQuestionColumn, quizActionColumn);
 
         loadMeAndDashboard();
     }

@@ -49,6 +49,7 @@ public class CategoryController {
         // Sorting + show all rows
         sorted.comparatorProperty().bind(categoryTable.comparatorProperty());
         categoryTable.setItems(sorted);
+        TableUtils.style(categoryTable, categoryIdColumn, categoryNameColumn);
 
         // Selection -> form
         categoryTable.getSelectionModel().selectedItemProperty().addListener((o, oldSel, c) -> {

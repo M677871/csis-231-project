@@ -6,6 +6,7 @@ import com.example.demo.common.AlertUtils;
 import com.example.demo.common.ApiException;
 import com.example.demo.common.ErrorDialog;
 import com.example.demo.common.SessionStore;
+import com.example.demo.common.TableUtils;
 import com.example.demo.model.CourseDto;
 import com.example.demo.model.EnrollmentRequest;
 import com.example.demo.model.MeResponse;
@@ -71,6 +72,7 @@ public class CourseCatalogController {
         });
 
         courseTable.setItems(courses);
+        TableUtils.style(courseTable, titleColumn, instructorColumn, publishedColumn, actionColumn);
 
         if (searchField != null) {
             searchField.textProperty().addListener((obs, o, n) -> loadCourses());

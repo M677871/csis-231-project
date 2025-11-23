@@ -21,6 +21,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
+import com.example.demo.common.TableUtils;
 
 /**
  * Admin view to inspect a student's enrollments.
@@ -65,11 +66,13 @@ public class AdminEnrollmentsController {
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
         enrolledAtColumn.setCellValueFactory(new PropertyValueFactory<>("enrolledAt"));
         enrollmentTable.setItems(enrollments);
+        TableUtils.style(enrollmentTable, courseIdColumn, courseTitleColumn, studentNameColumn, studentEmailColumn, statusColumn, enrolledAtColumn);
 
         instructorCourseIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         instructorCourseTitleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         instructorCoursePublishedColumn.setCellValueFactory(new PropertyValueFactory<>("published"));
         instructorCourseTable.setItems(instructorCourses);
+        TableUtils.style(instructorCourseTable, instructorCourseIdColumn, instructorCourseTitleColumn, instructorCoursePublishedColumn);
 
         instructorPicker.setItems(instructors);
         instructorPicker.setCellFactory(list -> new ListCell<>() {

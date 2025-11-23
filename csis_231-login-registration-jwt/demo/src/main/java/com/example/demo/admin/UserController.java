@@ -90,6 +90,8 @@ public class UserController {
         // Sort + show all rows
         sorted.comparatorProperty().bind(userTable.comparatorProperty());
         userTable.setItems(sorted);
+        TableUtils.style(userTable, userIdColumn, userNameColumn, userEmailColumn, firstNameColumn, lastNameColumn,
+                phoneColumn, userRoleColumn, activeColumn, twoFaColumn, emailVerColumn);
 
         // Selection -> form
         userTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, u) -> {

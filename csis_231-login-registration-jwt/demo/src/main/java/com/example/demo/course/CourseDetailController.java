@@ -5,6 +5,7 @@ import com.example.demo.common.AlertUtils;
 import com.example.demo.common.ApiException;
 import com.example.demo.common.ErrorDialog;
 import com.example.demo.common.SessionStore;
+import com.example.demo.common.TableUtils;
 import com.example.demo.model.CourseDetailDto;
 import com.example.demo.model.CourseDto;
 import com.example.demo.model.CourseMaterialDto;
@@ -76,6 +77,8 @@ public class CourseDetailController {
             }
         });
         quizTable.setItems(quizzes);
+        TableUtils.style(materialTable, materialTitleColumn, materialTypeColumn, materialUrlColumn);
+        TableUtils.style(quizTable, quizNameColumn, quizQuestionsColumn, quizActionColumn);
 
         course = SessionStore.getActiveCourse();
         if (course == null) {
