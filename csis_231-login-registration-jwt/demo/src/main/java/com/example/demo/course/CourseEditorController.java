@@ -28,6 +28,8 @@ import javafx.beans.property.SimpleStringProperty;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -61,6 +63,7 @@ public class CourseEditorController {
     private final QuizApi quizApi = new QuizApi();
     private final AuthApi authApi = new AuthApi();
     private final com.example.demo.admin.CategoryApi categoryApi = new com.example.demo.admin.CategoryApi();
+    private final com.example.demo.admin.UserApi userApi = new com.example.demo.admin.UserApi();
     private CourseDto activeCourse;
     private CourseDetailDto activeDetail;
     private final ObservableList<CourseMaterialDto> materials = FXCollections.observableArrayList();
@@ -415,7 +418,20 @@ public class CourseEditorController {
         CompletableFuture.runAsync(() -> {
             try {
                 QuizResultDto[] res = quizApi.results(quiz.getId());
-                Platform.runLater(() -> showResultsDialog(quiz, res != null ? List.of(res) : List.of()));
+                Map<Long, String> names = new HashMap<>();
+                if (res != null) {
+                    for (QuizResultDto r : res) {
+                        if (r != null && r.getStudentUserId() != null && !names.containsKey(r.getStudentUserId())) {
+                            try {
+                                var u = userApi.get(r.getStudentUserId());
+                                if (u != null && u.getUsername() != null) {
+                                    names.put(r.getStudentUserId(), u.getUsername());
+                                }
+                            } catch (Exception ignored) {}
+                        }
+                    }
+                }
+                Platform.runLater(() -> showResultsDialog(quiz, res != null ? List.of(res) : List.of(), names));
             } catch (ApiException ex) {
                 Platform.runLater(() -> ErrorDialog.showError(ex.getMessage(), ex.getErrorCode()));
             } catch (Exception ex) {
@@ -424,7 +440,7 @@ public class CourseEditorController {
         });
     }
 
-    private void showResultsDialog(QuizSummaryDto quiz, List<QuizResultDto> results) {
+    private void showResultsDialog(QuizSummaryDto quiz, List<QuizResultDto> results, Map<Long, String> usernames) {
         Stage stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setTitle("Results - " + (quiz != null ? quiz.getName() : ""));
@@ -434,15 +450,20 @@ public class CourseEditorController {
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         table.setItems(FXCollections.observableArrayList(results));
 
-        TableColumn<QuizResultDto, Long> studentCol = new TableColumn<>("Student ID");
-        studentCol.setCellValueFactory(new PropertyValueFactory<>("studentUserId"));
+        TableColumn<QuizResultDto, String> studentCol = new TableColumn<>("Student");
+        studentCol.setCellValueFactory(c -> {
+            QuizResultDto r = c.getValue();
+            Long id = r.getStudentUserId();
+            String name = id != null ? usernames.getOrDefault(id, String.valueOf(id)) : "";
+            return new SimpleStringProperty(name);
+        });
         TableColumn<QuizResultDto, String> scoreCol = new TableColumn<>("Score");
         scoreCol.setCellValueFactory(c -> {
             QuizResultDto r = c.getValue();
-            return new javafx.beans.property.SimpleStringProperty(r.getScore() + "/" + r.getTotalQuestions());
+            return new SimpleStringProperty(r.getScore() + "/" + r.getTotalQuestions());
         });
         TableColumn<QuizResultDto, String> completedCol = new TableColumn<>("Completed At");
-        completedCol.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(
+        completedCol.setCellValueFactory(c -> new SimpleStringProperty(
                 c.getValue().getCompletedAt() != null ? c.getValue().getCompletedAt().toString() : ""
         ));
 
