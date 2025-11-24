@@ -20,6 +20,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -245,17 +246,14 @@ public class CourseEditorController {
     @FXML
     private void onCreateQuiz() {
         if (!ensureCourseExists()) return;
-        Dialog<QuizCreationInput> dialog = buildQuizDialog();
-        dialog.showAndWait().ifPresent(input -> {
+        promptQuizCreation().ifPresent(payload -> {
             CompletableFuture.runAsync(() -> {
                 try {
                     QuizSummaryDto quiz = quizApi.createQuiz(
-                            new QuizCreateRequest(activeCourse.getId(), input.name, input.description));
-                    List<QuizQuestionRequest> questions = new ArrayList<>();
-                    questions.add(new QuizQuestionRequest(input.question, input.answers));
-                    quizApi.addQuestions(quiz.getId(), questions);
+                            new QuizCreateRequest(activeCourse.getId(), payload.name, payload.description));
+                    quizApi.addQuestions(quiz.getId(), payload.questions);
                     loadCourse();
-                    Platform.runLater(() -> AlertUtils.info("Quiz created"));
+                    Platform.runLater(() -> AlertUtils.info("Quiz created with " + payload.questions.size() + " question(s)"));
                 } catch (ApiException ex) {
                     Platform.runLater(() -> ErrorDialog.showError(ex.getMessage(), ex.getErrorCode()));
                 } catch (Exception ex) {
@@ -265,15 +263,60 @@ public class CourseEditorController {
         });
     }
 
-    private Dialog<QuizCreationInput> buildQuizDialog() {
-        Dialog<QuizCreationInput> dialog = new Dialog<>();
-        dialog.setTitle("Create Quiz");
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+    private Optional<QuizPayload> promptQuizCreation() {
+        Dialog<QuizMeta> metaDialog = new Dialog<>();
+        metaDialog.setTitle("Create Quiz");
+        metaDialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         TextField nameField = new TextField();
         nameField.setPromptText("Quiz title");
         TextField descField = new TextField();
         descField.setPromptText("Description");
+
+        GridPane metaGrid = new GridPane();
+        metaGrid.setVgap(8); metaGrid.setHgap(8);
+        metaGrid.addRow(0, new Label("Name"), nameField);
+        metaGrid.addRow(1, new Label("Description"), descField);
+        metaDialog.getDialogPane().setContent(metaGrid);
+
+        metaDialog.setResultConverter(btn -> {
+            if (btn != ButtonType.OK) return null;
+            if (nameField.getText().isBlank()) {
+                AlertUtils.warn("Enter quiz name.");
+                return null;
+            }
+            return new QuizMeta(nameField.getText().trim(), descField.getText().trim());
+        });
+
+        Optional<QuizMeta> metaOpt = metaDialog.showAndWait();
+        if (metaOpt.isEmpty()) return Optional.empty();
+
+        List<QuizQuestionRequest> questions = new ArrayList<>();
+        boolean keepAdding = true;
+        while (keepAdding) {
+            Dialog<QuizQuestionRequest> qDialog = buildQuestionDialog(questions.isEmpty());
+            Optional<QuizQuestionRequest> q = qDialog.showAndWait();
+            if (q.isPresent()) {
+                questions.add(q.get());
+            } else {
+                keepAdding = false;
+            }
+        }
+
+        if (questions.isEmpty()) {
+            AlertUtils.warn("A quiz must contain at least one question.");
+            return Optional.empty();
+        }
+
+        QuizMeta meta = metaOpt.get();
+        return Optional.of(new QuizPayload(meta.name, meta.description, questions));
+    }
+
+    private Dialog<QuizQuestionRequest> buildQuestionDialog(boolean first) {
+        Dialog<QuizQuestionRequest> dialog = new Dialog<>();
+        dialog.setTitle(first ? "Add first question" : "Add another question");
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
         TextField questionField = new TextField();
         questionField.setPromptText("Question text");
         TextField optA = new TextField();
@@ -291,21 +334,18 @@ public class CourseEditorController {
 
         GridPane grid = new GridPane();
         grid.setVgap(8); grid.setHgap(8);
-        grid.addRow(0, new Label("Name"), nameField);
-        grid.addRow(1, new Label("Description"), descField);
-        grid.addRow(2, new Label("Question"), questionField);
-        grid.addRow(3, new Label("Option A"), optA);
-        grid.addRow(4, new Label("Option B"), optB);
-        grid.addRow(5, new Label("Option C"), optC);
-        grid.addRow(6, new Label("Option D"), optD);
-        grid.addRow(7, new Label("Correct"), correctBox);
+        grid.addRow(0, new Label("Question"), questionField);
+        grid.addRow(1, new Label("Option A"), optA);
+        grid.addRow(2, new Label("Option B"), optB);
+        grid.addRow(3, new Label("Option C"), optC);
+        grid.addRow(4, new Label("Option D"), optD);
+        grid.addRow(5, new Label("Correct"), correctBox);
 
         dialog.getDialogPane().setContent(grid);
         dialog.setResultConverter(btn -> {
             if (btn != ButtonType.OK) return null;
-            if (nameField.getText().isBlank() || questionField.getText().isBlank()
-                    || optA.getText().isBlank() || optB.getText().isBlank()) {
-                AlertUtils.warn("Enter name, question, and at least two options.");
+            if (questionField.getText().isBlank() || optA.getText().isBlank() || optB.getText().isBlank()) {
+                AlertUtils.warn("Enter question and at least two options.");
                 return null;
             }
             List<AnswerCreateRequest> answers = new ArrayList<>();
@@ -321,12 +361,7 @@ public class CourseEditorController {
             if (!hasCorrect) {
                 answers.get(0).setCorrect(true);
             }
-            return new QuizCreationInput(
-                    nameField.getText().trim(),
-                    descField.getText().trim(),
-                    questionField.getText().trim(),
-                    answers
-            );
+            return new QuizQuestionRequest(questionField.getText().trim(), answers);
         });
         return dialog;
     }
@@ -389,5 +424,6 @@ public class CourseEditorController {
         Launcher.go("login.fxml", "Login");
     }
 
-    private record QuizCreationInput(String name, String description, String question, List<AnswerCreateRequest> answers) {}
+    private record QuizMeta(String name, String description) {}
+    private record QuizPayload(String name, String description, List<QuizQuestionRequest> questions) {}
 }
