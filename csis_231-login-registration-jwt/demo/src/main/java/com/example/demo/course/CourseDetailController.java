@@ -25,6 +25,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.awt.*;
 import java.net.URI;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -159,17 +162,53 @@ public class CourseDetailController {
 
     private void openSelectedMaterial() {
         CourseMaterialDto selected = materialTable.getSelectionModel().getSelectedItem();
-        if (selected == null || selected.getUrl() == null || selected.getUrl().isBlank()) return;
+        if (selected == null) {
+            return;
+        }
+
+        String raw = selected.getUrl();
+        if (raw == null || raw.isBlank()) {
+            return;
+        }
+
         if (!Desktop.isDesktopSupported()) {
             AlertUtils.warn("Opening materials is not supported on this system.");
             return;
         }
+
+        String url = raw.trim();
+
         try {
-            Desktop.getDesktop().browse(new URI(selected.getUrl()));
+            // If it looks like a bare domain, prefix https://
+            if (!url.matches("(?i)^https?://.*")
+                    && url.matches("(?i)^[a-z0-9][a-z0-9.-]*\\.[a-z]{2,}.*")) {
+                url = "https://" + url;
+            }
+
+            boolean isHttp = url.matches("(?i)^https?://.*");
+
+            if (isHttp) {
+                // ✅ Web link: open in browser, no Path.of(...) here
+                String safe = url.replace("<", "")
+                        .replace(">", "")
+                        .replace(" ", "%20");
+                Desktop.getDesktop().browse(new URI(safe));
+
+            } else {
+                // ✅ Local file path: use Path.of only here
+                Path file = Path.of(url);
+                if (Files.exists(file)) {
+                    Desktop.getDesktop().open(file.toFile());
+                } else {
+                    AlertUtils.warn("File does not exist: " + url);
+                }
+            }
+
         } catch (Exception ex) {
             ErrorDialog.showError("Could not open material: " + ex.getMessage());
         }
     }
+
 
     private void onTakeQuiz(QuizSummaryDto quiz) {
         if (quiz == null) { return; }
