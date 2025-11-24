@@ -16,7 +16,7 @@ public final class TableUtils {
         }
         if (columns != null) {
             for (TableColumn<?, ?> col : columns) {
-                if (col != null) col.setStyle("-fx-alignment: CENTER-LEFT; -fx-text-fill: #FFFFFF;");
+                if (col != null) col.setStyle("-fx-alignment: CENTER; -fx-text-fill: #FFFFFF;");
             }
         }
     }
