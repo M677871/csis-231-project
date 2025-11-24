@@ -9,4 +9,6 @@ import java.util.List;
 public interface QuizResultRepository extends JpaRepository<QuizResult, Long> {
     List<QuizResult> findTop5ByStudent_IdOrderByCompletedAtDesc(Long studentId);
     List<QuizResult> findByQuiz_Id(Long quizId);
+
+    java.util.Optional<QuizResult> findTop1ByQuiz_IdAndStudent_IdOrderByCompletedAtDesc(Long quizId, Long studentId);
 }

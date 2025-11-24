@@ -40,4 +40,9 @@ public class QuizApi {
     public void deleteQuiz(Long quizId) {
         client.delete("/api/quizzes/" + quizId);
     }
+
+    public QuizResultDto myResult(Long quizId) {
+        ApiResponse<QuizResultDto> resp = client.get("/api/quizzes/" + quizId + "/my-result", new TypeReference<QuizResultDto>() {});
+        return resp.getBody();
+    }
 }

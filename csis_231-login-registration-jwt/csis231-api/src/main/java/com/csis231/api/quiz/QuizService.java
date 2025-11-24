@@ -110,8 +110,14 @@ public class QuizService {
                 .orElseThrow(() -> new ResourceNotFoundException("Quiz not found: " + quizId));
 
         if (actor.getRole() == User.Role.STUDENT || actor.getRole() == User.Role.INSTRUCTOR) {
-            boolean enrolled = enrollmentService.isStudentEnrolled(actor.getId(), quiz.getCourse().getId());
-            if (!enrolled) throw new UnauthorizedException("Enroll in the course before taking the quiz");
+            boolean ownsCourse = actor.getRole() == User.Role.INSTRUCTOR
+                    && quiz.getCourse() != null
+                    && quiz.getCourse().getInstructor() != null
+                    && Objects.equals(quiz.getCourse().getInstructor().getId(), actor.getId());
+            if (!ownsCourse) {
+                boolean enrolled = enrollmentService.isStudentEnrolled(actor.getId(), quiz.getCourse().getId());
+                if (!enrolled) throw new UnauthorizedException("Enroll in the course before taking the quiz");
+            }
         }
 
         List<QuizQuestion> questions = questionRepository.findByQuiz_Id(quizId);
@@ -195,6 +201,18 @@ public class QuizService {
         return resultRepository.findTop5ByStudent_IdOrderByCompletedAtDesc(studentId).stream()
                 .map(QuizMapper::toResultDto)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public QuizResultDto latestResultForUser(Long quizId, User actor) {
+        if (actor == null) throw new UnauthorizedException("Authentication required");
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new ResourceNotFoundException("Quiz not found: " + quizId));
+        // any authenticated user can ask for their own result if they can view the quiz
+        enforceQuizAccessForView(quiz, actor);
+        return resultRepository.findTop1ByQuiz_IdAndStudent_IdOrderByCompletedAtDesc(quizId, actor.getId())
+                .map(QuizMapper::toResultDto)
+                .orElse(null);
     }
 
     private static void requireInstructorOrAdmin(User actor) {

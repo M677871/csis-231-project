@@ -10,7 +10,9 @@ import com.example.demo.model.CourseDetailDto;
 import com.example.demo.model.CourseDto;
 import com.example.demo.model.CourseMaterialDto;
 import com.example.demo.model.QuizSummaryDto;
+import com.example.demo.model.QuizResultDto;
 import com.example.demo.quiz.QuizApi;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,7 +25,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.awt.*;
 import java.net.URI;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Course detail view for students and instructors.
@@ -42,12 +46,14 @@ public class CourseDetailController {
     @FXML private TableView<QuizSummaryDto> quizTable;
     @FXML private TableColumn<QuizSummaryDto, String> quizNameColumn;
     @FXML private TableColumn<QuizSummaryDto, Integer> quizQuestionsColumn;
+    @FXML private TableColumn<QuizSummaryDto, String> quizResultColumn;
     @FXML private TableColumn<QuizSummaryDto, Void> quizActionColumn;
 
     private final CourseApi courseApi = new CourseApi();
     private final QuizApi quizApi = new QuizApi();
     private final ObservableList<CourseMaterialDto> materials = FXCollections.observableArrayList();
     private final ObservableList<QuizSummaryDto> quizzes = FXCollections.observableArrayList();
+    private final Map<Long, QuizResultDto> latestResults = new ConcurrentHashMap<>();
     private CourseDto course;
 
     @FXML
@@ -62,6 +68,24 @@ public class CourseDetailController {
 
         quizNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         quizQuestionsColumn.setCellValueFactory(new PropertyValueFactory<>("questionCount"));
+        quizResultColumn.setCellValueFactory(c -> new SimpleStringProperty(""));
+        quizResultColumn.setCellFactory(col -> new TableCell<>() {
+            @Override protected void updateItem(String v, boolean empty) {
+                super.updateItem(v, empty);
+                if (empty || getIndex() >= getTableView().getItems().size()) {
+                    setText(null);
+                    return;
+                }
+                QuizSummaryDto q = getTableView().getItems().get(getIndex());
+                QuizResultDto r = latestResults.get(q.getId());
+                if (r == null) {
+                    setText("—");
+                } else {
+                    setText(r.getScore() + "/" + r.getTotalQuestions());
+                }
+            }
+        });
+
         quizActionColumn.setCellFactory(col -> new TableCell<>() {
             private final Button takeBtn = new Button("Take");
             {
@@ -73,12 +97,19 @@ public class CourseDetailController {
             }
             @Override protected void updateItem(Void v, boolean empty) {
                 super.updateItem(v, empty);
-                setGraphic(empty ? null : takeBtn);
+                if (empty || getIndex() >= getTableView().getItems().size()) {
+                    setGraphic(null);
+                    return;
+                }
+                QuizSummaryDto q = getTableView().getItems().get(getIndex());
+                boolean hasResult = latestResults.containsKey(q.getId());
+                takeBtn.setText(hasResult ? "Retry" : "Take");
+                setGraphic(takeBtn);
             }
         });
         quizTable.setItems(quizzes);
         TableUtils.style(materialTable, materialTitleColumn, materialTypeColumn, materialUrlColumn);
-        TableUtils.style(quizTable, quizNameColumn, quizQuestionsColumn, quizActionColumn);
+        TableUtils.style(quizTable, quizNameColumn, quizQuestionsColumn, quizResultColumn, quizActionColumn);
 
         course = SessionStore.getActiveCourse();
         if (course == null) {
@@ -93,12 +124,28 @@ public class CourseDetailController {
             try {
                 CourseDetailDto detail = courseApi.get(courseId);
                 Platform.runLater(() -> populate(detail));
+                loadLatestResults(detail);
             } catch (ApiException ex) {
                 Platform.runLater(() -> ErrorDialog.showError(ex.getMessage(), ex.getErrorCode()));
             } catch (Exception ex) {
                 Platform.runLater(() -> ErrorDialog.showError("Failed to load course: " + ex.getMessage()));
             }
         });
+    }
+
+    private void loadLatestResults(CourseDetailDto d) {
+        if (d == null || d.getQuizzes() == null) return;
+        for (QuizSummaryDto quiz : d.getQuizzes()) {
+            CompletableFuture.runAsync(() -> {
+                try {
+                    QuizResultDto res = quizApi.myResult(quiz.getId());
+                    if (res != null) {
+                        latestResults.put(quiz.getId(), res);
+                        Platform.runLater(() -> quizTable.refresh());
+                    }
+                } catch (Exception ignored) {}
+            });
+        }
     }
 
     private void populate(CourseDetailDto d) {

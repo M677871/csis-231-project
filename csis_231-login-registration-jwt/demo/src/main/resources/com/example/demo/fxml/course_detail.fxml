@@ -2,7 +2,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.demo.course.CourseDetailController"
@@ -55,9 +54,10 @@
                             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                         </columnResizePolicy>
                         <columns>
-                            <TableColumn fx:id="quizNameColumn" text="Quiz" prefWidth="320"/>
-                            <TableColumn fx:id="quizQuestionsColumn" text="Questions" prefWidth="120"/>
-                            <TableColumn fx:id="quizActionColumn" text="Action" prefWidth="160"/>
+                            <TableColumn fx:id="quizNameColumn" text="Quiz" prefWidth="260"/>
+                            <TableColumn fx:id="quizQuestionsColumn" text="Questions" prefWidth="90"/>
+                            <TableColumn fx:id="quizResultColumn" text="Result" prefWidth="140"/>
+                            <TableColumn fx:id="quizActionColumn" text="Action" prefWidth="140"/>
                         </columns>
                         <placeholder><Label text="No quizzes yet"/></placeholder>
                     </TableView>

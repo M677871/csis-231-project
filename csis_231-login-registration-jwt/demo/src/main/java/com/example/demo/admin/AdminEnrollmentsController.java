@@ -18,6 +18,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.paint.Color;
 
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
@@ -80,6 +81,7 @@ public class AdminEnrollmentsController {
             protected void updateItem(User item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(empty || item == null ? null : item.getUsername() + " (" + item.getEmail() + ")");
+                setTextFill(Color.WHITE);
             }
         });
         instructorPicker.setButtonCell(new ListCell<>() {
@@ -87,6 +89,7 @@ public class AdminEnrollmentsController {
             protected void updateItem(User item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(empty || item == null ? null : item.getUsername());
+                setTextFill(Color.WHITE);
             }
         });
 

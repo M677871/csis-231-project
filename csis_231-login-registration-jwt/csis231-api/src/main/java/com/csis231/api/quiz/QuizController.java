@@ -60,6 +60,12 @@ public class QuizController {
         return quizService.resultsForQuiz(quizId, actor);
     }
 
+    @GetMapping("/{quizId}/my-result")
+    public QuizResultDto myResult(@PathVariable Long quizId, Authentication authentication) {
+        User actor = resolveUser(authentication);
+        return quizService.latestResultForUser(quizId, actor);
+    }
+
     @DeleteMapping("/{quizId}")
     public ResponseEntity<Void> delete(@PathVariable Long quizId, Authentication authentication) {
         User actor = resolveUser(authentication);

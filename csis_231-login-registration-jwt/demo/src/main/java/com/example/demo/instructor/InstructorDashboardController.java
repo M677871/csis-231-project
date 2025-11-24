@@ -15,6 +15,7 @@ import com.example.demo.model.InstructorDashboardResponse;
 import com.example.demo.model.MeResponse;
 import com.example.demo.model.CourseStatsDto;
 import com.example.demo.dashboard.DashboardApi;
+import com.example.demo.student.EnrollmentApi;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -47,11 +48,18 @@ public class InstructorDashboardController {
     @FXML private TableColumn<EnrollmentResponse, String> enrollStatusColumn;
     @FXML private TableColumn<EnrollmentResponse, String> enrollDateColumn;
 
+    @FXML private TableView<EnrollmentResponse> myEnrollmentTable;
+    @FXML private TableColumn<EnrollmentResponse, String> myCourseTitleColumn;
+    @FXML private TableColumn<EnrollmentResponse, String> myCourseStatusColumn;
+    @FXML private TableColumn<EnrollmentResponse, String> myCourseEnrolledAtColumn;
+
     private final ObservableList<CourseDto> courses = FXCollections.observableArrayList();
     private final ObservableList<EnrollmentResponse> enrollments = FXCollections.observableArrayList();
+    private final ObservableList<EnrollmentResponse> myEnrollments = FXCollections.observableArrayList();
     private final CourseApi courseApi = new CourseApi();
     private final DashboardApi dashboardApi = new DashboardApi();
     private final AuthApi authApi = new AuthApi();
+    private final EnrollmentApi enrollmentApi = new EnrollmentApi();
     private MeResponse me;
 
     @FXML
@@ -99,6 +107,14 @@ public class InstructorDashboardController {
         enrollmentTable.setItems(enrollments);
         TableUtils.style(enrollmentTable, enrollStudentColumn, enrollEmailColumn, enrollStatusColumn, enrollDateColumn);
 
+        if (myEnrollmentTable != null) {
+            myCourseTitleColumn.setCellValueFactory(new PropertyValueFactory<>("courseTitle"));
+            myCourseStatusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+            myCourseEnrolledAtColumn.setCellValueFactory(new PropertyValueFactory<>("enrolledAt"));
+            myEnrollmentTable.setItems(myEnrollments);
+            TableUtils.style(myEnrollmentTable, myCourseTitleColumn, myCourseStatusColumn, myCourseEnrolledAtColumn);
+        }
+
         loadMeAndDashboard();
     }
 
@@ -108,6 +124,7 @@ public class InstructorDashboardController {
                 MeResponse cached = SessionStore.getMe();
                 me = cached != null ? cached : authApi.me();
                 if (cached == null) SessionStore.setMe(me);
+                loadMyEnrollments();
                 loadDashboard();
             } catch (Exception ex) {
                 Platform.runLater(() -> ErrorDialog.showError("Failed to load profile: " + ex.getMessage()));
@@ -170,6 +187,18 @@ public class InstructorDashboardController {
                 Platform.runLater(() -> ErrorDialog.showError(ex.getMessage(), ex.getErrorCode()));
             } catch (Exception ex) {
                 Platform.runLater(() -> ErrorDialog.showError("Failed to load enrollments: " + ex.getMessage()));
+            }
+        });
+    }
+
+    private void loadMyEnrollments() {
+        if (myEnrollmentTable == null || me == null || me.getId() == null) return;
+        CompletableFuture.runAsync(() -> {
+            try {
+                EnrollmentResponse[] resp = enrollmentApi.listByCurrentUser(me.getId());
+                Platform.runLater(() -> myEnrollments.setAll(resp != null ? java.util.Arrays.asList(resp) : java.util.List.of()));
+            } catch (Exception ex) {
+                Platform.runLater(() -> ErrorDialog.showError("Failed to load your enrollments: " + ex.getMessage()));
             }
         });
     }

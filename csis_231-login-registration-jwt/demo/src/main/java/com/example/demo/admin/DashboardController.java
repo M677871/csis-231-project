@@ -7,10 +7,19 @@ import com.example.demo.common.ApiException;
 import com.example.demo.common.ErrorDialog;
 import com.example.demo.common.SessionStore;
 import com.example.demo.common.TokenStore;
+import com.example.demo.common.TableUtils;
+import com.example.demo.model.EnrollmentResponse;
 import com.example.demo.model.MeResponse;
+import com.example.demo.student.EnrollmentApi;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * JavaFX controller for the main dashboard screen.
@@ -27,6 +36,13 @@ public class DashboardController {
     @FXML private Label name;
     @FXML private Label email;
     @FXML private Label role;
+    @FXML private TableView<EnrollmentResponse> myEnrollmentsTable;
+    @FXML private TableColumn<EnrollmentResponse, String> myCourseTitleColumn;
+    @FXML private TableColumn<EnrollmentResponse, String> myCourseStatusColumn;
+    @FXML private TableColumn<EnrollmentResponse, String> myCourseEnrolledAtColumn;
+
+    private final ObservableList<EnrollmentResponse> myEnrollments = FXCollections.observableArrayList();
+    private final EnrollmentApi enrollmentApi = new EnrollmentApi();
 
     /**
      * Initializes the dashboard after the FXML has been loaded.
@@ -49,6 +65,14 @@ public class DashboardController {
         welcome.setText("Welcome");
         name.setText(""); email.setText(""); role.setText("");
 
+        if (myEnrollmentsTable != null) {
+            myCourseTitleColumn.setCellValueFactory(new PropertyValueFactory<>("courseTitle"));
+            myCourseStatusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+            myCourseEnrolledAtColumn.setCellValueFactory(new PropertyValueFactory<>("enrolledAt"));
+            myEnrollmentsTable.setItems(myEnrollments);
+            TableUtils.style(myEnrollmentsTable, myCourseTitleColumn, myCourseStatusColumn, myCourseEnrolledAtColumn);
+        }
+
         Platform.runLater(() -> {
             try {
                 if (!TokenStore.hasToken()) {
@@ -66,10 +90,23 @@ public class DashboardController {
                 name.setText(full);
                 email.setText(me.getEmail());
                 role.setText(me.getRole());
+                loadMyEnrollments(me.getId());
             } catch (ApiException ex) {
                 ErrorDialog.showError(ex.getMessage(), ex.getErrorCode());
             } catch (Exception ex) {
                 ErrorDialog.showError("Failed to load profile: " + ex.getMessage());
+            }
+        });
+    }
+
+    private void loadMyEnrollments(Long userId) {
+        if (userId == null || myEnrollmentsTable == null) return;
+        CompletableFuture.runAsync(() -> {
+            try {
+                var resp = enrollmentApi.listByCurrentUser(userId);
+                Platform.runLater(() -> myEnrollments.setAll(resp != null ? java.util.Arrays.asList(resp) : java.util.List.of()));
+            } catch (Exception ex) {
+                Platform.runLater(() -> ErrorDialog.showError("Failed to load your enrollments: " + ex.getMessage()));
             }
         });
     }
