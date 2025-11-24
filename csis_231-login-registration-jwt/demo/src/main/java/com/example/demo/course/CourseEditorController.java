@@ -15,9 +15,15 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+import javafx.beans.property.SimpleStringProperty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -405,8 +411,51 @@ public class CourseEditorController {
     }
 
     private void onViewResults(QuizSummaryDto quiz) {
-        SessionStore.setActiveQuiz(quiz);
-        AlertUtils.info("Results view not implemented yet; coming soon.");
+        if (quiz == null) { AlertUtils.warn("Select a quiz first."); return; }
+        CompletableFuture.runAsync(() -> {
+            try {
+                QuizResultDto[] res = quizApi.results(quiz.getId());
+                Platform.runLater(() -> showResultsDialog(quiz, res != null ? List.of(res) : List.of()));
+            } catch (ApiException ex) {
+                Platform.runLater(() -> ErrorDialog.showError(ex.getMessage(), ex.getErrorCode()));
+            } catch (Exception ex) {
+                Platform.runLater(() -> ErrorDialog.showError("Failed to load results: " + ex.getMessage()));
+            }
+        });
+    }
+
+    private void showResultsDialog(QuizSummaryDto quiz, List<QuizResultDto> results) {
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle("Results - " + (quiz != null ? quiz.getName() : ""));
+
+        TableView<QuizResultDto> table = new TableView<>();
+
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.setItems(FXCollections.observableArrayList(results));
+
+        TableColumn<QuizResultDto, Long> studentCol = new TableColumn<>("Student ID");
+        studentCol.setCellValueFactory(new PropertyValueFactory<>("studentUserId"));
+        TableColumn<QuizResultDto, String> scoreCol = new TableColumn<>("Score");
+        scoreCol.setCellValueFactory(c -> {
+            QuizResultDto r = c.getValue();
+            return new javafx.beans.property.SimpleStringProperty(r.getScore() + "/" + r.getTotalQuestions());
+        });
+        TableColumn<QuizResultDto, String> completedCol = new TableColumn<>("Completed At");
+        completedCol.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(
+                c.getValue().getCompletedAt() != null ? c.getValue().getCompletedAt().toString() : ""
+        ));
+
+        table.getColumns().addAll(studentCol, scoreCol, completedCol);
+        TableUtils.style(table, studentCol, scoreCol, completedCol);
+        table.setPrefHeight(360);
+
+        VBox root = new VBox(12, new Label("Results"), table);
+        root.setPadding(new javafx.geometry.Insets(16));
+        VBox.setVgrow(table, Priority.ALWAYS);
+
+        stage.setScene(new Scene(root, 600, 420));
+        stage.showAndWait();
     }
 
     private void onDeleteQuiz(QuizSummaryDto quiz) {
