@@ -21,4 +21,8 @@ public class EnrollmentApi {
         ApiResponse<EnrollmentResponse[]> resp = client.get("/api/students/" + userId + "/enrollments", new TypeReference<EnrollmentResponse[]>() {});
         return resp.getBody();
     }
+
+    public EnrollmentResponse[] listByCurrentUser(Long userId) {
+        return listByStudent(userId);
+    }
 }

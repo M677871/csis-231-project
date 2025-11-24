@@ -9,6 +9,7 @@ import com.example.demo.common.SessionStore;
 import com.example.demo.common.TableUtils;
 import com.example.demo.model.CourseDto;
 import com.example.demo.model.EnrollmentRequest;
+import com.example.demo.model.EnrollmentResponse;
 import com.example.demo.model.MeResponse;
 import com.example.demo.student.EnrollmentApi;
 import javafx.application.Platform;
@@ -38,6 +39,7 @@ public class CourseCatalogController {
     private final AuthApi authApi = new AuthApi();
     private final ObservableList<CourseDto> courses = FXCollections.observableArrayList();
     private MeResponse me;
+    private final java.util.Set<Long> enrolledCourseIds = new java.util.HashSet<>();
 
     @FXML
     public void initialize() {
@@ -66,7 +68,10 @@ public class CourseCatalogController {
                     setGraphic(null);
                     return;
                 }
-                primary.setText(isStudent() ? "Enroll" : "Edit");
+                CourseDto course = getTableView().getItems().get(getIndex());
+                boolean enrolled = course.getId() != null && enrolledCourseIds.contains(course.getId());
+                primary.setDisable(enrolled);
+                primary.setText(enrolled ? "Enrolled" : (isOwner(course) ? "Edit" : "Enroll"));
                 setGraphic(primary);
             }
         });
@@ -86,10 +91,26 @@ public class CourseCatalogController {
                 MeResponse cached = SessionStore.getMe();
                 me = cached != null ? cached : authApi.me();
                 if (cached == null) SessionStore.setMe(me);
+                loadEnrollments();
                 loadCourses();
             } catch (Exception ex) {
                 Platform.runLater(() -> ErrorDialog.showError("Failed to load profile: " + ex.getMessage()));
             }
+        });
+    }
+
+    private void loadEnrollments() {
+        if (me == null || me.getId() == null) return;
+        CompletableFuture.runAsync(() -> {
+            try {
+                EnrollmentResponse[] resp = enrollmentApi.listByCurrentUser(me.getId());
+                enrolledCourseIds.clear();
+                if (resp != null) {
+                    for (EnrollmentResponse e : resp) {
+                        if (e.getCourseId() != null) enrolledCourseIds.add(e.getCourseId());
+                    }
+                }
+            } catch (Exception ignored) {}
         });
     }
 
@@ -114,11 +135,20 @@ public class CourseCatalogController {
     }
 
     private void onAction(CourseDto course) {
-        if (isStudent()) {
-            doEnroll(course);
+        if (course == null) return;
+        boolean enrolled = course.getId() != null && enrolledCourseIds.contains(course.getId());
+        if (enrolled) return;
+
+        if (isStudent() || isInstructor() || isAdmin()) {
+            // instructors/admins enroll unless they own it (then edit)
+            if (isOwner(course) && !isStudent()) {
+                SessionStore.setActiveCourse(course);
+                Launcher.go("course_editor.fxml", "Edit Course");
+            } else {
+                doEnroll(course);
+            }
         } else {
-            SessionStore.setActiveCourse(course);
-            Launcher.go("course_editor.fxml", "Edit Course");
+            doEnroll(course);
         }
     }
 
@@ -128,6 +158,8 @@ public class CourseCatalogController {
             try {
                 enrollmentApi.enroll(new EnrollmentRequest(null, course.getId()));
                 Platform.runLater(() -> AlertUtils.info("Enrolled in " + course.getTitle()));
+                if (course.getId() != null) enrolledCourseIds.add(course.getId());
+                courseTable.refresh();
             } catch (ApiException ex) {
                 Platform.runLater(() -> ErrorDialog.showError(ex.getMessage(), ex.getErrorCode()));
             } catch (Exception ex) {
@@ -136,8 +168,12 @@ public class CourseCatalogController {
         });
     }
 
-    private boolean isStudent() {
-        return me != null && "STUDENT".equalsIgnoreCase(me.getRole());
+    private boolean isStudent() { return me != null && "STUDENT".equalsIgnoreCase(me.getRole()); }
+    private boolean isInstructor() { return me != null && "INSTRUCTOR".equalsIgnoreCase(me.getRole()); }
+    private boolean isAdmin() { return me != null && "ADMIN".equalsIgnoreCase(me.getRole()); }
+    private boolean isOwner(CourseDto c) {
+        return c != null && me != null && me.getId() != null && c.getInstructorUserId() != null
+                && c.getInstructorUserId().equals(me.getId());
     }
 
     @FXML

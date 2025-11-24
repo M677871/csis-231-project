@@ -100,8 +100,8 @@ public class QuizService {
     @Transactional
     public QuizSubmissionResponse submitQuiz(Long quizId, QuizSubmissionRequest request, User actor) {
         if (actor == null) throw new UnauthorizedException("Authentication required");
-        if (actor.getRole() != User.Role.STUDENT && actor.getRole() != User.Role.ADMIN) {
-            throw new UnauthorizedException("Only students can submit quizzes");
+        if (actor.getRole() != User.Role.STUDENT && actor.getRole() != User.Role.ADMIN && actor.getRole() != User.Role.INSTRUCTOR) {
+            throw new UnauthorizedException("Not authorized to submit quizzes");
         }
         if (request == null || request.answers() == null || request.answers().isEmpty()) {
             throw new BadRequestException("Answers are required");
@@ -109,7 +109,7 @@ public class QuizService {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new ResourceNotFoundException("Quiz not found: " + quizId));
 
-        if (actor.getRole() == User.Role.STUDENT) {
+        if (actor.getRole() == User.Role.STUDENT || actor.getRole() == User.Role.INSTRUCTOR) {
             boolean enrolled = enrollmentService.isStudentEnrolled(actor.getId(), quiz.getCourse().getId());
             if (!enrolled) throw new UnauthorizedException("Enroll in the course before taking the quiz");
         }

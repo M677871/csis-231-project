@@ -35,16 +35,14 @@ public class EnrollmentService {
         User targetStudent = userRepository.findById(targetStudentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found: " + targetStudentId));
 
-        // only the student himself or an admin can enroll this student
+        // only the same user or an admin can enroll this target
         boolean isSelf = actor.getId().equals(targetStudentId);
-        if (actor.getRole() == User.Role.INSTRUCTOR) {
-            throw new UnauthorizedException("Instructors cannot enroll students");
-        }
         if (!isSelf && actor.getRole() != User.Role.ADMIN) {
-            throw new UnauthorizedException("You cannot enroll another student");
+            throw new UnauthorizedException("You cannot enroll another user");
         }
-        if (targetStudent.getRole() != User.Role.STUDENT && actor.getRole() != User.Role.ADMIN) {
-            throw new UnauthorizedException("Only students can be enrolled");
+        // allow STUDENT / INSTRUCTOR / ADMIN to be enrolled (admin already allowed)
+        if (targetStudent.getRole() == null) {
+            throw new UnauthorizedException("User role is required for enrollment");
         }
 
         Course course = courseRepository.findById(req.courseId())
