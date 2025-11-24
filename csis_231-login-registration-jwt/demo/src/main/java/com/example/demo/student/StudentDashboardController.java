@@ -9,6 +9,7 @@ import com.example.demo.common.TokenStore;
 import com.example.demo.common.TableUtils;
 import com.example.demo.dashboard.DashboardApi;
 import com.example.demo.model.*;
+import com.example.demo.quiz.QuizApi;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -45,6 +46,7 @@ public class StudentDashboardController {
     private final ObservableList<QuizSummaryDto> upcomingQuizzes = FXCollections.observableArrayList();
     private final DashboardApi dashboardApi = new DashboardApi();
     private final AuthApi authApi = new AuthApi();
+    private final QuizApi quizApi = new QuizApi();
     private MeResponse me;
 
     @FXML
@@ -119,13 +121,35 @@ public class StudentDashboardController {
         enrolledCourses.setAll(resp.getEnrolledCourses() != null ? resp.getEnrolledCourses() : java.util.List.of());
         upcomingQuizzes.setAll(resp.getUpcomingQuizzes() != null ? resp.getUpcomingQuizzes() : java.util.List.of());
         enrolledCountLabel.setText(String.valueOf(resp.getEnrolledCourseCount()));
-        upcomingCountLabel.setText(String.valueOf(upcomingQuizzes.size()));
+        filterUpcomingByResult();
         if (resp.getRecentQuizResults() != null && !resp.getRecentQuizResults().isEmpty()) {
             QuizResultDto last = resp.getRecentQuizResults().get(0);
             lastScoreLabel.setText(last.getScore() + "/" + last.getTotalQuestions());
         } else {
-            lastScoreLabel.setText("—");
+            lastScoreLabel.setText("-");
         }
+    }
+
+    private void filterUpcomingByResult() {
+        var items = new java.util.ArrayList<>(upcomingQuizzes);
+        CompletableFuture.runAsync(() -> {
+            java.util.List<QuizSummaryDto> remaining = new java.util.ArrayList<>();
+            for (QuizSummaryDto q : items) {
+                try {
+                    QuizResultDto r = quizApi.myResult(q.getId());
+                    if (r == null) {
+                        remaining.add(q);
+                    }
+                } catch (Exception ex) {
+                    // if API fails, keep it visible
+                    remaining.add(q);
+                }
+            }
+            Platform.runLater(() -> {
+                upcomingQuizzes.setAll(remaining);
+                upcomingCountLabel.setText(String.valueOf(remaining.size()));
+            });
+        });
     }
 
     private void onOpenCourse(CourseDto course) {

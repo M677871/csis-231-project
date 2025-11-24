@@ -81,8 +81,27 @@
                                         <TableColumn fx:id="myCourseTitleColumn" text="Course" prefWidth="360"/>
                                         <TableColumn fx:id="myCourseStatusColumn" text="Status" prefWidth="160"/>
                                         <TableColumn fx:id="myCourseEnrolledAtColumn" text="Enrolled At" prefWidth="240"/>
+                                        <TableColumn fx:id="myCourseActionColumn" text="Action" prefWidth="140"/>
                                     </columns>
                                     <placeholder><Label text="You are not enrolled in any courses"/></placeholder>
+                                </TableView>
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="12" styleClass="management-card">
+                            <children>
+                                <Label text="Upcoming Quizzes" styleClass="title-label"/>
+                                <TableView fx:id="upcomingQuizTable" prefHeight="240">
+                                    <columnResizePolicy>
+                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                    </columnResizePolicy>
+                                    <columns>
+                                        <TableColumn fx:id="upcomingCourseColumn" text="Course" prefWidth="260"/>
+                                        <TableColumn fx:id="upcomingQuizNameColumn" text="Quiz" prefWidth="240"/>
+                                        <TableColumn fx:id="upcomingQuizQuestionsColumn" text="Questions" prefWidth="120"/>
+                                        <TableColumn fx:id="upcomingQuizActionColumn" text="Action" prefWidth="140"/>
+                                    </columns>
+                                    <placeholder><Label text="No pending quizzes"/></placeholder>
                                 </TableView>
                             </children>
                         </VBox>
