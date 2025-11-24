@@ -60,6 +60,13 @@ public class QuizController {
         return quizService.resultsForQuiz(quizId, actor);
     }
 
+    @DeleteMapping("/{quizId}")
+    public ResponseEntity<Void> delete(@PathVariable Long quizId, Authentication authentication) {
+        User actor = resolveUser(authentication);
+        quizService.deleteQuiz(quizId, actor);
+        return ResponseEntity.noContent().build();
+    }
+
     private User resolveUser(Authentication authentication) {
         if (authentication == null || authentication.getName() == null) {
             throw new UnauthorizedException("Authentication required");

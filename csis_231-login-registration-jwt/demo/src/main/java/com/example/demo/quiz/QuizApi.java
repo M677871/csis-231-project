@@ -36,4 +36,8 @@ public class QuizApi {
         ApiResponse<QuizResultDto[]> resp = client.get("/api/quizzes/" + quizId + "/results", new TypeReference<QuizResultDto[]>() {});
         return resp.getBody();
     }
+
+    public void deleteQuiz(Long quizId) {
+        client.delete("/api/quizzes/" + quizId);
+    }
 }

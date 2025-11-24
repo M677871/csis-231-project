@@ -170,6 +170,26 @@ public class QuizService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public void deleteQuiz(Long quizId, User actor) {
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new ResourceNotFoundException("Quiz not found: " + quizId));
+        ensureCourseOwnership(actor, quiz.getCourse());
+
+        List<QuizQuestion> questions = questionRepository.findByQuiz_Id(quizId);
+        List<Long> questionIds = questions.stream().map(QuizQuestion::getId).toList();
+
+        if (!questionIds.isEmpty()) {
+            var options = answerOptionRepository.findByQuestion_IdIn(questionIds);
+            answerOptionRepository.deleteAll(options);
+            questionRepository.deleteAll(questions);
+        }
+        var results = resultRepository.findByQuiz_Id(quizId);
+        resultRepository.deleteAll(results);
+
+        quizRepository.delete(quiz);
+    }
+
     @Transactional(readOnly = true)
     public List<QuizResultDto> latestResultsForStudent(Long studentId) {
         return resultRepository.findTop5ByStudent_IdOrderByCompletedAtDesc(studentId).stream()

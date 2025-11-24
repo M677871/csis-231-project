@@ -17,6 +17,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,16 +71,27 @@ public class CourseEditorController {
         quizQuestionsColumn.setCellValueFactory(new PropertyValueFactory<>("questionCount"));
         quizActionColumn.setCellFactory(col -> new TableCell<>() {
             private final Button viewBtn = new Button("Results");
+            private final Button deleteBtn = new Button("Delete");
             {
                 viewBtn.getStyleClass().add("ghost-button");
+                deleteBtn.getStyleClass().add("danger-button");
                 viewBtn.setOnAction(e -> {
                     QuizSummaryDto q = getTableView().getItems().get(getIndex());
                     onViewResults(q);
                 });
+                deleteBtn.setOnAction(e -> {
+                    QuizSummaryDto q = getTableView().getItems().get(getIndex());
+                    onDeleteQuiz(q);
+                });
             }
             @Override protected void updateItem(Void v, boolean empty) {
                 super.updateItem(v, empty);
-                setGraphic(empty ? null : viewBtn);
+                if (empty || getIndex() >= getTableView().getItems().size()) {
+                    setGraphic(null);
+                    return;
+                }
+                HBox box = new HBox(8, viewBtn, deleteBtn);
+                setGraphic(box);
             }
         });
         quizTable.setItems(quizzes);
@@ -395,6 +407,23 @@ public class CourseEditorController {
     private void onViewResults(QuizSummaryDto quiz) {
         SessionStore.setActiveQuiz(quiz);
         AlertUtils.info("Results view not implemented yet; coming soon.");
+    }
+
+    private void onDeleteQuiz(QuizSummaryDto quiz) {
+        if (quiz == null) return;
+        CompletableFuture.runAsync(() -> {
+            try {
+                quizApi.deleteQuiz(quiz.getId());
+                Platform.runLater(() -> {
+                    quizzes.remove(quiz);
+                    AlertUtils.info("Quiz deleted");
+                });
+            } catch (ApiException ex) {
+                Platform.runLater(() -> ErrorDialog.showError(ex.getMessage(), ex.getErrorCode()));
+            } catch (Exception ex) {
+                Platform.runLater(() -> ErrorDialog.showError("Failed to delete quiz: " + ex.getMessage()));
+            }
+        });
     }
 
     private boolean ensureCourseExists() {
