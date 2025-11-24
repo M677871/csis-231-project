@@ -70,8 +70,9 @@ public class CourseCatalogController {
                 }
                 CourseDto course = getTableView().getItems().get(getIndex());
                 boolean enrolled = course.getId() != null && enrolledCourseIds.contains(course.getId());
-                primary.setDisable(enrolled);
-                primary.setText(enrolled ? "Enrolled" : (isOwner(course) ? "Edit" : "Enroll"));
+                boolean editable = isOwner(course) || isAdmin();
+                primary.setDisable(enrolled && !editable);
+                primary.setText(editable ? (enrolled ? "Edit" : "Edit") : (enrolled ? "Enrolled" : "Enroll"));
                 setGraphic(primary);
             }
         });
@@ -91,6 +92,11 @@ public class CourseCatalogController {
                 MeResponse cached = SessionStore.getMe();
                 me = cached != null ? cached : authApi.me();
                 if (cached == null) SessionStore.setMe(me);
+                Platform.runLater(() -> {
+                    if (courseTable != null) {
+                        courseTable.refresh(); // ensure action column reflects updated role
+                    }
+                });
                 loadEnrollments();
                 loadCourses();
             } catch (Exception ex) {
@@ -136,20 +142,32 @@ public class CourseCatalogController {
 
     private void onAction(CourseDto course) {
         if (course == null) return;
-        boolean enrolled = course.getId() != null && enrolledCourseIds.contains(course.getId());
-        if (enrolled) return;
 
-        if (isStudent() || isInstructor() || isAdmin()) {
-            // instructors/admins enroll unless they own it (then edit)
-            if (isOwner(course) && !isStudent()) {
+        // Best-effort ensure we know who is clicking (guards against rare race where me not loaded yet)
+        if (me == null) {
+            me = SessionStore.getMe();
+            if (me == null) {
+                try {
+                    me = authApi.me();
+                    SessionStore.setMe(me);
+                } catch (Exception ignored) { /* if this fails we still allow enroll flow below */ }
+            }
+        }
+
+        boolean editable = isOwner(course) || isAdmin();
+        if (editable) {
+            try {
                 SessionStore.setActiveCourse(course);
                 Launcher.go("course_editor.fxml", "Edit Course");
-            } else {
-                doEnroll(course);
+            } catch (RuntimeException ex) {
+                ErrorDialog.showError("Unable to open course editor: " + ex.getMessage());
             }
-        } else {
-            doEnroll(course);
+            return;
         }
+        boolean enrolled = course.getId() != null && enrolledCourseIds.contains(course.getId());
+        if (enrolled) return;
+        // otherwise enroll if not already
+        doEnroll(course);
     }
 
     private void doEnroll(CourseDto course) {
@@ -172,6 +190,7 @@ public class CourseCatalogController {
     private boolean isInstructor() { return me != null && "INSTRUCTOR".equalsIgnoreCase(me.getRole()); }
     private boolean isAdmin() { return me != null && "ADMIN".equalsIgnoreCase(me.getRole()); }
     private boolean isOwner(CourseDto c) {
+        if (isAdmin()) return true;
         return c != null && me != null && me.getId() != null && c.getInstructorUserId() != null
                 && c.getInstructorUserId().equals(me.getId());
     }

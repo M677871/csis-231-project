@@ -1,6 +1,6 @@
 /* 42-inspired dark theme */
 .root {
-    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #080c18, #0f172a);
+    -fx-background-color: linear-gradient(to bottom right, #080c18 0%, #0f172a 100%);
     -fx-font-family: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
     -fx-text-fill: #e5e7eb;
 }
