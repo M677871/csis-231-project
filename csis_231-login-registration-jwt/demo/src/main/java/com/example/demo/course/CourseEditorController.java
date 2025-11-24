@@ -475,7 +475,12 @@ public class CourseEditorController {
         root.setPadding(new javafx.geometry.Insets(16));
         VBox.setVgrow(table, Priority.ALWAYS);
 
-        stage.setScene(new Scene(root, 600, 420));
+        Scene scene = new Scene(root, 600, 420);
+        String css = com.example.demo.HelloApplication.class
+                .getResource("/com/example/demo/styles.css")
+                .toExternalForm();
+        scene.getStylesheets().add(css);
+        stage.setScene(scene);
         stage.showAndWait();
     }
 
