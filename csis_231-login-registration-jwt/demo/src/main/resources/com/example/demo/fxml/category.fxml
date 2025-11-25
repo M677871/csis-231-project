@@ -16,7 +16,7 @@
             <children>
                 <Button text="← Back" onAction="#backToMain" styleClass="ghost-button"/>
                 <Label text="Category Management"
-                       style="-fx-font-size: 24px; -fx-font-weight: 900; -fx-text-fill: #FFFFFF;"/>
+                       styleClass="toolbar-title-large"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <Button text="Logout" onAction="#onLogout" styleClass="ghost-button"/>
             </children>
@@ -27,7 +27,7 @@
     <center>
         <ScrollPane fitToWidth="true" styleClass="content-scroll">
             <content>
-                <VBox spacing="24" style="-fx-padding: 32;">
+                <VBox spacing="24" styleClass="page-section">
                     <children>
 
                         <VBox spacing="20" styleClass="management-card">
@@ -73,7 +73,7 @@
 
                                 <!-- Form -->
                                 <Label text="Manage Categories"
-                                       style="-fx-font-size: 18px; -fx-font-weight: 700; -fx-text-fill: #FFFFFF; -fx-padding: 16 0 8 0;"/>
+                                       styleClass="form-title"/>
 
                                 <GridPane hgap="16" vgap="12">
                                     <columnConstraints>
@@ -89,7 +89,7 @@
                                 </GridPane>
 
                                 <!-- Actions -->
-                                <HBox spacing="12" alignment="CENTER_LEFT" style="-fx-padding: 16 0 0 0;">
+                                <HBox spacing="12" alignment="CENTER_LEFT" styleClass="actions-bar">
                                     <children>
                                         <Button text="Add Category" onAction="#onAddCategory" styleClass="primary-button"/>
                                         <Button text="Update Category" onAction="#onUpdateCategory" styleClass="secondary-button"/>

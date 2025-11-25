@@ -35,7 +35,7 @@
                                 <HBox alignment="CENTER" spacing="8">
 
                                         <Label text="Didn't receive the code?" styleClass="subtitle-label"/>
-                                        <Hyperlink text="Resend Code" onAction="#onResend" style="-fx-font-weight: 600;"/>
+                                        <Hyperlink text="Resend Code" onAction="#onResend" styleClass="link-medium"/>
 
                                 </HBox>
 

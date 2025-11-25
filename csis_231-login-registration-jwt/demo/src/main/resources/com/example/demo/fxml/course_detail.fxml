@@ -11,7 +11,7 @@
         <HBox spacing="16" alignment="CENTER_LEFT" styleClass="topbar">
             <children>
                 <Button text="← Back" onAction="#onBack" styleClass="ghost-button"/>
-                <Label text="Course Detail" style="-fx-font-size: 22px; -fx-font-weight: 900; -fx-text-fill: #FFFFFF;"/>
+                <Label text="Course Detail" styleClass="title-label"/>
                 <Region HBox.hgrow="ALWAYS"/>
             </children>
             <padding><Insets top="16" bottom="16" left="24" right="24"/></padding>
@@ -21,11 +21,11 @@
     <center>
         <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="content-scroll">
             <content>
-                <VBox spacing="20" style="-fx-padding: 24;">
+                <VBox spacing="20" styleClass="padded-section">
                     <children>
                         <VBox spacing="8" styleClass="card">
                             <Label fx:id="titleLabel" text="Course" styleClass="title-label"/>
-                            <Label fx:id="descriptionLabel" text="" wrapText="true" styleClass="muted"/>
+                            <Label fx:id="descriptionLabel" text="" wrapText="true" styleClass="subtitle-label"/>
                             <HBox spacing="16">
                                 <Label text="Instructor:" styleClass="field-label"/>
                                 <Label fx:id="instructorLabel" text=""/>

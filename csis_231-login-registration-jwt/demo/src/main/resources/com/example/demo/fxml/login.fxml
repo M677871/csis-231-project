@@ -45,7 +45,7 @@
 
                                 <HBox alignment="CENTER_RIGHT">
 
-                                        <Hyperlink text="🔒 Forgot password?" onAction="#goForgot" style="-fx-font-weight: 600;"/>
+                                        <Hyperlink text="🔒 Forgot password?" onAction="#goForgot" styleClass="link-medium"/>
 
                                 </HBox>
 
@@ -54,7 +54,7 @@
                                 <HBox alignment="CENTER" spacing="8">
 
                                         <Label text="Don't have an account?" styleClass="subtitle-label"/>
-                                        <Hyperlink text="Create account" onAction="#goRegister" style="-fx-font-weight: 600;"/>
+                                        <Hyperlink text="Create account" onAction="#goRegister" styleClass="link-medium"/>
 
                                 </HBox>
 

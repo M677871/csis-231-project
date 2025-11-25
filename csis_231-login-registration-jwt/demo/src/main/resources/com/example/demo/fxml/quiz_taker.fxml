@@ -12,16 +12,16 @@
         <HBox spacing="16" alignment="CENTER_LEFT" styleClass="topbar">
             <children>
                 <Button text="← Back" onAction="#onBack" styleClass="ghost-button"/>
-                <Label fx:id="quizTitleLabel" text="Quiz" style="-fx-font-size: 20px; -fx-font-weight: 900; -fx-text-fill: #FFFFFF;"/>
+                <Label fx:id="quizTitleLabel" text="Quiz" styleClass="toolbar-title-small"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Label fx:id="progressLabel" text="Question" style="-fx-text-fill: #FFFFFF;"/>
+                <Label fx:id="progressLabel" text="Question" styleClass="light-label"/>
             </children>
             <padding><Insets top="16" bottom="16" left="24" right="24"/></padding>
         </HBox>
     </top>
 
     <center>
-        <VBox spacing="16" style="-fx-padding: 24;">
+        <VBox spacing="16" styleClass="padded-section">
             <children>
                 <Label fx:id="questionLabel" text="Question will appear here" wrapText="true" styleClass="title-label"/>
                 <VBox fx:id="answersBox" spacing="10"/>

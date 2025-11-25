@@ -85,6 +85,24 @@
 .subtitle-label { -fx-font-size: 15px; -fx-text-fill: #cbd5e1; -fx-font-weight: 700; }
 .field-label { -fx-font-size: 14px; -fx-font-weight: 800; -fx-text-fill: #e5e7eb; }
 .muted { -fx-text-fill: #94a3b8; -fx-font-size: 12.5px; }
+.toolbar-title { -fx-font-size: 22px; -fx-font-weight: 900; -fx-text-fill: #ffffff; }
+.toolbar-title-small { -fx-font-size: 20px; -fx-font-weight: 900; -fx-text-fill: #ffffff; }
+.toolbar-title-large { -fx-font-size: 24px; -fx-font-weight: 900; -fx-text-fill: #ffffff; }
+.card-heading { -fx-font-weight: 800; -fx-text-fill: #ffffff; }
+.card-heading-large { -fx-font-size: 18px; -fx-font-weight: 800; -fx-text-fill: #ffffff; }
+.stat-value { -fx-font-size: 26px; -fx-font-weight: 900; -fx-text-fill: #ffffff; }
+.stat-label { -fx-font-size: 16px; -fx-font-weight: 700; -fx-text-fill: #ffffff; }
+.stat-subtitle { -fx-font-size: 18px; -fx-font-weight: 700; -fx-text-fill: #ffffff; }
+.light-label { -fx-text-fill: #ffffff; }
+.profile-value { -fx-font-weight: 600; -fx-text-fill: #ffffff; }
+
+/* Layout helpers */
+.padded-section { -fx-padding: 24; }
+.page-section { -fx-padding: 32; }
+.actions-bar { -fx-padding: 16 0 0 0; }
+.actions-bar-roomy { -fx-padding: 20 0 0 0; }
+.form-title { -fx-font-size: 18px; -fx-font-weight: 700; -fx-text-fill: #ffffff; -fx-padding: 16 0 8 0; }
+.form-title-spacious { -fx-font-size: 18px; -fx-font-weight: 700; -fx-text-fill: #ffffff; -fx-padding: 20 0 12 0; }
 
 /* Inputs */
 .rounded-text-field, .form-field, .password-field, .combo-field {
@@ -235,6 +253,7 @@
 /* Links & form helpers */
 .hyperlink { -fx-text-fill: #22d3ee; -fx-underline: false; -fx-font-weight: 700; }
 .hyperlink:hover { -fx-underline: true; }
+.link-medium { -fx-font-weight: 600; }
 .check-box { -fx-text-fill: #e5e7eb; -fx-font-weight: 600; }
 .check-box .box { -fx-background-color: #0f172a; -fx-border-color: #1f2937; -fx-border-radius: 6; -fx-background-radius: 6; }
 .check-box:selected .mark { -fx-background-color: #22d3ee; }
@@ -242,5 +261,6 @@
 .table-row-cell .text, .table-cell .text { -fx-fill: #e5e7eb; }
 
 /* Profile labels */
-#name, #email, #role, #welcome { -fx-text-fill: #f9fafb; -fx-font-weight: 700; }
+#name, #email, #role { -fx-text-fill: #ffffff; -fx-font-weight: 600; }
+#welcome { -fx-text-fill: #ffffff; -fx-font-weight: 700; -fx-font-size: 16px; }
 .avatar { -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 12, 0, 0, 4); -fx-cursor: hand; }

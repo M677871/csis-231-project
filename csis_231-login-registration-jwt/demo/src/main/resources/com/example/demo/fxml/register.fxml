@@ -101,7 +101,7 @@
                                 <HBox alignment="CENTER" spacing="8">
 
                                         <Label text="Already have an account?" styleClass="subtitle-label"/>
-                                        <Hyperlink text="Sign In" onAction="#goLogin" style="-fx-font-weight: 600;"/>
+                                        <Hyperlink text="Sign In" onAction="#goLogin" styleClass="link-medium"/>
 
                                 </HBox>
 

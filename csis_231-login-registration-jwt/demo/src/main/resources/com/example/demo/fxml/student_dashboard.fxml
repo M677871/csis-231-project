@@ -11,9 +11,9 @@
     <top>
         <HBox spacing="16" alignment="CENTER_LEFT" styleClass="topbar">
             <children>
-                <Label text="🎓 Student" style="-fx-font-size: 24px; -fx-font-weight: 900; -fx-text-fill: #FFFFFF;"/>
+                <Label text="🎓 Student" styleClass="toolbar-title-large"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Label fx:id="welcomeLabel" text="Welcome" style="-fx-text-fill: #FFFFFF; -fx-font-weight: 700;"/>
+                <Label fx:id="welcomeLabel" text="Welcome" styleClass="stat-label"/>
                 <Button text="Course Catalog" onAction="#onOpenCatalog" styleClass="ghost-button"/>
                 <Button text="Logout" onAction="#onLogout" styleClass="ghost-button"/>
             </children>
@@ -24,25 +24,25 @@
     <center>
         <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="content-scroll">
             <content>
-                <VBox spacing="24" style="-fx-padding: 32;">
+                <VBox spacing="24" styleClass="page-section">
                     <children>
 
                         <Label text="Dashboard Overview" styleClass="title-label"/>
 
                         <HBox spacing="16">
                             <VBox spacing="10" styleClass="card" HBox.hgrow="ALWAYS">
-                                <Label text="📚 Enrolled Courses" style="-fx-text-fill: #FFFFFF; -fx-font-weight: 800;"/>
-                                <Label fx:id="enrolledCountLabel" text="0" style="-fx-font-size: 26px; -fx-text-fill: #FFFFFF; -fx-font-weight: 900;"/>
+                                <Label text="📚 Enrolled Courses" styleClass="card-heading"/>
+                                <Label fx:id="enrolledCountLabel" text="0" styleClass="stat-value"/>
                                 <Label text="Active enrollments" styleClass="muted"/>
                             </VBox>
                             <VBox spacing="10" styleClass="card" HBox.hgrow="ALWAYS">
-                                <Label text="🧠 Upcoming Quizzes" style="-fx-text-fill: #FFFFFF; -fx-font-weight: 800;"/>
-                                <Label fx:id="upcomingCountLabel" text="0" style="-fx-font-size: 26px; -fx-text-fill: #FFFFFF; -fx-font-weight: 900;"/>
+                                <Label text="🧠 Upcoming Quizzes" styleClass="card-heading"/>
+                                <Label fx:id="upcomingCountLabel" text="0" styleClass="stat-value"/>
                                 <Label text="Across your courses" styleClass="muted"/>
                             </VBox>
                             <VBox spacing="10" styleClass="card" HBox.hgrow="ALWAYS">
-                                <Label text="⭐ Last Score" style="-fx-text-fill: #FFFFFF; -fx-font-weight: 800;"/>
-                                <Label fx:id="lastScoreLabel" text="—" style="-fx-font-size: 18px; -fx-text-fill: #FFFFFF; -fx-font-weight: 700;"/>
+                                <Label text="⭐ Last Score" styleClass="card-heading"/>
+                                <Label fx:id="lastScoreLabel" text="—" styleClass="stat-subtitle"/>
                                 <Label text="Most recent quiz" styleClass="muted"/>
                             </VBox>
                         </HBox>
