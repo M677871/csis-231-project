@@ -24,6 +24,7 @@ module com.example.demo {
     opens com.example.demo.common to javafx.fxml, com.fasterxml.jackson.databind;
     opens com.example.demo.course to javafx.fxml;
     opens com.example.demo.quiz to javafx.fxml;
+    opens com.example.demo.graphics to javafx.fxml;
 
     // models used in TableView, etc.
     opens com.example.demo.model to com.fasterxml.jackson.databind, javafx.base;

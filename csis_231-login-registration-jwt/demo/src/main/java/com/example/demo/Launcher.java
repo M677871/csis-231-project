@@ -39,9 +39,9 @@ public final class Launcher {
             try {
                 ensureInitialized();
 
-                URL url = HelloApplication.class.getResource(FXML_PREFIX + fxmlFileName);
+                URL url = resolveFXML(fxmlFileName);
                 if (url == null) {
-                    throw new IllegalStateException("FXML not found: " + FXML_PREFIX + fxmlFileName);
+                    throw new IllegalStateException("FXML not found: " + fxmlFileName);
                 }
 
                 FXMLLoader loader = new FXMLLoader(url);
@@ -69,6 +69,14 @@ public final class Launcher {
         };
 
         if (Platform.isFxApplicationThread()) task.run(); else Platform.runLater(task);
+    }
+
+    private static URL resolveFXML(String name) {
+        URL url = HelloApplication.class.getResource(FXML_PREFIX + name);
+        if (url != null) return url;
+        // Fallback to other resource roots (e.g., graphics/)
+        String normalized = name.startsWith("/") ? name : "/com/example/demo/" + name;
+        return HelloApplication.class.getResource(normalized);
     }
 
     private static void ensureInitialized() {

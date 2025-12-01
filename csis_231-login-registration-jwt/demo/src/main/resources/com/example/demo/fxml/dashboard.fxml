@@ -63,6 +63,7 @@
                                             <Button text="📁 Category Management" styleClass="secondary-button" onAction="#openCategories" maxWidth="Infinity"/>
                                             <Button text="📚 Courses Management" styleClass="primary-button" onAction="#openCourses" maxWidth="Infinity"/>
                                             <Button text="🧾 Enrollments Management" styleClass="secondary-button" onAction="#openEnrollments" maxWidth="Infinity"/>
+                                            <Button text="📈 Data Visualizations" styleClass="ghost-button" onAction="#openVisuals" maxWidth="Infinity"/>
 
                                     </VBox>
                                     <Label text="💡 Tip: You can return here anytime from any management screen." styleClass="muted"/>

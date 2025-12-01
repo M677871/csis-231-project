@@ -264,3 +264,126 @@
 #name, #email, #role { -fx-text-fill: #ffffff; -fx-font-weight: 600; }
 #welcome { -fx-text-fill: #ffffff; -fx-font-weight: 700; -fx-font-size: 16px; }
 .avatar { -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 12, 0, 0, 4); -fx-cursor: hand; }
+
+/* Visualization tabs */
+.viz-tabs .tab-header-area {
+    -fx-background-color: #0c1324;
+    -fx-padding: 6 12;
+}
+.viz-tabs .tab-header-background {
+    -fx-background-color: transparent;
+}
+.viz-tabs .tab {
+    -fx-background-color: #111827;
+    -fx-border-color: #1f2937;
+    -fx-border-radius: 10 10 0 0;
+    -fx-background-radius: 10 10 0 0;
+    -fx-text-fill: #cbd5e1;
+    -fx-padding: 8 12;
+}
+.viz-tabs .tab:selected {
+    -fx-background-color: linear-gradient(to bottom, #0f172a, #0b1628);
+    -fx-border-color: #22d3ee;
+    -fx-text-fill: #f8fafc;
+}
+.viz-tabs .tab:selected .tab-label {
+    -fx-text-fill: #f8fafc;
+}
+.viz-tabs .tab:hover {
+    -fx-background-color: #152036;
+}
+
+/* Rounded pill buttons */
+.pill-button {
+    -fx-background-radius: 999;
+    -fx-border-radius: 999;
+    -fx-padding: 9px 16px;
+    -fx-font-weight: 800;
+}
+
+.ghost-pill {
+    -fx-background-color: transparent;
+    -fx-text-fill: #e5e7eb;
+    -fx-border-color: #243045;
+    -fx-border-radius: 999;
+    -fx-background-radius: 999;
+    -fx-padding: 8 14;
+    -fx-font-weight: 700;
+}
+.ghost-pill:hover {
+    -fx-border-color: #22d3ee;
+    -fx-text-fill: #22d3ee;
+    -fx-background-color: rgba(34, 211, 238, 0.08);
+}
+
+.viz-header {
+    -fx-background-color: #0b1020;
+    -fx-border-color: #111827;
+    -fx-border-width: 0 0 1 0;
+}
+
+.viz-section {
+    -fx-background-color: linear-gradient(to bottom, #0d1629, #0b1220);
+}
+
+.viz-card {
+    -fx-background-color: #0f172a;
+    -fx-background-radius: 18px;
+    -fx-border-radius: 18px;
+    -fx-border-color: #1f2937;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 22, 0, 0, 8);
+}
+
+.viz-3d-surface {
+    -fx-padding: 10;
+}
+
+.viz-toolbar .label {
+    -fx-text-fill: #cbd5e1;
+}
+
+.viz-chart .chart-plot-background {
+    -fx-background-color: #0b1220;
+}
+.viz-chart .chart-vertical-grid-lines, .viz-chart .chart-horizontal-grid-lines {
+    -fx-stroke: rgba(255,255,255,0.08);
+}
+.viz-chart .chart-series-line {
+    -fx-stroke: #22d3ee;
+}
+.viz-chart .default-color0.chart-bar {
+    -fx-bar-fill: linear-gradient(to top, #14d8ff, #06b6d4);
+}
+.viz-chart .chart-title {
+    -fx-text-fill: #cbd5e1;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+}
+.viz-chart .axis-label, .viz-chart .axis-tick-mark {
+    -fx-text-fill: #94a3b8;
+}
+
+.chip-muted {
+    -fx-text-fill: #cbd5e1;
+    -fx-background-color: rgba(34, 211, 238, 0.08);
+    -fx-padding: 6 10;
+    -fx-background-radius: 12;
+    -fx-font-size: 12px;
+}
+
+.chip-warning {
+    -fx-text-fill: #fbbf24;
+    -fx-background-color: rgba(251, 191, 36, 0.14);
+    -fx-padding: 8 12;
+    -fx-background-radius: 12;
+    -fx-font-size: 13px;
+}
+
+.combo-box {
+    -fx-background-color: #0f172a;
+    -fx-border-color: #1f2937;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-text-fill: #f1f5f9;
+}

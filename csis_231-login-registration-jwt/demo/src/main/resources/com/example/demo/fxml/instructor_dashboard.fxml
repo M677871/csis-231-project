@@ -14,6 +14,7 @@
                 <Label text="🎓 Instructor" styleClass="toolbar-title-large"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <Label fx:id="welcomeLabel" text="Welcome" styleClass="stat-label"/>
+                <Button fx:id="analyticsButton" text="3D Analytics" onAction="#onOpenAnalytics" styleClass="secondary-button" visible="false" managed="false"/>
                 <Button text="Course Catalog" onAction="#onOpenCatalog" styleClass="ghost-button"/>
                 <Button text="Logout" onAction="#onLogout" styleClass="ghost-button"/>
             </children>

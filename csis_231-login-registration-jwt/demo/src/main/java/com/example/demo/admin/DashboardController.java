@@ -231,13 +231,14 @@ public class DashboardController {
 
     @FXML private void openUsers()      { Launcher.go("user_Dashboard.fxml", "Users"); }
 
-/**
- * Opens the category management screen.
- */
+    /**
+     * Opens the category management screen.
+     */
 
     @FXML private void openCategories() { Launcher.go("category.fxml", "Categories"); }
     @FXML private void openCourses()    { Launcher.go("course_catalog.fxml", "Courses"); }
     @FXML private void openEnrollments(){ Launcher.go("admin_enrollments.fxml", "Enrollments"); }
+    @FXML private void openVisuals()    { Launcher.go("graphics/graphics_playground.fxml", "Data Visualizations"); }
 
     /**
      * Logs the user out by clearing the stored JWT and returning to the login screen.

@@ -42,6 +42,7 @@ public class InstructorDashboardController {
     @FXML private Label courseCountLabel;
     @FXML private Label enrollmentCountLabel;
     @FXML private Label lastCourseLabel;
+    @FXML private Button analyticsButton;
 
     @FXML private TableView<CourseDto> courseTable;
     @FXML private TableColumn<CourseDto, String> titleColumn;
@@ -78,6 +79,7 @@ public class InstructorDashboardController {
     private final QuizApi quizApi = new QuizApi();
     private MeResponse me;
     private final Map<Long, String> courseTitles = new HashMap<>();
+    private InstructorDashboardResponse lastDashboard;
 
     @FXML
     public void initialize() {
@@ -181,6 +183,7 @@ public class InstructorDashboardController {
                 MeResponse cached = SessionStore.getMe();
                 me = cached != null ? cached : authApi.me();
                 if (cached == null) SessionStore.setMe(me);
+                Platform.runLater(this::updateAnalyticsButton);
                 loadMyEnrollments();
                 loadUpcomingQuizzes();
                 loadDashboard();
@@ -204,6 +207,7 @@ public class InstructorDashboardController {
     }
 
     private void populate(InstructorDashboardResponse resp) {
+        this.lastDashboard = resp;
         if (me != null) {
             welcomeLabel.setText("Welcome, " + (me.getFirstName() != null ? me.getFirstName() : me.getUsername()));
         }
@@ -217,6 +221,7 @@ public class InstructorDashboardController {
         }
         courses.setAll(resp.getCourses() != null ? resp.getCourses() : java.util.List.of());
         enrollments.clear();
+        updateAnalyticsButton();
     }
 
     private void onOpenCourse(CourseDto course) {
@@ -310,6 +315,16 @@ public class InstructorDashboardController {
         Launcher.go("course_detail.fxml", "Course Detail");
     }
 
+    @FXML
+    private void onOpenAnalytics() {
+        if (!isInstructorOrAdmin()) return;
+        if (lastDashboard == null || lastDashboard.getCourseCount() <= 0) {
+            AlertUtils.warn("You need at least one course to view analytics.");
+            return;
+        }
+        Launcher.go("graphics/graphics_playground.fxml", "3D Analytics");
+    }
+
     private void onTakeQuiz(QuizSummaryDto quiz) {
         if (quiz == null) return;
         SessionStore.setActiveQuiz(quiz);
@@ -328,5 +343,19 @@ public class InstructorDashboardController {
         TokenStore.clear();
         SessionStore.clearAll();
         Launcher.go("login.fxml", "Login");
+    }
+
+    private void updateAnalyticsButton() {
+        if (analyticsButton == null) return;
+        boolean allowed = isInstructorOrAdmin() && me != null;
+        boolean hasData = lastDashboard != null && lastDashboard.getCourseCount() > 0;
+        analyticsButton.setVisible(allowed);
+        analyticsButton.setManaged(allowed);
+        analyticsButton.setDisable(!hasData);
+    }
+
+    private boolean isInstructorOrAdmin() {
+        String role = SessionStore.currentRole();
+        return "INSTRUCTOR".equals(role) || "ADMIN".equals(role);
     }
 }

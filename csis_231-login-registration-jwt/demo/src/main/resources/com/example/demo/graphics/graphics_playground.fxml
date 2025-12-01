@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.demo.graphics.GraphicsPlaygroundController"
+            prefWidth="1200" prefHeight="820"
+            styleClass="glass-pane">
+    <top>
+        <VBox spacing="6" styleClass="viz-header">
+            <children>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Button text="↩ Back" onAction="#onBack" styleClass="ghost-pill"/>
+                    <Label text="Data Visualizations" styleClass="toolbar-title-large"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="3D analytics (instructors/admins) • 2D progress (students/admins)" styleClass="muted"/>
+                </HBox>
+            </children>
+            <padding><Insets top="12" bottom="10" left="18" right="18"/></padding>
+        </VBox>
+    </top>
+
+    <center>
+        <TabPane tabClosingPolicy="UNAVAILABLE" styleClass="viz-tabs">
+            <tabs>
+                <Tab text="3D Analytics">
+                    <content>
+                        <VBox spacing="14" styleClass="padded-section viz-section">
+                            <children>
+                                <HBox spacing="12" alignment="CENTER_LEFT" styleClass="viz-toolbar">
+                                    <Button text="⟳ Refresh 3D" onAction="#refresh3d" styleClass="secondary-button pill-button"/>
+                                    <Label text="Course enrollments or quiz scores visualized in 3D" styleClass="muted"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label fx:id="threeDMetaLabel" text="" styleClass="chip-muted"/>
+                                </HBox>
+                                <HBox spacing="10" alignment="CENTER_LEFT">
+                                    <Label fx:id="coursePickerLabel" text="Course scope" styleClass="muted"/>
+                                    <ComboBox fx:id="coursePicker" promptText="All available" prefWidth="280" />
+                                </HBox>
+                                <AnchorPane fx:id="threeDContainer" prefHeight="560" styleClass="viz-card viz-3d-surface"/>
+                            </children>
+                        </VBox>
+                    </content>
+                </Tab>
+                <Tab text="2D Progress">
+                    <content>
+                        <VBox spacing="14" styleClass="padded-section viz-section">
+                            <children>
+                                <HBox spacing="12" alignment="CENTER_LEFT" styleClass="viz-toolbar">
+                                    <Button text="⟳ Refresh 2D" onAction="#refresh2d" styleClass="secondary-button pill-button"/>
+                                    <Label text="Recent quiz scores" styleClass="muted"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label fx:id="twoDMetaLabel" text="" styleClass="chip-muted"/>
+                                </HBox>
+                                <BarChart fx:id="progressChart" title="Latest quiz performance" legendVisible="false" VBox.vgrow="ALWAYS" styleClass="viz-card viz-chart">
+                                    <xAxis>
+                                        <CategoryAxis fx:id="progressXAxis" side="BOTTOM"/>
+                                    </xAxis>
+                                    <yAxis>
+                                        <NumberAxis fx:id="progressYAxis" side="LEFT"/>
+                                    </yAxis>
+                                </BarChart>
+                                <Label fx:id="progressNoticeLabel" text="" styleClass="chip-warning" visible="false" managed="false"/>
+                            </children>
+                        </VBox>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+</BorderPane>

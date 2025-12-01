@@ -32,6 +32,7 @@ public class StudentDashboardController {
     @FXML private Label enrolledCountLabel;
     @FXML private Label upcomingCountLabel;
     @FXML private Label lastScoreLabel;
+    @FXML private Button visualizeButton;
 
     @FXML private TableView<CourseDto> enrolledTable;
     @FXML private TableColumn<CourseDto, String> courseTitleColumn;
@@ -48,6 +49,7 @@ public class StudentDashboardController {
     private final AuthApi authApi = new AuthApi();
     private final QuizApi quizApi = new QuizApi();
     private MeResponse me;
+    private StudentDashboardResponse lastDashboard;
 
     @FXML
     public void initialize() {
@@ -94,6 +96,7 @@ public class StudentDashboardController {
                 MeResponse cached = SessionStore.getMe();
                 me = cached != null ? cached : authApi.me();
                 if (cached == null) SessionStore.setMe(me);
+                Platform.runLater(this::updateVisualizeButton);
                 loadDashboard();
             } catch (Exception ex) {
                 Platform.runLater(() -> ErrorDialog.showError("Failed to load profile: " + ex.getMessage()));
@@ -115,6 +118,7 @@ public class StudentDashboardController {
     }
 
     private void populate(StudentDashboardResponse resp) {
+        this.lastDashboard = resp;
         if (me != null) {
             welcomeLabel.setText("Welcome, " + (me.getFirstName() != null ? me.getFirstName() : me.getUsername()));
         }
@@ -128,6 +132,7 @@ public class StudentDashboardController {
         } else {
             lastScoreLabel.setText("-");
         }
+        updateVisualizeButton();
     }
 
     private void filterUpcomingByResult() {
@@ -157,6 +162,12 @@ public class StudentDashboardController {
         Launcher.go("course_detail.fxml", "Course Detail");
     }
 
+    @FXML
+    private void onOpenGraphics() {
+        if (!isStudentOrAdmin()) return;
+        Launcher.go("graphics/graphics_playground.fxml", "Visualize Progress");
+    }
+
     private void onTakeQuiz(QuizSummaryDto quiz) {
         SessionStore.setActiveQuiz(quiz);
         Launcher.go("quiz_taker.fxml", "Take Quiz");
@@ -170,5 +181,21 @@ public class StudentDashboardController {
         TokenStore.clear();
         SessionStore.clearAll();
         Launcher.go("login.fxml", "Login");
+    }
+
+    private void updateVisualizeButton() {
+        if (visualizeButton == null) return;
+        boolean allowed = isStudentOrAdmin() && me != null;
+        boolean hasData = lastDashboard != null
+                && lastDashboard.getRecentQuizResults() != null
+                && !lastDashboard.getRecentQuizResults().isEmpty();
+        visualizeButton.setVisible(allowed);
+        visualizeButton.setManaged(allowed);
+        visualizeButton.setDisable(!hasData);
+    }
+
+    private boolean isStudentOrAdmin() {
+        String role = SessionStore.currentRole();
+        return "STUDENT".equals(role) || "ADMIN".equals(role);
     }
 }
