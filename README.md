@@ -475,6 +475,6 @@ The JavaFX app will handle login, dashboards, and navigation to the 2D/3D analyt
 
 ## 13. Credits
 
-**Author:** Charbel Boutros  
-**Course:** CSIS 231 – Advances in Computer Science  
+**Author:** Miled issa 
+**Course:** CSIS 231 – Java Technology 
 **Institution:** University of Balamand – Faculty of Arts & Sciences
