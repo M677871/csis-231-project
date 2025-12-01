@@ -7,28 +7,31 @@ import com.example.demo.common.ErrorDialog;
 import com.example.demo.common.SessionStore;
 import com.example.demo.course.CourseApi;
 import com.example.demo.dashboard.DashboardApi;
-import com.example.demo.model.CourseDetailDto;
 import com.example.demo.model.CourseDto;
 import com.example.demo.model.CourseStatsDto;
 import com.example.demo.model.InstructorDashboardResponse;
 import com.example.demo.model.MeResponse;
 import com.example.demo.model.QuizResultDto;
-import com.example.demo.model.QuizSummaryDto;
 import com.example.demo.model.StudentDashboardResponse;
-import com.example.demo.quiz.QuizApi;
+import com.example.demo.stats.ChartPoint;
+import com.example.demo.stats.StatsApi;
 import javafx.animation.Animation;
 import javafx.animation.RotateTransition;
+import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Point3D;
 import javafx.scene.AmbientLight;
 import javafx.scene.Group;
+import javafx.scene.PerspectiveCamera;
 import javafx.scene.SubScene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.ComboBox;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
@@ -36,10 +39,8 @@ import javafx.scene.shape.Box;
 import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
 
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -59,12 +60,16 @@ public class GraphicsPlaygroundController {
 
     private final DashboardApi dashboardApi = new DashboardApi();
     private final CourseApi courseApi = new CourseApi();
-    private final QuizApi quizApi = new QuizApi();
+    private final StatsApi statsApi = new StatsApi();
     private final AuthApi authApi = new AuthApi();
     private RotateTransition rotateTransition;
     private MeResponse me;
     private StudentDashboardResponse studentCache;
-    private CourseDetailDto selectedCourseDetail;
+    private CourseViz cachedCourseViz;
+    private double anchorX, anchorY;
+    private double angleY = -30;
+    private double cameraDistance = -450;
+    private PerspectiveCamera camera;
 
     @FXML
     public void initialize() {
@@ -119,7 +124,7 @@ public class GraphicsPlaygroundController {
 
     private void load3dData() {
         if (isInstructorOrAdmin() && selectedCourseId() != null) {
-            fetch3dForCourse(selectedCourseId());
+            fetchCourseViz(selectedCourseId());
         } else if (isInstructorOrAdmin()) {
             fetchInstructor3dWithFallback();
         } else {
@@ -187,60 +192,7 @@ public class GraphicsPlaygroundController {
             return;
         }
 
-        stopRotation();
-
-        List<CourseStatsDto> stats = instructorResp != null ? instructorResp.getCourseStats().stream()
-                .sorted(Comparator.comparing(CourseStatsDto::getEnrollmentCount).reversed())
-                .collect(Collectors.toList()) : List.of();
-        Group barsGroup = new Group();
-        double spacing = 80;
-        double startX = -((bars.size() - 1) * spacing) / 2.0;
-
-        for (int i = 0; i < bars.size(); i++) {
-            Box bar = bars.get(i);
-            bar.setTranslateX(startX + i * spacing);
-            barsGroup.getChildren().add(bar);
-        }
-
-        javafx.scene.text.Text subtitleText = new javafx.scene.text.Text(subtitle);
-        subtitleText.setFill(Color.web("#94a3b8"));
-        subtitleText.setTranslateY(-160);
-        subtitleText.setTranslateX(-150);
-        subtitleText.setScaleX(1.1);
-        subtitleText.setScaleY(1.1);
-
-        double planeWidth = Math.max(200, bars.size() * spacing + 60);
-        Box ground = new Box(planeWidth, 2, 180);
-        ground.setTranslateY(1);
-        ground.setMaterial(new PhongMaterial(Color.web("#0b1220")));
-
-        Group root3d = new Group(ground, barsGroup, subtitleText, new AmbientLight(Color.color(0.8, 0.8, 0.8)));
-
-        SubScene subScene = new SubScene(root3d, 900, 520, true, javafx.scene.SceneAntialiasing.BALANCED);
-        subScene.setFill(Color.web("#0a1020"));
-        subScene.widthProperty().bind(threeDContainer.widthProperty());
-        subScene.heightProperty().bind(threeDContainer.heightProperty());
-
-        javafx.scene.PerspectiveCamera camera = new javafx.scene.PerspectiveCamera(true);
-        camera.setTranslateZ(-420);
-        camera.setTranslateY(-120);
-        camera.setNearClip(0.1);
-        camera.setFarClip(2000);
-        camera.setRotationAxis(new Point3D(1, 0, 0));
-        camera.setRotate(-18);
-        subScene.setCamera(camera);
-
-        rotateTransition = new RotateTransition(Duration.seconds(12), barsGroup);
-        rotateTransition.setAxis(Rotate.Y_AXIS);
-        rotateTransition.setByAngle(360);
-        rotateTransition.setCycleCount(Animation.INDEFINITE);
-        rotateTransition.play();
-
-        threeDContainer.getChildren().setAll(subScene);
-        AnchorPane.setTopAnchor(subScene, 0d);
-        AnchorPane.setLeftAnchor(subScene, 0d);
-        AnchorPane.setRightAnchor(subScene, 0d);
-        AnchorPane.setBottomAnchor(subScene, 0d);
+        renderBars3d(bars, subtitle);
     }
 
     private void loadStudentProgress() {
@@ -278,6 +230,7 @@ public class GraphicsPlaygroundController {
             showProgressNotice("No quiz results yet.");
             return;
         }
+        progressYAxis.setAutoRanging(true);
         hideProgressNotice();
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         List<QuizResultDto> recent = resp.getRecentQuizResults().stream()
@@ -389,7 +342,7 @@ public class GraphicsPlaygroundController {
             @Override public CourseDto fromString(String s) { return null; }
         });
         coursePicker.setOnAction(e -> {
-            selectedCourseDetail = null;
+            cachedCourseViz = null;
             load3dData();
             loadStudentProgress();
         });
@@ -428,87 +381,74 @@ public class GraphicsPlaygroundController {
         return c != null ? c.getId() : null;
     }
 
-    private void fetch3dForCourse(Long courseId) {
+    private void fetchCourseViz(Long courseId) {
         CompletableFuture
                 .supplyAsync(() -> {
+                    int enrollments = 0;
                     try {
-                        var enrollments = courseApi.listCourseEnrollments(courseId);
-                        return enrollments != null ? enrollments.length : 0;
-                    } catch (Exception ex) {
-                        throw new RuntimeException(ex);
-                    }
+                        var enroll = courseApi.listCourseEnrollments(courseId);
+                        enrollments = enroll != null ? enroll.length : 0;
+                    } catch (Exception ignored) {}
+
+                    ChartPoint[] points = new ChartPoint[0];
+                    try {
+                        points = statsApi.quizAverages(courseId);
+                    } catch (Exception ignored) {}
+                    return new CourseViz(enrollments, points);
                 })
-                .thenAccept(count -> Platform.runLater(() -> renderSingleCourse3d(courseId, count)))
+                .thenAccept(viz -> Platform.runLater(() -> renderCourse3dAnd2d(viz)))
                 .exceptionally(ex -> {
                     Platform.runLater(() -> clear3dWithMessage("Unable to load course data."));
                     return null;
                 });
     }
 
-    private void renderSingleCourse3d(Long courseId, int enrollments) {
-        stopRotation();
-        double height = Math.max(20, enrollments * 15);
-        Box bar = new Box(30, height, 30);
-        bar.setTranslateY(-height / 2);
-        bar.setMaterial(materialForIndex(0));
-        Group barsGroup = new Group(bar);
+    private void renderCourse3dAnd2d(CourseViz viz) {
+        this.cachedCourseViz = viz;
+        List<Box> bars = new ArrayList<>();
+        if (viz.points().length > 0) {
+            double max = Arrays.stream(viz.points()).mapToDouble(ChartPoint::value).max().orElse(1);
+            for (int i = 0; i < viz.points().length; i++) {
+                ChartPoint p = viz.points()[i];
+                double height = Math.max(15, (p.value() / Math.max(1, max)) * 140);
+                Box bar = new Box(30, height, 30);
+                bar.setTranslateY(-height / 2);
+                bar.setMaterial(materialForValue(p.value(), max));
+                bars.add(bar);
+            }
+            renderBars3d(bars, "Quiz averages (selected course)");
+            renderCourse2d(pointsToScores(viz.points()));
+        } else {
+            double height = Math.max(20, viz.enrollments() * 15);
+            Box bar = new Box(30, height, 30);
+            bar.setTranslateY(-height / 2);
+            bar.setMaterial(materialForIndex(0));
+            bars.add(bar);
+            renderBars3d(bars, "Enrollments (selected course)");
+            renderCourse2d(List.of());
+        }
+        updateThreeDMeta("Enrollments: " + viz.enrollments());
+    }
 
-        double planeWidth = 220;
-        Box ground = new Box(planeWidth, 2, 180);
-        ground.setTranslateY(1);
-        ground.setMaterial(new PhongMaterial(Color.web("#0b1220")));
-
-        Group root3d = new Group(ground, barsGroup, new AmbientLight(Color.color(0.8, 0.8, 0.8)));
-        SubScene subScene = new SubScene(root3d, 900, 520, true, javafx.scene.SceneAntialiasing.BALANCED);
-        subScene.setFill(Color.web("#0a1020"));
-        subScene.widthProperty().bind(threeDContainer.widthProperty());
-        subScene.heightProperty().bind(threeDContainer.heightProperty());
-
-        javafx.scene.PerspectiveCamera camera = new javafx.scene.PerspectiveCamera(true);
-        camera.setTranslateZ(-420);
-        camera.setTranslateY(-120);
-        camera.setNearClip(0.1);
-        camera.setFarClip(2000);
-        camera.setRotationAxis(new Point3D(1, 0, 0));
-        camera.setRotate(-18);
-        subScene.setCamera(camera);
-
-        rotateTransition = new RotateTransition(Duration.seconds(12), barsGroup);
-        rotateTransition.setAxis(Rotate.Y_AXIS);
-        rotateTransition.setByAngle(360);
-        rotateTransition.setCycleCount(Animation.INDEFINITE);
-        rotateTransition.play();
-
-        threeDContainer.getChildren().setAll(subScene);
-        AnchorPane.setTopAnchor(subScene, 0d);
-        AnchorPane.setLeftAnchor(subScene, 0d);
-        AnchorPane.setRightAnchor(subScene, 0d);
-        AnchorPane.setBottomAnchor(subScene, 0d);
-        updateThreeDMeta("Enrollments: " + enrollments);
+    private List<QuizScorePoint> pointsToScores(ChartPoint[] points) {
+        return Arrays.stream(points)
+                .map(p -> new QuizScorePoint(p.label(), p.value()))
+                .toList();
     }
 
     private void load2dForCourse(Long courseId) {
+        if (cachedCourseViz != null && cachedCourseViz.points().length > 0) {
+            renderCourse2d(pointsToScores(cachedCourseViz.points()));
+            return;
+        }
         CompletableFuture
                 .supplyAsync(() -> {
-                    CourseDetailDto detail = courseApi.get(courseId);
-                    selectedCourseDetail = detail;
-                    if (detail == null || detail.getQuizzes() == null) return List.<QuizScorePoint>of();
-                    var list = new java.util.ArrayList<QuizScorePoint>();
-                    for (QuizSummaryDto q : detail.getQuizzes()) {
-                        try {
-                            QuizResultDto[] results = quizApi.results(q.getId());
-                            if (results == null || results.length == 0) continue;
-                            AtomicInteger total = new AtomicInteger();
-                            AtomicInteger possible = new AtomicInteger();
-                            for (QuizResultDto r : results) {
-                                total.addAndGet(r.getScore());
-                                possible.addAndGet(Math.max(1, r.getTotalQuestions()));
-                            }
-                            double avg = possible.get() == 0 ? 0 : (double) total.get() / possible.get() * 100.0;
-                            list.add(new QuizScorePoint(q.getName(), avg));
-                        } catch (Exception ignored) {}
+                    try {
+                        ChartPoint[] points = statsApi.quizAverages(courseId);
+                        return pointsToScores(points);
+                    } catch (Exception ex) {
+                        return List.<QuizScorePoint>of();
                     }
-                    return list;
                 })
                 .thenAccept(points -> Platform.runLater(() -> renderCourse2d(points)))
                 .exceptionally(ex -> {
@@ -528,6 +468,10 @@ public class GraphicsPlaygroundController {
             return;
         }
         hideProgressNotice();
+        progressYAxis.setAutoRanging(false);
+        progressYAxis.setLowerBound(0);
+        progressYAxis.setUpperBound(100);
+        progressYAxis.setTickUnit(10);
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         for (QuizScorePoint p : points) {
             series.getData().add(new XYChart.Data<>(p.name(), p.averageScore()));
@@ -536,5 +480,99 @@ public class GraphicsPlaygroundController {
         updateTwoDMeta("Quizzes: " + points.size());
     }
 
+    private void renderBars3d(List<Box> bars, String subtitle) {
+        stopRotation();
+        Group barsGroup = new Group();
+        double spacing = 80;
+        double startX = -((bars.size() - 1) * spacing) / 2.0;
+        for (int i = 0; i < bars.size(); i++) {
+            Box bar = bars.get(i);
+            bar.setTranslateX(startX + i * spacing);
+            barsGroup.getChildren().add(bar);
+            animateBar(bar);
+        }
+
+        javafx.scene.text.Text subtitleText = new javafx.scene.text.Text(subtitle);
+        subtitleText.setFill(Color.web("#94a3b8"));
+        subtitleText.setTranslateY(-160);
+        subtitleText.setTranslateX(-150);
+        subtitleText.setScaleX(1.1);
+        subtitleText.setScaleY(1.1);
+
+        double planeWidth = Math.max(200, bars.size() * spacing + 60);
+        Box ground = new Box(planeWidth, 2, 220);
+        ground.setTranslateY(1);
+        ground.setMaterial(new PhongMaterial(Color.web("#0b1220")));
+
+        Group pivot = new Group(barsGroup);
+        pivot.setRotationAxis(Rotate.Y_AXIS);
+        pivot.setRotate(angleY);
+
+        Group root3d = new Group(ground, pivot, subtitleText, new AmbientLight(Color.color(0.8, 0.8, 0.8)));
+        javafx.scene.PointLight keyLight = new javafx.scene.PointLight(Color.web("#22d3ee", 0.7));
+        keyLight.setTranslateX(200);
+        keyLight.setTranslateY(-120);
+        keyLight.setTranslateZ(-200);
+        root3d.getChildren().add(keyLight);
+
+        SubScene subScene = new SubScene(root3d, 900, 520, true, javafx.scene.SceneAntialiasing.BALANCED);
+        subScene.setFill(Color.web("#0a1020"));
+        subScene.widthProperty().bind(threeDContainer.widthProperty());
+        subScene.heightProperty().bind(threeDContainer.heightProperty());
+
+        camera = new PerspectiveCamera(true);
+        camera.setTranslateZ(cameraDistance);
+        camera.setTranslateY(-120);
+        camera.setNearClip(0.1);
+        camera.setFarClip(2000);
+        camera.setRotationAxis(new Point3D(1, 0, 0));
+        camera.setRotate(-18);
+        subScene.setCamera(camera);
+
+        rotateTransition = new RotateTransition(Duration.seconds(18), pivot);
+        rotateTransition.setAxis(Rotate.Y_AXIS);
+        rotateTransition.setByAngle(360);
+        rotateTransition.setCycleCount(Animation.INDEFINITE);
+        rotateTransition.play();
+
+        subScene.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> {
+            anchorX = e.getSceneX();
+            anchorY = e.getSceneY();
+        });
+        subScene.addEventHandler(MouseEvent.MOUSE_DRAGGED, e -> {
+            double deltaX = e.getSceneX() - anchorX;
+            angleY = angleY + deltaX * 0.25;
+            pivot.setRotate(angleY);
+            anchorX = e.getSceneX();
+            anchorY = e.getSceneY();
+        });
+        subScene.addEventHandler(ScrollEvent.SCROLL, e -> {
+            cameraDistance += e.getDeltaY() * -0.5;
+            cameraDistance = Math.max(-900, Math.min(-200, cameraDistance));
+            camera.setTranslateZ(cameraDistance);
+        });
+
+        threeDContainer.getChildren().setAll(subScene);
+        AnchorPane.setTopAnchor(subScene, 0d);
+        AnchorPane.setLeftAnchor(subScene, 0d);
+        AnchorPane.setRightAnchor(subScene, 0d);
+        AnchorPane.setBottomAnchor(subScene, 0d);
+    }
+
+    private void animateBar(Box bar) {
+        ScaleTransition st = new ScaleTransition(Duration.millis(800), bar);
+        st.setFromY(0.1);
+        st.setToY(1);
+        st.play();
+    }
+
+    private PhongMaterial materialForValue(double value, double max) {
+        double ratio = max == 0 ? 0 : value / max;
+        Color color = ratio > 0.7 ? Color.web("#22c55e") : ratio > 0.4 ? Color.web("#14d8ff") : Color.web("#f97316");
+        return new PhongMaterial(color);
+    }
+
     private record QuizScorePoint(String name, double averageScore) {}
+
+    private record CourseViz(int enrollments, ChartPoint[] points) {}
 }
