@@ -1,7 +1,7 @@
 # LearnOnline – CSIS 231 Final Project
 
 > **University of Balamand – Faculty of Arts & Sciences**  
-> **CSIS 231 – java technology**  
+> **CSIS 231 – Java Technology**  
 > Secure online learning platform with **Spring Boot + PostgreSQL + JavaFX 2D/3D**,  
 > **JWT + OTP 2FA**, and **role-based dashboards (Admin / Instructor / Student)**.
 
@@ -9,32 +9,37 @@
 
 ## 1. Project Overview
 
-**LearnOnline** is a modular e-learning platform built as the final project for **CSIS 231 – Advances in Computer Science**.
+**LearnOnline** is a modular e-learning platform built as the final project for **CSIS 231 – Java Technology / Advanced Java**.
 
 The system provides:
 
 - A **secure REST backend** (Spring Boot + Spring Security + JWT + OTP 2FA).
 - A **desktop JavaFX client** with:
-    - Modular **FXML views** and shared styling.
-    - **2D dashboards** using JavaFX charts.
-    - **3D analytics** using JavaFX 3D (`SubScene`, `Box`, `PerspectiveCamera`).
+    - Modular **FXML views** and shared styling (`styles.css`).
+    - **2D dashboards** using JavaFX charts (`BarChart`, `LineChart`).
+    - **3D analytics** using JavaFX 3D (`SubScene`, `Box`, `PerspectiveCamera`, `RotateTransition`).
 - A **PostgreSQL** database as the single source of truth for all business logic and persistence.
 
-**Roles & flows**
+### Roles & flows
 
 - **Student**
-    - Register, login (with optional OTP).
-    - Browse courses, enroll, take quizzes.
-    - View **recent quiz performance** and progress in **2D/3D visualizations**.
+    - Register and login (with **OTP-based 2FA** when required).
+    - Browse courses, enroll, and take quizzes.
+    - View **recent quiz performance** and progress in **2D and 3D visualizations**.
 - **Instructor**
     - Manage their courses and quizzes.
     - View enrollments and quiz statistics.
-    - Open **3D analytics** for their courses and see quiz Aggregates.
+    - Open **3D analytics** for their courses and see **aggregated quiz results**.
 - **Admin**
     - Global view and management of users, roles, categories, courses, enrollments.
-    - Access **data visualizations** (2D + 3D) for any instructor’s courses via a **course selector**.
+    - Access **data visualizations (2D + 3D)** for any instructor’s courses via a **course selector**.
 
-The project is designed explicitly to match the **CSIS 231 Final Project requirements** (see section 11).
+This project is explicitly designed to match the **CSIS 231 Final Project requirements** (see section 11) and to demonstrate:
+
+- Real **JavaFX 2D + 3D graphics** for dashboards and analytics.
+- **JWT + OTP-based security**, with OTP used both for:
+    - **Two-Factor Authentication (2FA)** on login (`LOGIN_2FA`).
+    - **Forgot-password** flows (`PASSWORD_RESET` OTP).
 
 ---
 
@@ -51,15 +56,17 @@ csis-231-project/
 
 ### Backend (Spring Boot – `csis231-api`)
 
-- Follows a **layered design**:
+- **Layered architecture**:
     - `controller` – REST endpoints.
     - `service` – business logic, validation, security checks.
     - `repository` – Spring Data JPA repositories.
     - `domain/model` – entities (User, Role, Course, Enrollment, Quiz, OTP, etc.).
     - `exception` – custom exception hierarchy.
-    - `common` – shared utilities, `GlobalExceptionHandler`, converters, etc.
+    - `common` – shared utilities, DTOs, `GlobalExceptionHandler`, constants.
 - Stateless security with **JWT**.
-- Email-based **OTP** for two-step flows (2FA).
+- Email-based **OTP** for:
+    - **LOGIN_2FA** (optional 2-factor on login).
+    - **PASSWORD_RESET** (forgot-password).
 - Centralized **error handling** via `@ControllerAdvice`.
 
 ### Database (PostgreSQL)
@@ -69,49 +76,55 @@ csis-231-project/
     - Categories & Courses
     - Enrollments
     - Quizzes, Questions, Results
-    - OTP tokens
+    - OTP tokens (purpose + expiry)
 - Uses **Spring Data JPA** for ORM.
-- Enforces relationships (e.g. User–Enrollment–Course, Course–Quiz–Result).
+- Enforces relationships such as:
+    - `User – Enrollment – Course`
+    - `Course – Quiz – Result`.
 
 ### Frontend (JavaFX – `demo`)
 
 - JavaFX 17 application with:
     - **FXML views** under `demo/src/main/resources/com/example/demo`.
     - Controllers under `demo/src/main/java/com/example/demo`.
-    - Shared stylesheet: `styles.css` (dark theme, buttons, tabs, cards, 2D/3D viz styles).
+    - Shared stylesheet: `styles.css` (dark theme, buttons, cards, tabs, 2D/3D viz styles).
 - Navigation:
-    - `Launcher` + `HelloApplication` provide scene switching.
+    - `Launcher` + `HelloApplication` handle scene switching and role-based routing.
     - Dedicated controllers for **Admin**, **Instructor**, **Student**, and **Graphics** (2D/3D).
 
 ---
 
 ## 3. Technology Stack
 
-**Backend**
+### Backend
 
 - Java 17+
 - Spring Boot (Web, Security, Validation)
 - Spring Data JPA / Hibernate
-- Spring Mail / JavaMail (for OTP, if configured)
+- Spring Mail / JavaMail (for OTP e-mails)
 - Spring Security + **JWT**
 - Jakarta Bean Validation (`jakarta.validation`)
 
-**Database**
+### Database
 
 - PostgreSQL
-- Schema managed via JPA mappings and configuration (`application.properties` / `application.yml`).
+- Configuration via `application.yml` + environment variables.
 
-**Frontend**
+### Frontend
 
 - JavaFX 17 (controls, FXML, 2D + 3D)
-- JavaFX charts (`BarChart`, `LineChart`)
-- JavaFX 3D (`SubScene`, `Group`, `Box`, `PhongMaterial`, `PerspectiveCamera`)
+- JavaFX charts:
+    - `BarChart<String, Number>`
+    - `LineChart<String, Number>`
+- JavaFX 3D:
+    - `SubScene`, `Group`, `Box`, `PhongMaterial`, `PerspectiveCamera`
+    - Animations using `RotateTransition`
 - Shared CSS (`styles.css`) with:
-    - Buttons (`primary-button`, `secondary-button`, `ghost-pill`, etc.)
-    - Layout helpers (cards, sections, chips, toolbars)
-    - Styled `TabPane` and chart surfaces
+    - Buttons: `.primary-button`, `.secondary-button`, `.ghost-pill`, …
+    - Layout helpers: cards, sections, chips, toolbars
+    - Styled `TabPane` and chart backgrounds
 
-**Build & Tools**
+### Build & Tools
 
 - Maven (multi-module)
 - IntelliJ IDEA
@@ -123,104 +136,118 @@ csis-231-project/
 
 ### Student
 
-- Register / login with **OTP 2FA** support.
+- Register / login with **JWT auth** and optional **OTP 2FA**.
 - Browse available courses and enroll.
 - Take quizzes and see their results.
-- View a **“Visualize Progress”** screen:
-    - **3D bars** for quiz scores.
-    - **2D chart** of recent quiz performance, labeled by quiz name.
+- Open a **“Visualize Progress”** screen with:
+    - **3D bars** for quiz scores using JavaFX 3D.
+    - **2D charts** (Bar/Line) for recent quiz performance by quiz name.
 
 ### Instructor
 
-- Manage owned courses (create/update/archive).
-- Manage quizzes attached to courses.
+- Manage owned courses (create, update, archive).
+- Manage quizzes attached to their courses.
 - View enrollments & quiz statistics.
 - Open **“3D Analytics”**:
-    - See a **3D course analytics** view.
-    - Course-specific 3D bar (enrollments).
-    - 2D chart of quiz averages for the selected course.
+    - 3D analytics per course (enrollments, scores).
+    - 2D chart: **average quiz score per quiz** for the selected course.
 
 ### Admin
 
-- Manage users, roles, categories, courses, enrollments (from `dashboard.fxml`).
+- Manage:
+    - Users & roles
+    - Categories
+    - Courses
+    - Enrollments
 - Open **“Data Visualizations”**:
-    - Choose any instructor’s course from a **course dropdown**.
-    - See **3D enrollment bar** for that course.
-    - See **2D quiz averages** by quiz name for that course.
+    - Select any instructor’s course from a **ComboBox**.
+    - See **3D enrollment bar(s)** for that course.
+    - See **2D quiz averages** by quiz name.
 
 ---
 
-## 5. Security & Authentication (JWT + OTP 2FA)
+## 5. Security & Authentication
+### JWT + OTP for 2FA and Forgot Password
 
-- **Authentication flow:**
-    1. User registers with email/password.
-    2. User logs in → backend validates credentials.
-    3. Backend optionally generates and sends a **one-time OTP** (2FA) to the user’s email.
-    4. User submits OTP → backend verifies code (correct, unexpired, bound to user).
-    5. Backend issues a **JWT access token** (and optionally a refresh token).
-    6. JavaFX client stores JWT in a dedicated **TokenStore/SessionStore**.
-    7. All protected API calls include `Authorization: Bearer <jwt>` header.
+### Login + 2FA flow
 
-- **Authorization:**
-    - Role-based API access enforced by **Spring Security**.
-    - UI hides or disables buttons that are not allowed for the current role.
-        - Example: `3D Analytics` button only reachable for allowed roles.
+1. User sends `POST /api/auth/login` with username/password.
+2. Backend validates credentials:
+    - If **2FA not required** → returns `AuthResponse` with JWT.
+    - If **2FA required** → throws `OtpRequiredException`, and:
+        - Returns HTTP **202 Accepted** with `otpRequired = true`.
+        - Sends **LOGIN_2FA OTP** to the user’s e-mail.
+3. JavaFX client opens **`otp.fxml`** and calls `POST /api/auth/otp/verify`.
+4. Backend verifies OTP:
+    - On success → returns normal `AuthResponse` with JWT.
+    - On failure → `401 Unauthorized` with unified error JSON.
+5. Client stores JWT in **TokenStore / SessionStore** and includes it in `Authorization: Bearer <jwt>` for all calls.
 
-- **Error Handling:**
-    - Custom exception hierarchy:
-        - `ApplicationException` (base)
-        - `ResourceNotFoundException`
-        - `BadRequestException`
-        - `UnauthorizedException`, `ForbiddenException`, `ConflictException`, etc.
-    - `GlobalExceptionHandler` (using `@ControllerAdvice`) produces a unified `ErrorResponse` with:
-        - Timestamp
-        - HTTP status
-        - Error code
-        - Message
-        - Optional details for validation errors
+### Forgot password (OTP-based `PASSWORD_RESET`)
+
+1. User clicks **“Forgot password?”** in the JavaFX client.
+2. Client calls `POST /api/auth/password/forgot` with e-mail.
+3. Backend sends a **PASSWORD_RESET OTP** to this e-mail.
+4. User enters OTP + new password; client calls `POST /api/auth/password/reset`.
+5. Backend validates OTP and updates the password.
+
+### OTP endpoints
+
+- `POST /api/auth/otp/verify`  
+  Verify OTP for both **LOGIN_2FA** and **PASSWORD_RESET**.
+- `POST /api/auth/otp/request`  
+  Resend OTP when the user did not receive it or it expired.
+
+### Authorization & errors
+
+- Role-based access enforced via **Spring Security**.
+- UI hides/disables actions that are not allowed for Student/Instructor/Admin.
+- `GlobalExceptionHandler` converts exceptions into a unified `ErrorResponse` with:
+    - timestamp
+    - HTTP status
+    - error code
+    - message
+    - validation details (if any)
 
 ---
 
 ## 6. 2D & 3D Visualizations
 
-**Location:**  
-`demo/src/main/java/com/example/demo/graphics/GraphicsPlaygroundController.java`  
-`demo/src/main/resources/com/example/demo/graphics/graphics_playground.fxml`
+**Location:**
 
-### View layout
+- `demo/src/main/java/com/example/demo/graphics/GraphicsPlaygroundController.java`
+- `demo/src/main/resources/com/example/demo/graphics/graphics_playground.fxml`
 
-- **Top bar**:
-    - “↩ Back” ghost-pill button (returns to appropriate dashboard based on role).
-    - Title and meta chips (e.g. selected course, last refresh).
+### Layout
+
+- **Top bar**
+    - “↩ Back” ghost-pill button routing back to the correct dashboard (Student/Instructor/Admin).
+    - Title + chips for selected course, last refresh, role.
 - **TabPane** with two tabs:
     1. **3D Analytics**
-        - Dark “viz-card” section with:
-            - `SubScene` hosting a 3D scene (`Group`, `Box` bars, `PerspectiveCamera`).
-            - Bars represent metrics:
-                - For Instructor/Admin: **enrollments per selected course**.
-                - Fallback: student quiz scores in 3D.
-            - Animated with `RotateTransition` for a high-level 3D feel.
+        - `SubScene` containing a 3D `Group` of `Box` bars.
+        - `PerspectiveCamera` and simple materials (`PhongMaterial`).
+        - `RotateTransition` for continuous rotation / highlighting.
+        - Metrics:
+            - Enrollments per course (Instructor/Admin).
+            - Student quiz scores in 3D (Student view).
     2. **2D Progress**
-        - JavaFX `BarChart<String, Number>` (or `LineChart`) inside a styled card.
-        - For students: recent quiz results by quiz **name**.
-        - For admin/instructor + selected course: per-quiz **average scores** (by quiz name).
+        - `BarChart<String, Number>` or `LineChart<String, Number>` inside a “viz card”.
+        - For students: recent quiz results (quiz name vs score).
+        - For instructors/admin: **average scores per quiz** for the selected course.
 
-### Course selector (Admin/Instructor)
+### Backend data used for 2D/3D
 
-- Admin & instructor see a **ComboBox** to pick a course:
-    - Admin: can select **any instructor’s course** (published/active courses).
-    - Instructor: sees **their own courses**.
-- When the selected course changes:
-    - 3D scene is refreshed with the new **enrollment bar**.
-    - 2D chart is refreshed with **quiz averages** for that course.
-
-### Error/empty data handling
-
-- If no data is available for the role/course:
-    - Friendly warning chip / message instead of exceptions.
-- Unauthorized situations (e.g. wrong role) are handled silently with:
-    - Fallbacks where possible, or
-    - Clear “not available for this role” notices.
+- `GET /api/student/dashboard`  
+  Student courses & recent quiz results.
+- `GET /api/instructor/dashboard`  
+  Instructor courses + stats.
+- `GET /api/instructors/{userId}/courses`  
+  Course selector for admin/instructor.
+- `GET /api/courses/{courseId}/enrollments`  
+  Enrollment count per course → **3D bars**.
+- `GET /api/statistics/courses/{courseId}/quiz-averages`  
+  Average quiz scores → **2D charts**.
 
 ---
 
@@ -230,101 +257,168 @@ csis-231-project/
 
 ```text
 csis231-api/
-├── src/main/java/com/example/csis231
-│   ├── auth/           # Auth controllers/services (login, register, OTP, JWT)
+├── src/main/java/com/csis231/api
+│   ├── auth/           # Login, register, forgot/reset password, JWT
+│   ├── otp/            # OTP verify/request endpoints
 │   ├── user/           # User & Role domain, services, controllers
-│   ├── category/       # Categories
-│   ├── course/         # Courses & materials
+│   ├── category/       # Course categories
+│   ├── course/         # Courses & their details
+│   ├── coursematerial/ # Course materials
 │   ├── enrollment/     # Enrollments
 │   ├── quiz/           # Quizzes, questions, results
-│   ├── dashboard/      # Dashboard endpoints (student/instructor stats)
-│   ├── otp/            # OTP domain (if separate)
-│   ├── common/         # Api constants, helpers, GlobalExceptionHandler, DTOs
+│   ├── dashboard/      # Student & Instructor dashboards
+│   ├── statistics/     # Quiz averages & analytics
+│   ├── common/         # DTOs, helpers, GlobalExceptionHandler, constants
 │   └── exception/      # Custom exception hierarchy
 └── src/main/resources
-    ├── application.properties (or application.yml)
-    └── [schema/data SQL if used]
+    └── application.yml
 ```
-
-*(Exact package names may differ slightly; the structure above reflects the conceptual layout.)*
 
 ### JavaFX Client – `demo`
 
 ```text
 demo/
 ├── src/main/java/com/example/demo
-│   ├── auth/          # Login, register, OTP, reset controllers & APIs
+│   ├── auth/          # Login, register, forgot password, OTP, reset controllers
 │   ├── common/        # ApiClient, ApiException, ErrorDialog, AlertUtils, SessionStore, TokenStore
-│   ├── course/        # Course catalog, detail, editor, enrollments
+│   ├── course/        # Course catalog, details, editor, enrollments
 │   ├── dashboard/     # Admin dashboard controller
 │   ├── instructor/    # InstructorDashboardController
 │   ├── student/       # StudentDashboardController
-│   ├── quiz/          # Quiz creation & quiz taker
+│   ├── quiz/          # Quiz creation + quiz-taker screens
 │   ├── graphics/      # GraphicsPlaygroundController (2D/3D visualizations)
 │   ├── Launcher.java  # Central navigation helper
-│   └── HelloApplication.java # JavaFX app entry point
+│   └── HelloApplication.java # JavaFX entry point
 └── src/main/resources/com/example/demo
-    ├── fxml/          # login.fxml, register.fxml, otp.fxml, dashboard.fxml, etc.
+    ├── fxml/          # login.fxml, register.fxml, otp.fxml, forgot_password.fxml, dashboard.fxml, ...
     ├── graphics/      # graphics_playground.fxml
-    ├── styles.css     # global JavaFX CSS
+    ├── styles.css     # shared JavaFX CSS
     └── icons/         # images/icons (if any)
 ```
 
 ---
 
-## 8. Key REST Endpoints (High-Level Overview)
+## 8. REST API Reference (Actual Endpoints)
 
-> **Note:** Exact paths may include prefixes (e.g. `/api`, `/api/v1`).  
-> Check the controllers for precise mappings; the list below is **conceptual**.
+Below are the main mappings from:
 
-### Auth
+- `AuthController`
+- `OtpController`
+- `UserController`
+- `CategoryController`
+- `CourseController`
+- `CourseMaterialController`
+- `EnrollmentController`
+- `DashboardController`
+- `StatisticsController`
+- `QuizController`
 
-- `POST /api/auth/register` – Register new user.
-- `POST /api/auth/login` – Login with email/password.
-- `POST /api/auth/otp/verify` – Verify OTP for 2FA.
-- `POST /api/auth/forgot` – Request password reset (OTP, token, or link).
-- `POST /api/auth/reset` – Reset password using token/OTP.
-- `GET  /api/auth/me` – Get current user profile (JWT required).
+### 8.1 Auth & OTP
 
-### Dashboards
+#### Auth (`/api/auth`)
 
-- `GET /api/student/dashboard` – Student summary:
-    - Enrolled courses, recent quizzes, scores, etc.
-- `GET /api/instructor/dashboard` – Instructor summary:
-    - Courses taught, enrollments, quiz statistics.
-- (Admin dashboard data may reuse other endpoints or have dedicated ones.)
+| HTTP   | Path                         | Description                                         |
+|--------|------------------------------|-----------------------------------------------------|
+| POST   | `/api/auth/login`           | Login with username/password (with optional 2FA).   |
+| POST   | `/api/auth/register`        | Register a new user.                               |
+| POST   | `/api/auth/password/forgot` | Start **forgot-password** OTP flow.                |
+| POST   | `/api/auth/password/reset`  | Reset password using a **PASSWORD_RESET** OTP.     |
 
-### Users & Roles (Admin)
+#### OTP (`/api/auth/otp`)
 
-- `GET /api/users` – List users (optionally paginated).
-- `GET /api/users/{id}`
-- `POST /api/users` / `PUT /api/users/{id}` / `DELETE /api/users/{id}`
-- Role management endpoints, if exposed.
+| HTTP   | Path                         | Description                                     |
+|--------|------------------------------|-------------------------------------------------|
+| POST   | `/api/auth/otp/verify`      | Verify OTP (`LOGIN_2FA` or `PASSWORD_RESET`).   |
+| POST   | `/api/auth/otp/request`     | Resend OTP for a given username.                |
 
-### Categories & Courses
+---
 
-- `GET /api/categories` – List categories (with optional pagination).
-- `POST /api/categories` – Create category.
-- `GET /api/courses` – List courses (with optional pagination).
-- `GET /api/courses/{id}`
-- `POST /api/courses`
-- `PUT /api/courses/{id}`
-- `DELETE /api/courses/{id}`
-- `GET /api/courses/{id}/enrollments` – Enrollment stats per course.
+### 8.2 Users (`UserController` – `/api/csis-users`)
 
-### Enrollments
+| HTTP   | Path                         | Description                          |
+|--------|------------------------------|--------------------------------------|
+| GET    | `/api/csis-users`           | List users (paged).                  |
+| GET    | `/api/csis-users/{id}`      | Get a single user by id.            |
+| POST   | `/api/csis-users`           | Create a new user.                  |
+| PUT    | `/api/csis-users/{id}`      | Update an existing user.            |
+| DELETE | `/api/csis-users/{id}`      | Delete a user.                      |
+| GET    | `/api/csis-users/me`        | Get the authenticated user profile. |
 
-- `POST /api/enrollments` or `POST /api/courses/{courseId}/enroll` – Enroll current user.
-- `GET  /api/enrollments` or `GET /api/users/{userId}/enrollments` – List enrollments.
+---
 
-### Quizzes
+### 8.3 Categories (`CategoryController` – `/api/categories`)
 
-- `GET  /api/quizzes/{id}` – Quiz definition (questions).
-- `POST /api/quizzes` – Create quiz.
-- `POST /api/quizzes/{id}/questions` – Add questions.
-- `POST /api/quizzes/{id}/submit` – Submit answers.
-- `GET  /api/quizzes/{id}/results` – Results overview (instructor/admin).
-- `GET  /api/quizzes/{id}/my-result` – Current user’s result.
+| HTTP   | Path                         | Description                   |
+|--------|------------------------------|-------------------------------|
+| GET    | `/api/categories`           | List all categories.         |
+| GET    | `/api/categories/{id}`      | Get category by id.          |
+| POST   | `/api/categories`           | Create category.             |
+| PUT    | `/api/categories/{id}`      | Update category.             |
+| DELETE | `/api/categories/{id}`      | Delete category.             |
+
+---
+
+### 8.4 Courses & Materials
+
+#### Courses (`CourseController` – `/api/courses`)
+
+| HTTP   | Path                         | Description                               |
+|--------|------------------------------|-------------------------------------------|
+| GET    | `/api/courses`              | List courses (with filters/paging).      |
+| GET    | `/api/courses/{id}`         | Get course details by id.                |
+| POST   | `/api/courses`              | Create a new course.                     |
+| PUT    | `/api/courses/{id}`         | Update an existing course.               |
+| DELETE | `/api/courses/{id}`         | Delete/archive a course.                 |
+
+#### Course Materials (`CourseMaterialController` – `/api`)
+
+| HTTP   | Path                                      | Description                                      |
+|--------|-------------------------------------------|--------------------------------------------------|
+| GET    | `/api/courses/{courseId}/materials`      | List materials for a course.                     |
+| POST   | `/api/courses/{courseId}/materials`      | Add a new material to a course.                  |
+| DELETE | `/api/materials/{id}`                    | Delete a material by id.                         |
+
+---
+
+### 8.5 Enrollments (`EnrollmentController` – `/api`)
+
+| HTTP   | Path                                      | Description                                      |
+|--------|-------------------------------------------|--------------------------------------------------|
+| POST   | `/api/enrollments/enroll`                | Enroll a student in a course.                    |
+| GET    | `/api/students/{userId}/enrollments`     | List a student’s enrollments.                    |
+| GET    | `/api/courses/{courseId}/enrollments`    | List enrollments for a course (for stats/viz).   |
+
+---
+
+### 8.6 Dashboards & Statistics
+
+#### Dashboards (`DashboardController`)
+
+| HTTP   | Path                                | Description                           |
+|--------|-------------------------------------|---------------------------------------|
+| GET    | `/api/student/dashboard`           | Student dashboard data.              |
+| GET    | `/api/instructor/dashboard`        | Instructor dashboard data.           |
+| GET    | `/api/instructors/{userId}/courses`| Courses for a specific instructor.   |
+
+#### Statistics (`StatisticsController` – `/api/statistics`)
+
+| HTTP   | Path                                                | Description                                   |
+|--------|-----------------------------------------------------|-----------------------------------------------|
+| GET    | `/api/statistics/courses/{courseId}/quiz-averages` | Average score per quiz for a given course.    |
+
+---
+
+### 8.7 Quizzes (`QuizController` – `/api/quizzes`)
+
+| HTTP   | Path                                 | Description                                          |
+|--------|--------------------------------------|------------------------------------------------------|
+| POST   | `/api/quizzes`                      | Create a new quiz.                                   |
+| POST   | `/api/quizzes/{quizId}/questions`   | Add questions to a quiz.                             |
+| GET    | `/api/quizzes/{quizId}`             | Get quiz definition (questions).                     |
+| POST   | `/api/quizzes/{quizId}/submit`      | Submit answers to a quiz.                            |
+| GET    | `/api/quizzes/{quizId}/results`     | Aggregated results for the quiz (instructor/admin).  |
+| GET    | `/api/quizzes/{quizId}/my-result`   | Current user’s result for that quiz.                 |
+| DELETE | `/api/quizzes/{quizId}`             | Delete a quiz.                                       |
 
 ---
 
@@ -334,44 +428,80 @@ demo/
 
 - **JDK 17+**
 - **Maven 3+**
-- **PostgreSQL** running locally or via Docker
+- **PostgreSQL** (local or Docker)
 
-### 1) Clone the repo
+### 1) Clone the repository
 
 ```bash
 git clone https://github.com/M677871/csis-231-project.git
 cd csis-231-project/csis_231-login-registration-jwt
 ```
 
-### 2) Configure PostgreSQL
-
-Create a database, e.g.:
+### 2) Create the database
 
 ```sql
-CREATE DATABASE learnonline;
+CREATE DATABASE csis_231_db;
 ```
 
-In `csis231-api/src/main/resources/application.properties`:
+### 3) Configure `application.yml`
 
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/learnonline
-spring.datasource.username=YOUR_DB_USERNAME
-spring.datasource.password=YOUR_DB_PASSWORD
+Create/edit: `csis231-api/src/main/resources/application.yml`:
 
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
+```yaml
+server:
+  port: 8080
 
-# JWT
-app.jwt.secret=YOUR_JWT_SECRET
-app.jwt.expiration=3600000
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/csis_231_db}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASS:postgres}
 
-# Mail/OTP (if enabled)
-spring.mail.host=smtp.your-provider.com
-spring.mail.username=YOUR_EMAIL
-spring.mail.password=YOUR_PASSWORD
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:your-gmail@example.com}
+    password: ${MAIL_PASSWORD:your-gmail-app-password}  # Use a Gmail App Password
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: true
+      mail.smtp.auth.mechanisms: LOGIN PLAIN
+      mail.smtp.ssl.trust: smtp.gmail.com
+      mail.smtp.connectiontimeout: 10000
+      mail.smtp.timeout: 10000
+      mail.smtp.writetimeout: 10000
+      mail.debug: false
+
+management:
+  health:
+    mail:
+      enabled: false
+
+jwt:
+  secret: ${JWT_SECRET:ChangeThisSecretForProductionUseALongRandomString}
+  expiration: ${JWT_EXPIRATION:900000}  # 15 minutes
+
+mail:
+  from: ${MAIL_FROM:your-gmail@example.com}
 ```
 
-### 3) Run the backend (Spring Boot)
+> **Important:** never commit real passwords or secrets. Use environment variables in production.
+
+### Environment variables (optional, override defaults)
+
+- `DB_URL`, `DB_USER`, `DB_PASS`
+- `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM`
+- `JWT_SECRET`, `JWT_EXPIRATION`
+
+### 4) Run the backend
 
 From `csis231-api`:
 
@@ -380,9 +510,9 @@ mvn clean install
 mvn spring-boot:run
 ```
 
-Backend will start on the configured port (typically `http://localhost:8080`).
+Backend will start on `http://localhost:8080` (unless overridden).
 
-### 4) Run the JavaFX client
+### 5) Run the JavaFX client
 
 From `demo`:
 
@@ -391,35 +521,35 @@ mvn clean install
 mvn javafx:run
 ```
 
-OR run `HelloApplication` from your IDE.  
-The JavaFX app will handle login, dashboards, and navigation to the 2D/3D analytics playground.
+Or run `HelloApplication` from your IDE.  
+The JavaFX app will handle login (with OTP 2FA), dashboards, and the **2D/3D analytics playground**.
 
 ---
 
 ## 10. State Management, Error Handling & Validation
 
-### State & Communication
+### State & communication (JavaFX)
 
-- **SessionStore / TokenStore** hold:
+- **SessionStore / TokenStore** track:
     - Current user
     - JWT token(s)
-    - Role info
-- All HTTP requests go through a reusable **ApiClient**:
-    - Adds `Authorization` header.
-    - Deserializes JSON.
+    - Role
+- All HTTP calls go through a shared **ApiClient**:
+    - Adds `Authorization: Bearer <jwt>` header.
+    - Deserializes JSON into DTOs.
     - Wraps errors in `ApiException`.
 
-### Error Handling (Frontend)
+### Error handling (Frontend)
 
-- `ApiException` and other exceptions are displayed via:
+- Errors are displayed using:
     - `ErrorDialog.showError(ex)` or
-    - `AlertUtils.showError(...)`.
-- Asynchronous calls use `CompletableFuture` + `Platform.runLater` to keep UI responsive.
+    - `AlertUtils.showError(...)`
+- Async calls use `CompletableFuture` + `Platform.runLater` to keep UI responsive.
 
 ### Validation (Backend)
 
 - DTOs annotated with `@NotBlank`, `@Email`, `@Size`, etc.
-- Validation errors are captured by `GlobalExceptionHandler` and returned as structured JSON.
+- Validation errors are handled in `GlobalExceptionHandler` and returned in a structured JSON format that the client shows nicely.
 
 ---
 
@@ -427,54 +557,62 @@ The JavaFX app will handle login, dashboards, and navigation to the 2D/3D analyt
 
 **Spring Boot Backend (25 pts)**
 
-- Clean **layered architecture** (Controller / Service / Repository / Domain).
-- Well-structured **PostgreSQL schema** mapped via JPA.
-- Business logic encapsulated in services, not controllers.
+- Proper **layered architecture** (Controller / Service / Repository / Domain).
+- PostgreSQL schema mapped via JPA entities.
+- Business logic pushed into service layer, not controllers.
+- Full, documented REST API (see section 8).
 
-**High-Level Features & 3D (20 pts)**
+**Advanced Features & JavaFX 2D/3D (20 pts)**
 
-- **Advanced 2D/3D data visualization**:
-    - 3D analytics using JavaFX 3D, animated and data-driven.
-    - 2D charts showing quiz scores and course performance.
-    - Course selector for admin/instructor to inspect any instructor’s course.
+- **Real 3D graphics**:
+    - JavaFX 3D (`SubScene`, `Box`, `PerspectiveCamera`, `RotateTransition`).
+    - 3D bars for course enrollments and student quiz scores.
+- **2D charts**:
+    - `BarChart`/`LineChart` for quiz performance and averages.
+- Visualizations fed from real backend endpoints:
+    - `/api/student/dashboard`
+    - `/api/instructor/dashboard`
+    - `/api/courses/{courseId}/enrollments`
+    - `/api/statistics/courses/{courseId}/quiz-averages`
 
 **JavaFX UI (30 pts)**
 
-- Modular FXML screens for each feature (Auth, Dashboards, Courses, Quizzes, Viz).
-- Shared stylesheet (`styles.css`) with reusable style classes.
-- Clear role-based dashboards and dedicated 2D/3D visualization playground.
+- Multiple FXML screens: login, register, forgot password, OTP, dashboards, courses, quizzes, graphics.
+- Shared `styles.css` with reusable style classes.
+- Clear role-based dashboards (Student / Instructor / Admin).
+- Dedicated **2D/3D visualization playground** with back navigation and course selector.
 
-**Error Handling & Security (10 pts)**
+**Security, OTP 2FA & Forgot Password (10 pts)**
 
-- **JWT + Spring Security** for authentication & authorization.
-- **OTP/2FA** support for sensitive flows.
-- Centralized error handling with `GlobalExceptionHandler`.
-- Input validation with `jakarta.validation`.
+- **JWT + Spring Security** for authentication and authorization.
+- **OTP 2FA on login** via `/api/auth/login` + `/api/auth/otp/verify`.
+- **OTP-based forgot-password** via `/api/auth/password/forgot` + `/api/auth/password/reset`.
+- Centralized error handling and validation.
 
 **Documentation & API Docs (15 pts)**
 
-- This README provides:
-    - Setup & run instructions.
-    - Architecture overview.
-    - Role-based feature summary.
-    - High-level API endpoints.
-    - Explanation of 2D/3D analytics and security.
-- Codebase includes descriptive naming and structured packages, ready for Javadoc / Swagger if needed.
+- This README includes:
+    - Setup and configuration via `application.yml`.
+    - Architecture & role-based feature overview.
+    - Detailed description of **2D/3D** visualizations.
+    - Full REST API reference.
+    - Explanation of **OTP 2FA** and **forgot-password OTP** flows.
+- Code is structured and ready for Javadoc / Swagger (springdoc) if extended.
 
 ---
 
 ## 12. Possible Future Improvements
 
-- Add **Swagger/OpenAPI (springdoc)** for fully interactive API docs.
-- Add **WebSockets** to stream live quiz/enrollment updates to the JavaFX client.
-- Add more metrics to the visualization chips (engagement, retention, completion rate).
-- Extend 3D scene with multiple bars and transitions per metric.
-- Implement audit logging and admin activity reports.
+- Add **springdoc-openapi** for Swagger UI.
+- Add **WebSockets** for real-time quiz/enrollment updates.
+- More analytics (engagement, retention, completion rate).
+- Multi-metric 3D scenes (e.g., 2–3 bars per course).
+- Audit logging and admin activity reports.
 
 ---
 
 ## 13. Credits
 
-**Author:** Miled issa 
-**Course:** CSIS 231 – Java Technology 
-**Institution:** University of Balamand – Faculty of Arts & Sciences
+**Author:** Miled Issa  
+**Course:** CSIS 231 – Java Technology  
+**Institution:** University of Balamand – Faculty of Arts & Sciences  

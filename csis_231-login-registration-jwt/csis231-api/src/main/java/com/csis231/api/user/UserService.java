@@ -27,19 +27,33 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    /** Returns all users. */
+    /**
+     * Retrieves all users without pagination.
+     *
+     * @return a list containing every {@link User} in the system
+     */
     @Transactional(readOnly = true)
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    /** Returns a paginated list of users. */
+    /**
+     * Retrieves users using pagination.
+     *
+     * @param pageable paging and sorting information
+     * @return a {@link Page} of {@link User} entities
+     */
     @Transactional(readOnly = true)
     public Page<User> getUsers(Pageable pageable) {
         return userRepository.findAll(pageable);
     }
 
-    /** Retrieves a user by ID. */
+    /**
+     * Looks up a user by identifier.
+     *
+     * @param id the user ID to search for
+     * @return an {@link Optional} containing the user if found
+     */
     @Transactional(readOnly = true)
     public Optional<User> getUser(Long id) {
         return userRepository.findById(id);
@@ -49,6 +63,11 @@ public class UserService {
      * Creates a new user.  This will throw an IllegalArgumentException
      * if the username or email is already in use.  The password is hashed
      * before the entity is persisted.
+     *
+     * @param user the user payload to create
+     * @return the persisted {@link User}
+     * @throws BadRequestException if required fields are missing
+     * @throws ConflictException   if username or email already exist
      */
     @Transactional
     public User createUser(User user) {
@@ -68,9 +87,15 @@ public class UserService {
     }
 
     /**
-     * Updates an existing user.  Only fields that are non‑null on the
+     * Updates an existing user.  Only fields that are non-null on the
      * {@code updated} object will be applied.  If a new password is provided,
      * it will be hashed before persisting.
+     *
+     * @param id      the identifier of the user to update
+     * @param updated the user fields to apply
+     * @return an {@link Optional} containing the updated {@link User}
+     * @throws BadRequestException if the payload is missing
+     * @throws ConflictException   if username or email are taken
      */
     @Transactional
     public Optional<User> updateUser(Long id, User updated) {
@@ -108,7 +133,13 @@ public class UserService {
         });
     }
 
-    /** Deletes a user by ID.  Returns true if the user existed and was removed. */
+    /**
+     * Deletes a user by identifier.
+     *
+     * @param id the user ID to remove
+     * @return {@code true} when the user existed and was deleted
+     * @throws ResourceNotFoundException if the user does not exist
+     */
     @Transactional
     public boolean deleteUser(Long id) {
         if (!userRepository.existsById(id)) {

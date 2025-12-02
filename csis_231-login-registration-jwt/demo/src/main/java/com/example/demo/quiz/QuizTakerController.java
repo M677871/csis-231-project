@@ -16,7 +16,8 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Simple quiz taking screen showing one question at a time.
+ * Simple quiz-taking screen that fetches a quiz and walks the user through
+ * one question at a time, collecting answers and submitting for scoring.
  */
 public class QuizTakerController {
     @FXML private Label quizTitleLabel;
@@ -30,6 +31,9 @@ public class QuizTakerController {
     private int index = 0;
     private final Map<Long, Long> answers = new HashMap<>();
 
+    /**
+     * Loads the selected quiz from {@link SessionStore} and fetches details.
+     */
     @FXML
     public void initialize() {
         QuizSummaryDto selected = SessionStore.getActiveQuiz();
@@ -41,6 +45,9 @@ public class QuizTakerController {
         loadQuiz(selected.getId());
     }
 
+    /**
+     * Fetches quiz detail and renders the first question.
+     */
     private void loadQuiz(Long quizId) {
         CompletableFuture.runAsync(() -> {
             try {
@@ -57,6 +64,9 @@ public class QuizTakerController {
         });
     }
 
+    /**
+     * Shows the current question and previously selected answer (if any).
+     */
     private void showCurrent() {
         if (quiz == null || quiz.getQuestions() == null || quiz.getQuestions().isEmpty()) {
             questionLabel.setText("No questions in this quiz yet.");
@@ -83,6 +93,9 @@ public class QuizTakerController {
         nextButton.setText(index == quiz.getQuestions().size() - 1 ? "Submit" : "Next");
     }
 
+    /**
+     * Advances to the next question or submits on the last question.
+     */
     @FXML
     private void onNext() {
         if (quiz == null) return;
@@ -100,6 +113,9 @@ public class QuizTakerController {
         }
     }
 
+    /**
+     * Reads the selected radio button answer for the current question.
+     */
     private Long getSelectedAnswer() {
         for (var node : answersBox.getChildren()) {
             if (node instanceof RadioButton rb && rb.isSelected()) {
@@ -110,6 +126,9 @@ public class QuizTakerController {
         return null;
     }
 
+    /**
+     * Builds the submission payload and posts it for scoring.
+     */
     private void submit() {
         if (quiz == null) return;
         var payload = quiz.getQuestions().stream()
@@ -139,6 +158,9 @@ public class QuizTakerController {
         });
     }
 
+    /**
+     * Navigates back to the role-appropriate dashboard.
+     */
     @FXML
     private void onBack() { navigateHome(); }
 

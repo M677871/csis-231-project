@@ -12,6 +12,10 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.Objects;
 
+/**
+ * Central navigation helper that loads FXML screens, applies global styles,
+ * and reuses a single JavaFX scene.
+ */
 public final class Launcher {
 
     private static Stage stage;
@@ -24,6 +28,9 @@ public final class Launcher {
 
     private Launcher() {}
 
+    /**
+     * Initializes the launcher with the primary stage and optional app icon.
+     */
     public static void init(Stage primary) {
         stage = Objects.requireNonNull(primary, "primary stage is null");
 
@@ -34,6 +41,10 @@ public final class Launcher {
         }
     }
 
+    /**
+     * Navigates to the given FXML view, setting the window title and applying
+     * shared styles. Can be called from any thread.
+     */
     public static void go(String fxmlFileName, String title) {
         Runnable task = () -> {
             try {
@@ -71,6 +82,9 @@ public final class Launcher {
         if (Platform.isFxApplicationThread()) task.run(); else Platform.runLater(task);
     }
 
+    /**
+     * Resolves an FXML resource path (supports nested folders like graphics/).
+     */
     private static URL resolveFXML(String name) {
         URL url = HelloApplication.class.getResource(FXML_PREFIX + name);
         if (url != null) return url;

@@ -2,6 +2,9 @@ package com.example.demo.model;
 
 /**
  * Request payload for creating course materials.
+ *
+ * <p>Includes display title, optional type (e.g. PDF, link, video), URL or
+ * file path, and optional metadata for the backend.</p>
  */
 public class CourseMaterialRequest {
     private String title;

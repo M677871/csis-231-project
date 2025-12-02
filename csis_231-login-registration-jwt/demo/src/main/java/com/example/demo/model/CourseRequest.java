@@ -2,6 +2,9 @@ package com.example.demo.model;
 
 /**
  * Request payload for creating/updating courses.
+ *
+ * <p>Holds basic metadata (title, description), category selection, and
+ * publish flag used by the course editor.</p>
  */
 public class CourseRequest {
     private String title;

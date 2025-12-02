@@ -4,6 +4,9 @@ import java.util.List;
 
 /**
  * Payload returned by /api/instructor/dashboard.
+ *
+ * <p>Summarizes instructor metrics (course count, total enrollments) and
+ * includes lists used to populate course tables and analytics.</p>
  */
 public class InstructorDashboardResponse {
     private Long instructorUserId;

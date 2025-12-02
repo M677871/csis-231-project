@@ -4,6 +4,9 @@ import java.time.Instant;
 
 /**
  * Enrollment DTO returned by backend.
+ *
+ * <p>Includes student identity, course info, status, and enrollment timestamp
+ * so dashboards can display enrollment lists.</p>
  */
 public class EnrollmentResponse {
     private Long id;

@@ -4,6 +4,9 @@ import java.util.List;
 
 /**
  * Payload returned by /api/student/dashboard.
+ *
+ * <p>Contains course enrollment counts, recent quiz results, and upcoming
+ * quizzes used to populate the student dashboard.</p>
  */
 public class StudentDashboardResponse {
     private Long studentUserId;

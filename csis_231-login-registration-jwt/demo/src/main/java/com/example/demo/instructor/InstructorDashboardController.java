@@ -34,7 +34,8 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Instructor dashboard showing courses and stats.
+ * Instructor dashboard showing owned courses, enrollments, and upcoming quizzes,
+ * with shortcuts to edit courses, open analytics, and take quizzes as a student.
  */
 public class InstructorDashboardController {
 
@@ -81,6 +82,10 @@ public class InstructorDashboardController {
     private final Map<Long, String> courseTitles = new HashMap<>();
     private InstructorDashboardResponse lastDashboard;
 
+    /**
+     * Configures table columns/actions and kicks off loading of profile,
+     * dashboard stats, enrollments, and quizzes.
+     */
     @FXML
     public void initialize() {
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
@@ -177,6 +182,9 @@ public class InstructorDashboardController {
         loadMeAndDashboard();
     }
 
+    /**
+     * Loads current user (from cache or API) then triggers dashboard data loads.
+     */
     private void loadMeAndDashboard() {
         CompletableFuture.runAsync(() -> {
             try {
@@ -193,6 +201,9 @@ public class InstructorDashboardController {
         });
     }
 
+    /**
+     * Fetches instructor dashboard summary and populates the view.
+     */
     private void loadDashboard() {
         CompletableFuture.runAsync(() -> {
             try {
@@ -206,6 +217,9 @@ public class InstructorDashboardController {
         });
     }
 
+    /**
+     * Populates summary labels and course table from the instructor dashboard response.
+     */
     private void populate(InstructorDashboardResponse resp) {
         this.lastDashboard = resp;
         if (me != null) {
@@ -241,6 +255,9 @@ public class InstructorDashboardController {
         loadEnrollmentsForCourse(selected.getId());
     }
 
+    /**
+     * Loads enrollments for the selected course into the enrollments table.
+     */
     private void loadEnrollmentsForCourse(Long courseId) {
         CompletableFuture.runAsync(() -> {
             try {
@@ -254,6 +271,9 @@ public class InstructorDashboardController {
         });
     }
 
+    /**
+     * Loads courses the instructor is enrolled in (when student view is present).
+     */
     private void loadMyEnrollments() {
         if (myEnrollmentTable == null || me == null || me.getId() == null) return;
         CompletableFuture.runAsync(() -> {
@@ -266,6 +286,9 @@ public class InstructorDashboardController {
         });
     }
 
+    /**
+     * Builds a list of quizzes the instructor has not taken yet across enrolled courses.
+     */
     private void loadUpcomingQuizzes() {
         if (upcomingQuizTable == null || me == null || me.getId() == null) return;
         CompletableFuture.runAsync(() -> {
@@ -316,6 +339,9 @@ public class InstructorDashboardController {
     }
 
     @FXML
+    /**
+     * Opens the graphics playground when the user has data and permissions.
+     */
     private void onOpenAnalytics() {
         if (!isInstructorOrAdmin()) return;
         if (lastDashboard == null || lastDashboard.getCourseCount() <= 0) {
@@ -345,6 +371,9 @@ public class InstructorDashboardController {
         Launcher.go("login.fxml", "Login");
     }
 
+    /**
+     * Shows/hides and enables/disables the analytics button based on role and data.
+     */
     private void updateAnalyticsButton() {
         if (analyticsButton == null) return;
         boolean allowed = isInstructorOrAdmin() && me != null;

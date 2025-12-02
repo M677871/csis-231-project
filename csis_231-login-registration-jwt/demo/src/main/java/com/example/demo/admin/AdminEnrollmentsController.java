@@ -59,6 +59,9 @@ public class AdminEnrollmentsController {
     private final ObservableList<User> instructors = FXCollections.observableArrayList();
 
     @FXML
+    /**
+     * Initializes table bindings, cell factories, and loads instructor options.
+     */
     public void initialize() {
         courseIdColumn.setCellValueFactory(new PropertyValueFactory<>("courseId"));
         courseTitleColumn.setCellValueFactory(new PropertyValueFactory<>("courseTitle"));
@@ -98,6 +101,9 @@ public class AdminEnrollmentsController {
     }
 
     @FXML
+    /**
+     * Loads enrollments for the student identified by username or email.
+     */
     private void onLoadStudent() {
         String identifier = studentIdentifierField.getText() == null ? "" : studentIdentifierField.getText().trim();
         if (identifier.isEmpty()) { AlertUtils.warn("Enter a username or email."); return; }
@@ -132,6 +138,9 @@ public class AdminEnrollmentsController {
     }
 
     @FXML
+    /**
+     * Loads courses for the selected instructor into the table.
+     */
     private void onLoadInstructor() {
         User instructor = instructorPicker.getSelectionModel().getSelectedItem();
         if (instructor == null) { AlertUtils.warn("Select an instructor."); return; }
@@ -157,6 +166,9 @@ public class AdminEnrollmentsController {
     }
 
     @FXML
+    /**
+     * Loads enrollments for a specific course title under the selected instructor.
+     */
     private void onLoadCourseEnrollments() {
         User instructor = instructorPicker.getSelectionModel().getSelectedItem();
         String courseName = courseNameField.getText() == null ? "" : courseNameField.getText().trim();
@@ -196,6 +208,9 @@ public class AdminEnrollmentsController {
     }
 
     @FXML
+    /**
+     * Returns to the main admin dashboard screen.
+     */
     private void backToDashboard() { Launcher.go("dashboard.fxml", "Dashboard"); }
 
     @FXML

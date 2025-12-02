@@ -34,6 +34,10 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * Instructor course editor for creating/updating courses and managing materials/quizzes.
+ *
+ * <p>Loads the selected course (if any) from {@link SessionStore}, lets
+ * instructors edit metadata, add/delete materials, create quizzes with
+ * questions/answers, and review quiz results.</p>
  */
 public class CourseEditorController {
     @FXML private TextField titleField;
@@ -69,6 +73,10 @@ public class CourseEditorController {
     private final ObservableList<CourseMaterialDto> materials = FXCollections.observableArrayList();
     private final ObservableList<QuizSummaryDto> quizzes = FXCollections.observableArrayList();
 
+    /**
+     * Configures tables, action buttons, and loads the current course and
+     * category choices.
+     */
     @FXML
     public void initialize() {
         materialTitleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
@@ -111,6 +119,10 @@ public class CourseEditorController {
         loadCategories();
     }
 
+    /**
+     * Loads the active course (if set in {@link SessionStore}) or prepares a
+     * blank editor for a new course.
+     */
     private void loadCourse() {
         CompletableFuture.runAsync(() -> {
             try {
@@ -132,6 +144,9 @@ public class CourseEditorController {
         });
     }
 
+    /**
+     * Clears the form for creating a new course.
+     */
     private void populateEmpty() {
         courseIdLabel.setText("New course");
         titleField.clear();
@@ -142,6 +157,9 @@ public class CourseEditorController {
         quizzes.clear();
     }
 
+    /**
+     * Populates the editor with an existing course's details.
+     */
     private void populate(CourseDetailDto detail) {
         if (detail == null) { populateEmpty(); return; }
         courseIdLabel.setText("Course #" + detail.getId());
@@ -160,6 +178,9 @@ public class CourseEditorController {
         quizzes.setAll(detail.getQuizzes() != null ? detail.getQuizzes() : List.of());
     }
 
+    /**
+     * Creates or updates a course based on the current form values.
+     */
     @FXML
     private void onSaveCourse() {
         String title = trim(titleField.getText());
@@ -198,6 +219,9 @@ public class CourseEditorController {
         });
     }
 
+    /**
+     * Deletes the active course and returns to the instructor dashboard.
+     */
     @FXML
     private void onDeleteCourse() {
         if (activeCourse == null || activeCourse.getId() == null) {
@@ -219,6 +243,9 @@ public class CourseEditorController {
         });
     }
 
+    /**
+     * Adds a course material using the form inputs.
+     */
     @FXML
     private void onAddMaterial() {
         if (!ensureCourseExists()) return;
@@ -248,6 +275,9 @@ public class CourseEditorController {
         });
     }
 
+    /**
+     * Deletes the selected material from the course.
+     */
     @FXML
     private void onDeleteMaterial() {
         CourseMaterialDto selected = materialTable.getSelectionModel().getSelectedItem();
@@ -264,6 +294,9 @@ public class CourseEditorController {
         });
     }
 
+    /**
+     * Creates a new quiz with questions by walking the user through dialogs.
+     */
     @FXML
     private void onCreateQuiz() {
         if (!ensureCourseExists()) return;
@@ -284,6 +317,11 @@ public class CourseEditorController {
         });
     }
 
+    /**
+     * Shows dialogs to collect quiz metadata and one or more questions.
+     *
+     * @return built quiz payload or empty if cancelled/invalid
+     */
     private Optional<QuizPayload> promptQuizCreation() {
         Dialog<QuizMeta> metaDialog = new Dialog<>();
         metaDialog.setTitle("Create Quiz");
@@ -333,6 +371,11 @@ public class CourseEditorController {
         return Optional.of(new QuizPayload(meta.name, meta.description, questions));
     }
 
+    /**
+     * Builds a dialog for a single quiz question and its options.
+     *
+     * @param first whether this is the first question (affects dialog title)
+     */
     private Dialog<QuizQuestionRequest> buildQuestionDialog(boolean first) {
         Dialog<QuizQuestionRequest> dialog = new Dialog<>();
         dialog.setTitle(first ? "Add first question" : "Add another question");
@@ -387,6 +430,9 @@ public class CourseEditorController {
         return dialog;
     }
 
+    /**
+     * Loads categories for the course selector.
+     */
     private void loadCategories() {
         CompletableFuture.runAsync(() -> {
             try {
@@ -413,6 +459,9 @@ public class CourseEditorController {
         });
     }
 
+    /**
+     * Retrieves quiz results and shows them in a dialog.
+     */
     private void onViewResults(QuizSummaryDto quiz) {
         if (quiz == null) { AlertUtils.warn("Select a quiz first."); return; }
         CompletableFuture.runAsync(() -> {
@@ -440,6 +489,9 @@ public class CourseEditorController {
         });
     }
 
+    /**
+     * Displays quiz results in a modal table with usernames where available.
+     */
     private void showResultsDialog(QuizSummaryDto quiz, List<QuizResultDto> results, Map<Long, String> usernames) {
         Stage stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL);
@@ -484,6 +536,9 @@ public class CourseEditorController {
         stage.showAndWait();
     }
 
+    /**
+     * Deletes a quiz and removes it from the table.
+     */
     private void onDeleteQuiz(QuizSummaryDto quiz) {
         if (quiz == null) return;
         CompletableFuture.runAsync(() -> {
@@ -501,6 +556,9 @@ public class CourseEditorController {
         });
     }
 
+    /**
+     * Ensures a course exists before performing child operations.
+     */
     private boolean ensureCourseExists() {
         if (activeCourse != null && activeCourse.getId() != null) return true;
         AlertUtils.warn("Save the course before adding materials or quizzes.");
@@ -509,6 +567,9 @@ public class CourseEditorController {
 
     private static String trim(String v) { return v == null ? "" : v.trim(); }
 
+    /**
+     * Navigates back to a role-appropriate dashboard.
+     */
     @FXML
     private void onBack() {
         var me = SessionStore.getMe();
@@ -521,6 +582,9 @@ public class CourseEditorController {
         }
     }
 
+    /**
+     * Clears auth/session state and returns to login.
+     */
     @FXML
     private void onLogout() {
         TokenStore.clear();

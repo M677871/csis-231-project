@@ -4,6 +4,9 @@ import java.time.Instant;
 
 /**
  * DTO representing course material.
+ *
+ * <p>Used by the course detail/editor views to list downloadable links,
+ * documents, or other resources attached to a course.</p>
  */
 public class CourseMaterialDto {
     private Long id;

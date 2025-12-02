@@ -26,7 +26,13 @@ public class UserController {
         this.userService = userService;
     }
 
-    /** Lists all users. */
+    /**
+     * Retrieves a paginated list of users.
+     *
+     * @param page the zero-based page index to return
+     * @param size the number of users per page (must be greater than zero)
+     * @return a {@link PagedResponse} containing users and pagination metadata
+     */
     @GetMapping
     public PagedResponse<User> list(@RequestParam(defaultValue = "0") int page,
                                     @RequestParam(defaultValue = "10") int size) {
@@ -37,21 +43,37 @@ public class UserController {
         var springPage = userService.getUsers(PageRequest.of(Math.max(0, page), size));
         return PagedResponse.fromPage(springPage);
     }
-    /** Retrieves a user by ID. */
+    /**
+     * Retrieves a user by identifier.
+     *
+     * @param id the user ID to fetch
+     * @return the matching {@link User}
+     */
     @GetMapping("/{id}")
     public User get(@PathVariable Long id) {
         return userService.getUser(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
     }
 
-    /** Creates a new user. Expects a complete User in the body. */
+    /**
+     * Creates a new user record.
+     *
+     * @param user the user payload to persist
+     * @return the created {@link User}
+     */
     @PostMapping
     public ResponseEntity<User> create(@Valid @RequestBody User user) {
         User created = userService.createUser(user);
         return ResponseEntity.status(201).body(created);
     }
 
-    /** Updates an existing user. Only non-null fields will be updated. */
+    /**
+     * Updates an existing user, applying only non-null fields.
+     *
+     * @param id   the identifier of the user to update
+     * @param user the incoming user fields to apply
+     * @return the updated {@link User}
+     */
     @PutMapping("/{id}")
     public User update(@PathVariable Long id,
                                        @Valid @RequestBody User user) {
@@ -59,7 +81,12 @@ public class UserController {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
     }
 
-    /** Deletes a user by ID. Returns 204 on success or 404 if not found. */
+    /**
+     * Deletes a user by identifier.
+     *
+     * @param id the user ID to delete
+     * @return {@link ResponseEntity} with no content on success
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         userService.deleteUser(id);

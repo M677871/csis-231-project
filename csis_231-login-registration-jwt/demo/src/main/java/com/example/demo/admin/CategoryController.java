@@ -17,6 +17,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Admin screen for viewing, searching, creating, updating, and deleting course
+ * categories. Manages a filtered/sorted table, a simple form, and integrates
+ * with {@link CategoryApi} for CRUD operations.
+ */
 public class CategoryController {
 
     // Table
@@ -39,6 +44,9 @@ public class CategoryController {
     private final SortedList<Category>   sorted   = new SortedList<>(filtered);
     private long totalCategories;
 
+    /**
+     * Initializes the category table, search, and loads the initial data set.
+     */
     @FXML
     public void initialize() {
         // Columns
@@ -75,6 +83,9 @@ public class CategoryController {
         loadCategories();
     }
 
+    /**
+     * Fetches categories asynchronously and refreshes the table.
+     */
     private void loadCategories() {
         CompletableFuture.runAsync(() -> {
             try {
@@ -95,6 +106,9 @@ public class CategoryController {
         });
     }
 
+    /**
+     * Updates the count label based on current filters and totals.
+     */
     private void updateCount() {
         long displayed = filtered.size();
         if (totalCategories > 0 && totalCategories >= displayed) {
@@ -104,6 +118,9 @@ public class CategoryController {
         }
     }
 
+    /**
+     * Handles adding a new category from the form input.
+     */
     @FXML
     private void onAddCategory() {
         String name = categoryNameField.getText().trim();
@@ -125,6 +142,9 @@ public class CategoryController {
         });
     }
 
+    /**
+     * Handles updating the selected category with the current form value.
+     */
     @FXML
     private void onUpdateCategory() {
         Category selected = categoryTable.getSelectionModel().getSelectedItem();
@@ -154,6 +174,9 @@ public class CategoryController {
         });
     }
 
+    /**
+     * Deletes the selected category.
+     */
     @FXML
     private void onDeleteCategory() {
         Category selected = categoryTable.getSelectionModel().getSelectedItem();
@@ -175,12 +198,21 @@ public class CategoryController {
         });
     }
 
+    /**
+     * Clears the form and table selection.
+     */
     private void clearForm() {
         categoryNameField.clear();
         categoryTable.getSelectionModel().clearSelection();
     }
 
+    /**
+     * Navigates back to the admin dashboard.
+     */
     @FXML private void backToMain() { Launcher.go("dashboard.fxml", "Dashboard"); }
+    /**
+     * Logs out the current user and returns to the login screen.
+     */
     @FXML public void onLogout() {
         TokenStore.clear();
         SessionStore.clearAll();

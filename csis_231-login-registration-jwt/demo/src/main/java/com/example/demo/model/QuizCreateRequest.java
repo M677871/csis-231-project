@@ -2,6 +2,8 @@ package com.example.demo.model;
 
 /**
  * Request body for creating a quiz.
+ *
+ * <p>Includes the owning course id plus quiz title/description.</p>
  */
 public class QuizCreateRequest {
     private Long courseId;

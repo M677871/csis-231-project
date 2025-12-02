@@ -3,9 +3,11 @@ package com.example.demo.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
- * Client-side user model.  Matches the structure of the backend entity
- * {@code com.csis231.api.user.User}.  The password field is only used
- * when creating or updating a user; it is never returned by the backend.
+ * Client-side user model matching the backend entity
+ * {@code com.csis231.api.user.User}.
+ *
+ * <p>The password field is only used when creating or updating a user; it is
+ * never returned by the backend.</p>
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User {

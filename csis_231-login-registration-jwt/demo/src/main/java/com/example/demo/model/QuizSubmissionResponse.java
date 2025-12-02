@@ -4,6 +4,9 @@ import java.time.Instant;
 
 /**
  * Response returned after submitting a quiz.
+ *
+ * <p>Includes score breakdown and completion timestamp for confirmation and
+ * dashboard summaries.</p>
  */
 public class QuizSubmissionResponse {
     private Long quizId;

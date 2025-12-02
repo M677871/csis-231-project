@@ -10,5 +10,11 @@ import java.util.List;
  */
 @Repository
 public interface QuizRepository extends JpaRepository<Quiz, Long> {
+    /**
+     * Retrieves quizzes belonging to a specific course.
+     *
+     * @param courseId the course identifier
+     * @return list of {@link Quiz} entities for the course
+     */
     List<Quiz> findByCourse_Id(Long courseId);
 }

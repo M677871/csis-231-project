@@ -6,6 +6,8 @@ package com.example.demo.model;
  * "forgot password" flow.
  *
  * @param email e-mail address associated with the account
+ *
+ * <p>When submitted, the backend sends a reset code to the provided e-mail.</p>
  */
 
 public record ForgetPasswordRequest(String email) {}

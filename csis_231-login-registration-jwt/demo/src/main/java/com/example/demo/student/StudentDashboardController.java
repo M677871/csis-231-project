@@ -25,6 +25,10 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * Student dashboard showing enrollments, progress and quizzes.
+ *
+ * <p>Loads the student's dashboard payload, filters upcoming quizzes the user
+ * hasn't taken, and provides shortcuts to course detail, quiz taking, and
+ * visualization.</p>
  */
 public class StudentDashboardController {
 
@@ -51,6 +55,9 @@ public class StudentDashboardController {
     private MeResponse me;
     private StudentDashboardResponse lastDashboard;
 
+    /**
+     * Configures tables/actions and kicks off profile + dashboard load.
+     */
     @FXML
     public void initialize() {
         courseTitleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
@@ -90,6 +97,9 @@ public class StudentDashboardController {
         loadMeAndDashboard();
     }
 
+    /**
+     * Loads the current user (cached or via API) then dashboard data.
+     */
     private void loadMeAndDashboard() {
         CompletableFuture.runAsync(() -> {
             try {
@@ -104,6 +114,9 @@ public class StudentDashboardController {
         });
     }
 
+    /**
+     * Fetches the student dashboard payload and populates the view.
+     */
     private void loadDashboard() {
         CompletableFuture.runAsync(() -> {
             try {
@@ -117,6 +130,9 @@ public class StudentDashboardController {
         });
     }
 
+    /**
+     * Populates labels/tables with dashboard data and updates counts/buttons.
+     */
     private void populate(StudentDashboardResponse resp) {
         this.lastDashboard = resp;
         if (me != null) {
@@ -135,6 +151,9 @@ public class StudentDashboardController {
         updateVisualizeButton();
     }
 
+    /**
+     * Removes quizzes the student already completed from the upcoming list.
+     */
     private void filterUpcomingByResult() {
         var items = new java.util.ArrayList<>(upcomingQuizzes);
         CompletableFuture.runAsync(() -> {
@@ -162,6 +181,9 @@ public class StudentDashboardController {
         Launcher.go("course_detail.fxml", "Course Detail");
     }
 
+    /**
+     * Opens the graphics playground if the user has data to visualize.
+     */
     @FXML
     private void onOpenGraphics() {
         if (!isStudentOrAdmin()) return;

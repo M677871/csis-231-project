@@ -2,6 +2,9 @@ package com.example.demo.model;
 
 /**
  * Authentication response returned by the backend.
+ *
+ * <p>Contains either a JWT (for direct login) or a flag indicating OTP is
+ * required; also echoes back basic user identity and role.</p>
  */
 public class AuthResponse {
     private boolean otpRequired;

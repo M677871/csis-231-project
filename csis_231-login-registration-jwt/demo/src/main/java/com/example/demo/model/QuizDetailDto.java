@@ -4,6 +4,9 @@ import java.util.List;
 
 /**
  * Full quiz definition returned to students.
+ *
+ * <p>Contains the quiz metadata plus the ordered list of questions and their
+ * answer options.</p>
  */
 public class QuizDetailDto {
     private Long id;

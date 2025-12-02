@@ -10,9 +10,9 @@ import javafx.scene.control.TextField;
 /**
  * JavaFX controller for the "forgot password" screen.
  *
- * <p>The user can enter either an e-mail address or username. The controller
- * sends a request to the backend to start the password-reset flow and then
- * navigates to the reset screen.</p>
+ * <p>Accepts either an e-mail address or username, triggers the backend
+ * password-reset flow via {@link AuthApi#requestResetOtp(String)}, remembers
+ * the e-mail for convenience, and then navigates to the reset screen.</p>
  */
 
 public class ForgotController {

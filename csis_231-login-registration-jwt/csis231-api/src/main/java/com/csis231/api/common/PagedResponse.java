@@ -14,6 +14,13 @@ public class PagedResponse<T> {
     private boolean first;
     private boolean last;
 
+    /**
+     * Converts a Spring {@link Page} into a generic {@link PagedResponse}.
+     *
+     * @param page the source page
+     * @param <T>  the element type
+     * @return a {@link PagedResponse} carrying content and pagination metadata
+     */
     public static <T> PagedResponse<T> fromPage(Page<T> page) {
         PagedResponse<T> dto = new PagedResponse<>();
         dto.setContent(page.getContent());

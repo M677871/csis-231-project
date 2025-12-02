@@ -2,6 +2,12 @@ package com.example.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+/**
+ * Profile payload returned by /api/csis-users/me for the current user.
+ *
+ * <p>Includes basic identity, contact info, role, and optionally a composed
+ * {@code fullName}. Unknown properties from the backend are ignored.</p>
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MeResponse {
     private Long id;

@@ -3,7 +3,10 @@ package com.example.demo.model;
 import java.time.Instant;
 
 /**
- * Lightweight course projection used across dashboards and catalog.
+ * Lightweight course projection used across dashboards, catalog, and lists.
+ *
+ * <p>Includes author, publish status, timestamps, and description so the UI
+ * can show summary cards or table rows without fetching full details.</p>
  */
 public class CourseDto {
     private Long id;

@@ -23,6 +23,10 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * Course catalog screen shared by students and instructors.
+ *
+ * <p>Loads published courses, shows enroll/edit actions depending on the
+ * current user's role or ownership, and lets students enroll or view
+ * details.</p>
  */
 public class CourseCatalogController {
     @FXML private TableView<CourseDto> courseTable;
@@ -41,6 +45,10 @@ public class CourseCatalogController {
     private MeResponse me;
     private final java.util.Set<Long> enrolledCourseIds = new java.util.HashSet<>();
 
+    /**
+     * Wires table columns, action buttons, search listener, and kicks off
+     * loading of the current user plus courses/enrollments.
+     */
     @FXML
     public void initialize() {
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
@@ -86,6 +94,10 @@ public class CourseCatalogController {
         loadMeAndCourses();
     }
 
+    /**
+     * Loads the current user (cached or via API) and then fetches enrollments
+     * and courses.
+     */
     private void loadMeAndCourses() {
         CompletableFuture.runAsync(() -> {
             try {
@@ -105,6 +117,10 @@ public class CourseCatalogController {
         });
     }
 
+    /**
+     * Fetches the current user's enrollments so the catalog can show "Enrolled"
+     * and disable duplicate enroll actions.
+     */
     private void loadEnrollments() {
         if (me == null || me.getId() == null) return;
         CompletableFuture.runAsync(() -> {
@@ -120,6 +136,10 @@ public class CourseCatalogController {
         });
     }
 
+    /**
+     * Loads the published courses (optionally filtered by search text) and
+     * updates the table and status label.
+     */
     private void loadCourses() {
         String search = searchField != null ? searchField.getText() : null;
         CompletableFuture.runAsync(() -> {
@@ -140,6 +160,10 @@ public class CourseCatalogController {
         });
     }
 
+    /**
+     * Handles clicks on the action button per course. Instructors/admins open
+     * the editor; students enroll when not already enrolled.
+     */
     private void onAction(CourseDto course) {
         if (course == null) return;
 
@@ -170,6 +194,10 @@ public class CourseCatalogController {
         doEnroll(course);
     }
 
+    /**
+     * Enrolls the current user in the given course asynchronously and updates
+     * the local enrolled set/UI on success.
+     */
     private void doEnroll(CourseDto course) {
         if (course == null) return;
         CompletableFuture.runAsync(() -> {
@@ -195,6 +223,9 @@ public class CourseCatalogController {
                 && c.getInstructorUserId().equals(me.getId());
     }
 
+    /**
+     * Opens the detail view for the selected course.
+     */
     @FXML
     private void onOpenCourseDetail() {
         CourseDto selected = courseTable.getSelectionModel().getSelectedItem();
@@ -203,9 +234,15 @@ public class CourseCatalogController {
         Launcher.go("course_detail.fxml", "Course Detail");
     }
 
+    /**
+     * Manual refresh trigger for the course list.
+     */
     @FXML
     private void onRefresh() { loadCourses(); }
 
+    /**
+     * Returns to the role-appropriate dashboard.
+     */
     @FXML
     private void onBack() {
         String role = me != null ? me.getRole() : null;

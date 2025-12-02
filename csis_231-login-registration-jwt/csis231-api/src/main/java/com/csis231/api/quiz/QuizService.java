@@ -27,6 +27,16 @@ public class QuizService {
     private final CourseRepository courseRepository;
     private final EnrollmentService enrollmentService;
 
+    /**
+     * Creates a new quiz under the given course for the instructor/admin actor.
+     *
+     * @param req   the quiz creation payload
+     * @param actor the authenticated user performing the action
+     * @return the persisted {@link Quiz}
+     * @throws BadRequestException        if the payload is missing
+     * @throws ResourceNotFoundException  if the course does not exist
+     * @throws UnauthorizedException      if the actor is not permitted
+     */
     @Transactional
     public Quiz createQuiz(QuizCreateRequest req, User actor) {
         requireInstructorOrAdmin(actor);
@@ -42,6 +52,17 @@ public class QuizService {
         return quizRepository.save(quiz);
     }
 
+    /**
+     * Adds questions (and their answer options) to an existing quiz.
+     *
+     * @param quizId   the quiz identifier
+     * @param requests the list of questions with answers to create
+     * @param actor    the authenticated user performing the action
+     * @return the list of created {@link QuizQuestion} entities
+     * @throws BadRequestException        if payload is invalid
+     * @throws ResourceNotFoundException  if the quiz is not found
+     * @throws UnauthorizedException      if the actor cannot modify the quiz
+     */
     @Transactional
     public List<QuizQuestion> addQuestions(Long quizId, List<QuizQuestionRequest> requests, User actor) {
         if (quizId == null) throw new BadRequestException("quizId required");
@@ -75,6 +96,15 @@ public class QuizService {
         return createdQuestions;
     }
 
+    /**
+     * Retrieves quiz details (questions and options) visible to the viewer.
+     *
+     * @param quizId the quiz identifier
+     * @param viewer the requesting user
+     * @return a {@link QuizDetailDto} containing quiz content
+     * @throws ResourceNotFoundException if the quiz is not found
+     * @throws UnauthorizedException     if the viewer cannot access the quiz
+     */
     @Transactional(readOnly = true)
     public QuizDetailDto getQuizDetail(Long quizId, User viewer) {
         Quiz quiz = quizRepository.findById(quizId)
@@ -97,6 +127,17 @@ public class QuizService {
         return QuizMapper.toDetailDto(quiz, questionDtos);
     }
 
+    /**
+     * Submits answers for a quiz, validates enrollment/ownership, and computes score.
+     *
+     * @param quizId  the quiz identifier
+     * @param request the submission payload containing answers
+     * @param actor   the authenticated user submitting
+     * @return a {@link QuizSubmissionResponse} summarizing the result
+     * @throws UnauthorizedException    if the user cannot submit
+     * @throws BadRequestException      if answers reference invalid questions/options
+     * @throws ResourceNotFoundException if the quiz is not found
+     */
     @Transactional
     public QuizSubmissionResponse submitQuiz(Long quizId, QuizSubmissionRequest request, User actor) {
         if (actor == null) throw new UnauthorizedException("Authentication required");
@@ -166,6 +207,15 @@ public class QuizService {
         );
     }
 
+    /**
+     * Retrieves all results for a quiz, enforcing course ownership for instructors.
+     *
+     * @param quizId the quiz identifier
+     * @param actor  the authenticated user requesting the data
+     * @return list of {@link QuizResultDto} for the quiz
+     * @throws ResourceNotFoundException if the quiz is not found
+     * @throws UnauthorizedException     if actor cannot view results
+     */
     @Transactional(readOnly = true)
     public List<QuizResultDto> resultsForQuiz(Long quizId, User actor) {
         Quiz quiz = quizRepository.findById(quizId)
@@ -176,6 +226,14 @@ public class QuizService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Deletes a quiz along with its questions, answers, and results.
+     *
+     * @param quizId the quiz identifier
+     * @param actor  the authenticated user performing deletion
+     * @throws ResourceNotFoundException if the quiz is not found
+     * @throws UnauthorizedException     if actor cannot manage the course
+     */
     @Transactional
     public void deleteQuiz(Long quizId, User actor) {
         Quiz quiz = quizRepository.findById(quizId)
@@ -196,6 +254,12 @@ public class QuizService {
         quizRepository.delete(quiz);
     }
 
+    /**
+     * Returns the latest quiz results for a student (limited to recent entries).
+     *
+     * @param studentId the student identifier
+     * @return list of recent {@link QuizResultDto}
+     */
     @Transactional(readOnly = true)
     public List<QuizResultDto> latestResultsForStudent(Long studentId) {
         return resultRepository.findTop5ByStudent_IdOrderByCompletedAtDesc(studentId).stream()
@@ -203,6 +267,15 @@ public class QuizService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Returns the most recent result for the given quiz and user, if accessible.
+     *
+     * @param quizId the quiz identifier
+     * @param actor  the authenticated user requesting their result
+     * @return the latest {@link QuizResultDto} or {@code null} if none
+     * @throws UnauthorizedException    if the user cannot view the quiz
+     * @throws ResourceNotFoundException if the quiz is not found
+     */
     @Transactional(readOnly = true)
     public QuizResultDto latestResultForUser(Long quizId, User actor) {
         if (actor == null) throw new UnauthorizedException("Authentication required");

@@ -2,6 +2,9 @@ package com.example.demo.model;
 
 /**
  * Answer option exposed to quiz taker (without correctness).
+ *
+ * <p>Returned by quiz endpoints so the UI can render options without leaking
+ * which one is correct.</p>
  */
 public class AnswerOptionDto {
     private Long id;

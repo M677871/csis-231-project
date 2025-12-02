@@ -35,11 +35,28 @@ public class ApiClient {
         this.baseUrl = url.endsWith("/") ? url.substring(0, url.length() - 1) : url;
     }
 
+    /**
+     * Executes an HTTP GET request and deserializes the response body.
+     *
+     * @param path    the relative or absolute path to invoke
+     * @param typeRef the target type for the JSON body
+     * @param <T>     the generic response type
+     * @return an {@link ApiResponse} containing the parsed body and headers
+     * @throws ApiException if the server returns a non-2xx status or parsing fails
+     */
     public <T> ApiResponse<T> get(String path, TypeReference<T> typeRef) {
         HttpRequest request = baseRequest(path).GET().build();
         return send(request, typeRef);
     }
 
+    /**
+     * Executes an HTTP POST request with a JSON payload, returning a raw string response.
+     *
+     * @param path    the relative or absolute path to invoke
+     * @param payload the payload to serialize as JSON
+     * @return an {@link ApiResponse} containing the raw string body
+     * @throws ApiException if the server returns a non-2xx status or parsing fails
+     */
     public ApiResponse<String> post(String path, Object payload) {
         HttpRequest request = baseRequest(path)
                 .header("Content-Type", "application/json")
@@ -49,6 +66,16 @@ public class ApiClient {
         return send(request, null);
     }
 
+    /**
+     * Executes an HTTP POST request with a JSON payload and deserializes the response body.
+     *
+     * @param path    the relative or absolute path to invoke
+     * @param payload the payload to serialize as JSON
+     * @param typeRef the target type for the JSON body
+     * @param <T>     the generic response type
+     * @return an {@link ApiResponse} containing the parsed body and headers
+     * @throws ApiException if the server returns a non-2xx status or parsing fails
+     */
     public <T> ApiResponse<T> post(String path, Object payload, TypeReference<T> typeRef) {
         HttpRequest request = baseRequest(path)
                 .header("Content-Type", "application/json")
@@ -57,6 +84,16 @@ public class ApiClient {
         return send(request, typeRef);
     }
 
+    /**
+     * Executes an HTTP PUT request with a JSON payload.
+     *
+     * @param path    the relative or absolute path to invoke
+     * @param payload the payload to serialize as JSON
+     * @param typeRef the target type for the JSON body
+     * @param <T>     the generic response type
+     * @return an {@link ApiResponse} containing the parsed body and headers
+     * @throws ApiException if the server returns a non-2xx status or parsing fails
+     */
     public <T> ApiResponse<T> put(String path, Object payload, TypeReference<T> typeRef) {
         HttpRequest request = baseRequest(path)
                 .header("Content-Type", "application/json")
@@ -65,11 +102,25 @@ public class ApiClient {
         return send(request, typeRef);
     }
 
+    /**
+     * Executes an HTTP DELETE request.
+     *
+     * @param path the relative or absolute path to invoke
+     * @throws ApiException if the server returns a non-2xx status or parsing fails
+     */
     public void delete(String path) {
         HttpRequest request = baseRequest(path).DELETE().build();
         send(request, null);
     }
 
+    /**
+     * Deserializes the given JSON payload into the requested type.
+     *
+     * @param payload the JSON string
+     * @param typeRef the target type
+     * @param <T>     the generic response type
+     * @return the parsed object
+     */
     public <T> T read(String payload, TypeReference<T> typeRef) {
         return parseBody(payload, typeRef);
     }

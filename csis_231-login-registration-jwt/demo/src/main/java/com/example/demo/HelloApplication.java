@@ -3,6 +3,9 @@ package com.example.demo;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+/**
+ * JavaFX entry point that boots the app and opens the login screen.
+ */
 public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) {

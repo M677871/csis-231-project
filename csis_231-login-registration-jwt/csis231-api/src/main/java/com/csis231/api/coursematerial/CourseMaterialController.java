@@ -22,12 +22,27 @@ public class CourseMaterialController {
     private final CourseMaterialService materialService;
     private final UserRepository userRepository;
 
+    /**
+     * Lists materials for a course that are visible to the current user.
+     *
+     * @param courseId       the course identifier
+     * @param authentication the authenticated principal requesting the data
+     * @return a list of {@link CourseMaterialDto} visible to the viewer
+     */
     @GetMapping("/courses/{courseId}/materials")
     public List<CourseMaterialDto> list(@PathVariable Long courseId, Authentication authentication) {
         User viewer = resolveUser(authentication);
         return materialService.mapToDto(materialService.listForViewer(courseId, viewer));
     }
 
+    /**
+     * Creates a new course material under the specified course.
+     *
+     * @param courseId       the course identifier
+     * @param request        the material payload
+     * @param authentication the authenticated principal performing the operation
+     * @return {@code 201 Created} with the created {@link CourseMaterialDto}
+     */
     @PostMapping("/courses/{courseId}/materials")
     public ResponseEntity<CourseMaterialDto> create(@PathVariable Long courseId,
                                                     @Valid @RequestBody CourseMaterialRequest request,
@@ -37,6 +52,13 @@ public class CourseMaterialController {
         return ResponseEntity.status(201).body(CourseMaterialMapper.toDto(created));
     }
 
+    /**
+     * Deletes a material by id after verifying permissions.
+     *
+     * @param id             the material identifier
+     * @param authentication the authenticated principal
+     * @return {@link ResponseEntity} with no content on success
+     */
     @DeleteMapping("/materials/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id, Authentication authentication) {
         User actor = resolveUser(authentication);

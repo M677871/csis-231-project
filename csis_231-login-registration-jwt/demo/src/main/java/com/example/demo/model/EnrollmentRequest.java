@@ -1,7 +1,10 @@
 package com.example.demo.model;
 
 /**
- * Request body for enrolling a student.
+ * Request body for enrolling a student in a course.
+ *
+ * <p>Used by enrollment flows where either an admin/instructor specifies a
+ * student id or the student enrolls themselves.</p>
  */
 public class EnrollmentRequest {
     private Long studentUserId;

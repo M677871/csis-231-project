@@ -17,13 +17,9 @@ import javafx.scene.control.TextField;
  *
  * <p>This controller:</p>
  * <ul>
- *   <li>Reads the username and password from the UI fields</li>
- *   <li>Calls {@link com.example.demo.auth.AuthApi#login(com.example.demo.model.LoginRequest)}
- *       to authenticate against the backend</li>
- *   <li>If the backend requires OTP, stores the username in
- *       {@link com.example.demo.auth.TempAuth} and navigates to the OTP screen</li>
- *   <li>Otherwise stores the JWT in {@link com.example.demo.common.TokenStore}
- *       and opens the main dashboard</li>
+ *   <li>Reads credentials from the UI and authenticates via {@link AuthApi#login(com.example.demo.model.LoginRequest)}</li>
+ *   <li>Handles OTP-required responses by caching the username in {@link TempAuth} and navigating to the OTP screen</li>
+ *   <li>On normal login, relies on {@link com.example.demo.common.TokenStore} being set, fetches the profile via {@link AuthApi#me()}, caches it in {@link SessionStore}, and opens a role-based dashboard</li>
  * </ul>
  */
 
@@ -35,16 +31,14 @@ public class LoginController {
     /**
      * Handles the login button action.
      *
-     * <p>Validates that both username and password are non-blank. If either is
-     * empty, a warning dialog is shown. Otherwise a login request is sent to
- * the backend and the result is handled as follows:</p>
- * <ul>
- *   <li>If {@link AuthResponse#isOtpRequired()} is {@code true}, the username
- *       is stored in {@link TempAuth#username} and the OTP screen is opened.</li>
- *   <li>Otherwise the JWT from {@link AuthResponse#getToken()} is stored and the
- *       appropriate dashboard is opened.</li>
- * </ul>
- */
+     * <p>Steps:</p>
+     * <ul>
+     *   <li>Validate that both username and password are provided</li>
+     *   <li>Call {@link AuthApi#login(LoginRequest)} to authenticate</li>
+     *   <li>If {@link AuthResponse#isOtpRequired()} is true, store {@link TempAuth#username} and route to the OTP screen</li>
+     *   <li>Otherwise ensure a token exists, fetch the current user via {@link AuthApi#me()}, cache it in {@link SessionStore}, and navigate based on role</li>
+     * </ul>
+     */
 
     public void onLogin() {
         try {
@@ -87,6 +81,11 @@ public class LoginController {
 
     public void goForgot(){ Launcher.go("forget.fxml", "Forgot Password"); }
 
+    /**
+     * Opens the dashboard corresponding to the authenticated user's role.
+     *
+     * @param role role string from the backend (e.g. ADMIN, INSTRUCTOR, STUDENT)
+     */
     private void navigateByRole(String role) {
         if (role != null && role.equalsIgnoreCase("ADMIN")) {
             Launcher.go("dashboard.fxml", "Admin Dashboard");

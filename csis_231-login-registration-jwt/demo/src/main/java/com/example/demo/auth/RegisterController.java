@@ -16,7 +16,8 @@ import javafx.scene.control.TextField;
  * <p>Collects account information (username, e-mail, password) and optional
  * profile details from the form, maps the chosen role to the backend enum
  * value and uses {@link AuthApi#register(com.example.demo.model.RegisterRequest)}
- * to create a new account.</p>
+ * to create a new account. Also ensures role choices are available even when
+ * not pre-populated in the FXML.</p>
  */
 
 public class RegisterController {

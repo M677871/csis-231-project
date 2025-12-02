@@ -22,6 +22,13 @@ public class EnrollmentController {
     private final EnrollmentService enrollmentService;
     private final UserRepository userRepository;
 
+    /**
+     * Enrolls a student (self or target) into a course.
+     *
+     * @param request        the enrollment request with courseId and optional studentUserId
+     * @param authentication the authenticated principal performing the action
+     * @return the created {@link EnrollmentResponse} representing the enrollment
+     */
     @PostMapping("/enrollments/enroll")
     public EnrollmentResponse enroll(@Valid @RequestBody EnrollmentRequest request,
                                      Authentication authentication) {
@@ -29,6 +36,13 @@ public class EnrollmentController {
         return EnrollmentMapper.toDto(enrollmentService.enroll(actor, request));
     }
 
+    /**
+     * Lists enrollments for a given student. Admins/instructors may view others; students may view themselves.
+     *
+     * @param userId         the student user id
+     * @param authentication the authenticated principal requesting the data
+     * @return a list of enrollments for the specified student
+     */
     @GetMapping("/students/{userId}/enrollments")
     public List<EnrollmentResponse> enrollmentsForStudent(@PathVariable Long userId,
                                                           Authentication authentication) {
@@ -41,6 +55,13 @@ public class EnrollmentController {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Lists enrollments for a course, enforcing instructor/admin visibility rules.
+     *
+     * @param courseId       the course identifier
+     * @param authentication the authenticated principal
+     * @return a list of enrollments for the course
+     */
     @GetMapping("/courses/{courseId}/enrollments")
     public List<EnrollmentResponse> enrollmentsForCourse(@PathVariable Long courseId, Authentication authentication) {
         User actor = resolveUser(authentication);

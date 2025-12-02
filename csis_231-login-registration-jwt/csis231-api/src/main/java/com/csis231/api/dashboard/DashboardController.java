@@ -36,6 +36,12 @@ public class DashboardController {
     private final QuizRepository quizRepository;
     private final QuizQuestionRepository questionRepository;
 
+    /**
+     * Builds the student dashboard with enrollments, recent quiz results, and upcoming quizzes.
+     *
+     * @param authentication the authenticated principal
+     * @return a {@link StudentDashboardResponse} containing dashboard data
+     */
     @GetMapping("/student/dashboard")
     public StudentDashboardResponse studentDashboard(Authentication authentication) {
         User student = resolveUser(authentication);
@@ -64,6 +70,12 @@ public class DashboardController {
         );
     }
 
+    /**
+     * Builds the instructor dashboard with owned courses and aggregated stats.
+     *
+     * @param authentication the authenticated principal
+     * @return an {@link InstructorDashboardResponse} summarizing instructor metrics
+     */
     @GetMapping("/instructor/dashboard")
     public InstructorDashboardResponse instructorDashboard(Authentication authentication) {
         User instructor = resolveUser(authentication);
@@ -93,6 +105,13 @@ public class DashboardController {
         );
     }
 
+    /**
+     * Lists courses belonging to the specified instructor (or all, if admin).
+     *
+     * @param userId         the instructor's user id
+     * @param authentication the authenticated principal
+     * @return a list of {@link CourseDto} owned by the instructor
+     */
     @GetMapping("/instructors/{userId}/courses")
     public List<CourseDto> coursesByInstructor(@PathVariable Long userId, Authentication authentication) {
         User actor = resolveUser(authentication);

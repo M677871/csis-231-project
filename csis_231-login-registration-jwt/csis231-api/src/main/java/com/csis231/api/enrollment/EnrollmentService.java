@@ -24,6 +24,17 @@ public class EnrollmentService {
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
 
+    /**
+     * Enrolls the target student (or the actor) into the given course after validation.
+     *
+     * @param actor the authenticated user initiating the enrollment
+     * @param req   the enrollment request containing courseId and optional studentUserId
+     * @return the created {@link CourseEnrollment}
+     * @throws BadRequestException      if payload is missing required fields
+     * @throws UnauthorizedException    if the actor cannot enroll the target
+     * @throws ResourceNotFoundException if the course or student cannot be found
+     * @throws ConflictException        if the enrollment already exists
+     */
     @Transactional
     public CourseEnrollment enroll(User actor, EnrollmentRequest req) {
         if (req == null || req.courseId() == null) {
@@ -63,11 +74,26 @@ public class EnrollmentService {
         return enrollmentRepository.save(enrollment);
     }
 
+    /**
+     * Lists enrollments for a given student.
+     *
+     * @param studentId the student identifier
+     * @return list of {@link CourseEnrollment} for the student
+     */
     @Transactional(readOnly = true)
     public List<CourseEnrollment> findByStudent(Long studentId) {
         return enrollmentRepository.findByStudent_Id(studentId);
     }
 
+    /**
+     * Lists enrollments for a given course, enforcing instructor/admin visibility rules.
+     *
+     * @param courseId the course identifier
+     * @param actor    the authenticated user requesting the data
+     * @return list of {@link CourseEnrollment} for the course
+     * @throws UnauthorizedException    if the actor is not allowed to view
+     * @throws ResourceNotFoundException if the course is not found
+     */
     @Transactional(readOnly = true)
     public List<CourseEnrollment> findByCourse(Long courseId, User actor) {
         Course course = courseRepository.findById(courseId)
@@ -87,11 +113,24 @@ public class EnrollmentService {
         throw new UnauthorizedException("Only instructors or admins can view course enrollments");
     }
 
+    /**
+     * Counts enrollments for a course.
+     *
+     * @param courseId the course identifier
+     * @return the total number of enrollments
+     */
     @Transactional(readOnly = true)
     public long countForCourse(Long courseId) {
         return enrollmentRepository.countByCourse_Id(courseId);
     }
 
+    /**
+     * Checks whether a student is enrolled in a course.
+     *
+     * @param studentId the student identifier
+     * @param courseId  the course identifier
+     * @return true if the enrollment exists
+     */
     @Transactional(readOnly = true)
     public boolean isStudentEnrolled(Long studentId, Long courseId) {
         return enrollmentRepository.existsByStudent_IdAndCourse_Id(studentId, courseId);

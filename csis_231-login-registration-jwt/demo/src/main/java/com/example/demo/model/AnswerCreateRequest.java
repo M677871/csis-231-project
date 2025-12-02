@@ -2,6 +2,9 @@ package com.example.demo.model;
 
 /**
  * Represents a single answer option when creating questions.
+ *
+ * <p>Used by instructors in the course editor when building quiz questions.
+ * Each option carries display text and whether it is the correct answer.</p>
  */
 public class AnswerCreateRequest {
     private String answerText;

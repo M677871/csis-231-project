@@ -54,6 +54,9 @@ public class UserController {
     private long totalUsers;
 
     @FXML
+    /**
+     * Initializes table bindings, filters, and triggers the initial load of users.
+     */
     public void initialize() {
         // Column value factories
         userIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -136,6 +139,9 @@ public class UserController {
         loadUsers();
     }
 
+    /**
+     * Loads users asynchronously and populates the table.
+     */
     private void loadUsers() {
         CompletableFuture.runAsync(() -> {
             try {
@@ -196,6 +202,9 @@ public class UserController {
     // ---- CRUD ----
 
     @FXML
+    /**
+     * Handles creating a new user based on the form fields.
+     */
     private void onAddUser() {
         String username = userNameField.getText().trim();
         String email    = userEmailField.getText().trim();
@@ -235,6 +244,9 @@ public class UserController {
     }
 
     @FXML
+    /**
+     * Handles updating the selected user with current form values.
+     */
     private void onUpdateUser() {
         User selected = userTable.getSelectionModel().getSelectedItem();
         if (selected == null) { AlertUtils.warn("Please select a user to update."); return; }
@@ -283,6 +295,9 @@ public class UserController {
     }
 
     @FXML
+    /**
+     * Handles deleting the currently selected user.
+     */
     private void onDeleteUser() {
         User selected = userTable.getSelectionModel().getSelectedItem();
         if (selected == null) { AlertUtils.warn("Please select a user to delete."); return; }

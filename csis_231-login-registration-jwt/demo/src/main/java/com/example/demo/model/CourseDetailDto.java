@@ -4,7 +4,10 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * Detailed course DTO including materials and quizzes.
+ * Detailed course DTO used by course detail/editor screens.
+ *
+ * <p>Contains basic course metadata plus nested materials and quizzes so the
+ * UI can render everything needed for viewing or editing a course.</p>
  */
 public class CourseDetailDto {
     private Long id;

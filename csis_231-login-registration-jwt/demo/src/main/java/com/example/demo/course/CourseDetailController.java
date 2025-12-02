@@ -34,6 +34,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Course detail view for students and instructors.
+ *
+ * <p>Displays course metadata, materials, and quizzes, allows opening links or
+ * files for materials, and lets the user start quizzes while showing their
+ * latest scores.</p>
  */
 public class CourseDetailController {
     @FXML private Label titleLabel;
@@ -59,6 +63,10 @@ public class CourseDetailController {
     private final Map<Long, QuizResultDto> latestResults = new ConcurrentHashMap<>();
     private CourseDto course;
 
+    /**
+     * Sets up tables, loads the active course from {@link SessionStore}, and
+     * fetches detail plus quiz results.
+     */
     @FXML
     public void initialize() {
         materialTitleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
@@ -122,6 +130,9 @@ public class CourseDetailController {
         loadDetail(course.getId());
     }
 
+    /**
+     * Loads course detail asynchronously and populates the view.
+     */
     private void loadDetail(Long courseId) {
         CompletableFuture.runAsync(() -> {
             try {
@@ -136,6 +147,10 @@ public class CourseDetailController {
         });
     }
 
+    /**
+     * Fetches the viewer's latest results for each quiz and refreshes the table
+     * as results arrive.
+     */
     private void loadLatestResults(CourseDetailDto d) {
         if (d == null || d.getQuizzes() == null) return;
         for (QuizSummaryDto quiz : d.getQuizzes()) {
@@ -151,6 +166,9 @@ public class CourseDetailController {
         }
     }
 
+    /**
+     * Populates labels and tables with course information.
+     */
     private void populate(CourseDetailDto d) {
         titleLabel.setText(d.getTitle());
         descriptionLabel.setText(d.getDescription());
@@ -160,6 +178,10 @@ public class CourseDetailController {
         quizzes.setAll(d.getQuizzes() != null ? d.getQuizzes() : java.util.List.of());
     }
 
+    /**
+     * Opens the selected course material in the default browser or associated
+     * application, handling both URLs and local file paths.
+     */
     private void openSelectedMaterial() {
         CourseMaterialDto selected = materialTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
@@ -210,12 +232,18 @@ public class CourseDetailController {
     }
 
 
+    /**
+     * Starts or retries the selected quiz.
+     */
     private void onTakeQuiz(QuizSummaryDto quiz) {
         if (quiz == null) { return; }
         SessionStore.setActiveQuiz(quiz);
         Launcher.go("quiz_taker.fxml", "Take Quiz");
     }
 
+    /**
+     * Returns to the dashboard that matches the current user's role.
+     */
     @FXML
     private void onBack() {
         var me = SessionStore.getMe();

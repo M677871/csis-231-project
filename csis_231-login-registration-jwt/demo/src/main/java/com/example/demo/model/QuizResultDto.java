@@ -3,7 +3,7 @@ package com.example.demo.model;
 import java.time.Instant;
 
 /**
- * Quiz result summary for dashboards.
+ * Quiz result summary for dashboards and recent-activity views.
  */
 public class QuizResultDto {
     private Long id;

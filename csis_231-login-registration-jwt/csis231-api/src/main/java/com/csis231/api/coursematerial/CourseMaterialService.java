@@ -26,6 +26,17 @@ public class CourseMaterialService {
     private final CourseRepository courseRepository;
     private final EnrollmentService enrollmentService;
 
+    /**
+     * Adds a new course material for the specified course.
+     *
+     * @param courseId the course identifier
+     * @param req      the material payload
+     * @param actor    the authenticated user performing the operation
+     * @return the persisted {@link CourseMaterial}
+     * @throws BadRequestException      if required fields are missing
+     * @throws ResourceNotFoundException if the course does not exist
+     * @throws UnauthorizedException    if the actor is not allowed to modify the course
+     */
     @Transactional
     public CourseMaterial addMaterial(Long courseId, CourseMaterialRequest req, User actor) {
         if (courseId == null) throw new BadRequestException("courseId is required");
@@ -44,6 +55,14 @@ public class CourseMaterialService {
         return materialRepository.save(material);
     }
 
+    /**
+     * Deletes a material by id after verifying permissions.
+     *
+     * @param materialId the material id to delete
+     * @param actor      the authenticated user requesting deletion
+     * @throws ResourceNotFoundException if the material is not found
+     * @throws UnauthorizedException    if the actor is not allowed to modify the course
+     */
     @Transactional
     public void deleteMaterial(Long materialId, User actor) {
         CourseMaterial material = materialRepository.findById(materialId)
@@ -56,6 +75,12 @@ public class CourseMaterialService {
      * Lists materials visible to the given viewer. Students must be enrolled;
      * instructors and admins can view regardless of enrollment. If viewer is
      * {@code null}, materials are hidden.
+     *
+     * @param courseId the course identifier
+     * @param viewer   the requesting user (may be null)
+     * @return list of materials visible to the viewer
+     * @throws ResourceNotFoundException if the course is not found
+     * @throws UnauthorizedException    if the viewer is not allowed to view
      */
     @Transactional(readOnly = true)
     public List<CourseMaterial> listForViewer(Long courseId, User viewer) {
@@ -83,6 +108,12 @@ public class CourseMaterialService {
         return Collections.emptyList();
     }
 
+    /**
+     * Maps a list of course materials to DTOs.
+     *
+     * @param materials the source materials
+     * @return list of {@link CourseMaterialDto} representations
+     */
     public List<CourseMaterialDto> mapToDto(List<CourseMaterial> materials) {
         return materials.stream().map(CourseMaterialMapper::toDto).collect(Collectors.toList());
     }

@@ -38,6 +38,14 @@ public class OtpService {
 
 
     // Default variant (keeps your existing login OTP flow working)
+    /**
+     * Creates and sends an OTP for the given user and purpose using default settings.
+     *
+     * @param user    the user who will receive the OTP
+     * @param purpose the OTP purpose (e.g., LOGIN_2FA or PASSWORD_RESET)
+     * @return the generated OTP code
+     * @throws BadRequestException if user or purpose are missing
+     */
     @Transactional
     public String createAndSend(User user, String purpose) {
         if (user == null) {
@@ -61,6 +69,17 @@ public class OtpService {
     }
 
     // New flexible variant used by password reset
+    /**
+     * Creates and sends an OTP with custom TTL and messaging.
+     *
+     * @param user       the target user
+     * @param purpose    the OTP purpose
+     * @param ttlMinutes time-to-live in minutes
+     * @param subject    email subject to send (if mail configured)
+     * @param body       optional email body (fallback is generated)
+     * @return the generated OTP code
+     * @throws BadRequestException if inputs are missing or invalid
+     */
     @Transactional
     public String createAndSend(User user, String purpose, int ttlMinutes,
                                 String subject, String body) {
@@ -108,6 +127,16 @@ public class OtpService {
     }
 
 
+    /**
+     * Verifies an OTP for a user and purpose, marking it consumed if valid.
+     *
+     * @param user    the user to validate against
+     * @param purpose the OTP purpose
+     * @param code    the OTP code to verify
+     * @throws UnauthorizedException if user is null
+     * @throws BadRequestException   if purpose/code are missing
+     * @throws OtpRequiredException  if the OTP is invalid or expired
+     */
     @Transactional
     public void verifyOtpOrThrow(User user, String purpose, String code) {
         if (user == null) {

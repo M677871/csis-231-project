@@ -215,6 +215,11 @@ public class DashboardController {
         Launcher.go("course_detail.fxml", "Course Detail");
     }
 
+    /**
+     * Navigates to the quiz-taking screen for the selected quiz.
+     *
+     * @param quiz the quiz to open
+     */
     private void onTakeQuiz(QuizSummaryDto quiz) {
         if (quiz == null) return;
         SessionStore.setActiveQuiz(quiz);

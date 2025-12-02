@@ -6,6 +6,12 @@ package com.csis231.api.enrollment;
 public final class EnrollmentMapper {
     private EnrollmentMapper() {}
 
+    /**
+     * Converts a {@link CourseEnrollment} entity to its DTO representation.
+     *
+     * @param enrollment the enrollment entity to map
+     * @return the mapped {@link EnrollmentResponse}, or {@code null} if input is null
+     */
     public static EnrollmentResponse toDto(CourseEnrollment enrollment) {
         if (enrollment == null) return null;
         return new EnrollmentResponse(

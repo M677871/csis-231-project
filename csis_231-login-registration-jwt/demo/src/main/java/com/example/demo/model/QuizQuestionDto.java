@@ -3,7 +3,7 @@ package com.example.demo.model;
 import java.util.List;
 
 /**
- * Quiz question with options.
+ * Quiz question with its answer options (without correctness flags).
  */
 public class QuizQuestionDto {
     private Long id;

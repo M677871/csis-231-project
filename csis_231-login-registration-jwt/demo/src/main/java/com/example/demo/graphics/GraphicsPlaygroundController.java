@@ -71,6 +71,9 @@ public class GraphicsPlaygroundController {
     private double cameraDistance = -450;
     private PerspectiveCamera camera;
 
+    /**
+     * Initializes chart labels, picker behavior, and kicks off profile + data load.
+     */
     @FXML
     public void initialize() {
         progressChart.setLegendVisible(false);
@@ -80,12 +83,21 @@ public class GraphicsPlaygroundController {
         loadProfileAndData();
     }
 
+    /**
+     * Manual refresh for the 3D visualization.
+     */
     @FXML
     private void refresh3d() { load3dData(); }
 
+    /**
+     * Manual refresh for the 2D progress chart.
+     */
     @FXML
     private void refresh2d() { loadStudentProgress(); }
 
+    /**
+     * Returns to the role-appropriate dashboard.
+     */
     @FXML
     private void onBack() {
         String role = SessionStore.currentRole();
@@ -101,6 +113,10 @@ public class GraphicsPlaygroundController {
         Launcher.go(dest, "Dashboard");
     }
 
+    /**
+     * Fetches the current user (cached if available) then loads course choices
+     * and both 3D/2D visualizations based on role.
+     */
     private void loadProfileAndData() {
         CompletableFuture
                 .supplyAsync(() -> {
@@ -122,6 +138,9 @@ public class GraphicsPlaygroundController {
                 });
     }
 
+    /**
+     * Chooses which 3D dataset to render based on role and course selection.
+     */
     private void load3dData() {
         if (isInstructorOrAdmin() && selectedCourseId() != null) {
             fetchCourseViz(selectedCourseId());
@@ -132,6 +151,9 @@ public class GraphicsPlaygroundController {
         }
     }
 
+    /**
+     * Loads instructor stats and renders them; falls back to student view on 401/403.
+     */
     private void fetchInstructor3dWithFallback() {
         CompletableFuture
                 .supplyAsync(() -> dashboardApi.instructorDashboard())
@@ -151,6 +173,9 @@ public class GraphicsPlaygroundController {
                 });
     }
 
+    /**
+     * Loads the student dashboard for 3D rendering.
+     */
     private void fetchStudent3d() {
         CompletableFuture
                 .supplyAsync(() -> dashboardApi.studentDashboard())
@@ -175,6 +200,9 @@ public class GraphicsPlaygroundController {
                 });
     }
 
+    /**
+     * Renders instructor course enrollments or student quiz scores as 3D bars.
+     */
     private void render3d(InstructorDashboardResponse instructorResp, StudentDashboardResponse studentResp) {
         List<Box> bars;
         String subtitle;
@@ -195,6 +223,9 @@ public class GraphicsPlaygroundController {
         renderBars3d(bars, subtitle);
     }
 
+    /**
+     * Loads and renders 2D progress; uses selected course for instructors/admins.
+     */
     private void loadStudentProgress() {
         if (isInstructorOrAdmin() && selectedCourseId() != null) {
             load2dForCourse(selectedCourseId());
@@ -224,6 +255,9 @@ public class GraphicsPlaygroundController {
                 });
     }
 
+    /**
+     * Renders recent quiz scores as a bar chart for students.
+     */
     private void render2d(StudentDashboardResponse resp) {
         progressChart.getData().clear();
         if (resp == null || resp.getRecentQuizResults() == null || resp.getRecentQuizResults().isEmpty()) {
@@ -247,6 +281,9 @@ public class GraphicsPlaygroundController {
         updateTwoDMeta("Recent quizzes: " + recent.size());
     }
 
+    /**
+     * Clears the 3D container and shows a fallback message.
+     */
     private void clear3dWithMessage(String message) {
         stopRotation();
         threeDContainer.getChildren().clear();
@@ -335,6 +372,9 @@ public class GraphicsPlaygroundController {
 
     // -------- Course/quiz scoped helpers for admin/instructor ----------
 
+    /**
+     * Configures the course picker for instructors/admins to scope visualizations.
+     */
     private void setupCoursePicker() {
         if (coursePicker == null) return;
         coursePicker.setConverter(new javafx.util.StringConverter<>() {
@@ -348,6 +388,9 @@ public class GraphicsPlaygroundController {
         });
     }
 
+    /**
+     * Loads course choices depending on role (all published for admin, owned for instructor).
+     */
     private void loadCourseChoices() {
         if (coursePicker == null) return;
         CompletableFuture
@@ -381,6 +424,9 @@ public class GraphicsPlaygroundController {
         return c != null ? c.getId() : null;
     }
 
+    /**
+     * Loads enrollment and quiz-average data for a specific course and renders both views.
+     */
     private void fetchCourseViz(Long courseId) {
         CompletableFuture
                 .supplyAsync(() -> {
@@ -403,6 +449,9 @@ public class GraphicsPlaygroundController {
                 });
     }
 
+    /**
+     * Renders 3D bars and 2D chart for the selected course.
+     */
     private void renderCourse3dAnd2d(CourseViz viz) {
         this.cachedCourseViz = viz;
         List<Box> bars = new ArrayList<>();
@@ -436,6 +485,9 @@ public class GraphicsPlaygroundController {
                 .toList();
     }
 
+    /**
+     * Loads 2D quiz averages for a selected course (no enrollment overlay).
+     */
     private void load2dForCourse(Long courseId) {
         if (cachedCourseViz != null && cachedCourseViz.points().length > 0) {
             renderCourse2d(pointsToScores(cachedCourseViz.points()));
@@ -460,6 +512,9 @@ public class GraphicsPlaygroundController {
                 });
     }
 
+    /**
+     * Renders quiz average scores for a course in a bar chart.
+     */
     private void renderCourse2d(List<QuizScorePoint> points) {
         progressChart.getData().clear();
         if (points == null || points.isEmpty()) {
@@ -480,6 +535,9 @@ public class GraphicsPlaygroundController {
         updateTwoDMeta("Quizzes: " + points.size());
     }
 
+    /**
+     * Builds and displays the 3D scene for a set of bars, including camera and interactions.
+     */
     private void renderBars3d(List<Box> bars, String subtitle) {
         stopRotation();
         Group barsGroup = new Group();

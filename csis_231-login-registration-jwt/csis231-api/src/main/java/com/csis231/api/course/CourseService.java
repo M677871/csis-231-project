@@ -42,6 +42,16 @@ public class CourseService {
     private final QuizRepository quizRepository;
     private final QuizQuestionRepository questionRepository;
 
+    /**
+     * Creates a new course for the given instructor/admin actor.
+     *
+     * @param req   the course creation request payload
+     * @param actor the authenticated user performing the operation
+     * @return the persisted {@link Course}
+     * @throws BadRequestException      if the payload is missing
+     * @throws UnauthorizedException    if the actor is not instructor/admin
+     * @throws ResourceNotFoundException if the category is not found
+     */
     @Transactional
     public Course createCourse(CourseRequest req, User actor) {
         if (req == null) throw new BadRequestException("Course payload is required");
@@ -64,6 +74,17 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
+    /**
+     * Updates an existing course with the supplied fields.
+     *
+     * @param id    the course identifier
+     * @param req   the update payload
+     * @param actor the authenticated user performing the update
+     * @return the updated {@link Course}
+     * @throws BadRequestException      if payload is missing
+     * @throws UnauthorizedException    if actor cannot modify the course
+     * @throws ResourceNotFoundException if course or category are not found
+     */
     @Transactional
     public Course updateCourse(Long id, CourseRequest req, User actor) {
         if (req == null) throw new BadRequestException("Course payload is required");
@@ -85,12 +106,27 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
+    /**
+     * Retrieves a course by id or throws if missing.
+     *
+     * @param id the course identifier
+     * @return the matching {@link Course}
+     * @throws ResourceNotFoundException if no course exists with this id
+     */
     @Transactional(readOnly = true)
     public Course getCourseOrThrow(Long id) {
         return courseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found: " + id));
     }
 
+    /**
+     * Deletes a course after verifying ownership or admin privileges.
+     *
+     * @param id    the course identifier
+     * @param actor the authenticated user performing the deletion
+     * @throws UnauthorizedException    if actor is not allowed to delete
+     * @throws ResourceNotFoundException if the course does not exist
+     */
     @Transactional
     public void deleteCourse(Long id, User actor) {
         Course course = getCourseOrThrow(id);
@@ -99,6 +135,14 @@ public class CourseService {
         courseRepository.delete(course);
     }
 
+    /**
+     * Lists published courses with optional category and search filters.
+     *
+     * @param categoryId optional category filter
+     * @param search     optional search text
+     * @param pageable   pagination information
+     * @return a page of {@link Course} entities
+     */
     @Transactional(readOnly = true)
     public Page<Course> listPublished(Long categoryId, String search, Pageable pageable) {
         Specification<Course> spec = Specification.where(isPublished());
@@ -111,16 +155,36 @@ public class CourseService {
         return courseRepository.findAll(spec, pageable);
     }
 
+    /**
+     * Retrieves courses taught by a specific instructor using pagination.
+     *
+     * @param instructorId the instructor user id
+     * @param pageable     pagination information
+     * @return a page of courses
+     */
     @Transactional(readOnly = true)
     public Page<Course> listByInstructor(Long instructorId, Pageable pageable) {
         return courseRepository.findByInstructor_Id(instructorId, pageable);
     }
 
+    /**
+     * Retrieves all courses taught by a specific instructor.
+     *
+     * @param instructorId the instructor user id
+     * @return list of courses
+     */
     @Transactional(readOnly = true)
     public List<Course> listByInstructor(Long instructorId) {
         return courseRepository.findByInstructor_Id(instructorId);
     }
 
+    /**
+     * Builds a detailed course view including materials and quizzes for a given viewer.
+     *
+     * @param id     the course id
+     * @param viewer the user requesting the data (may be null)
+     * @return a {@link CourseDetailDto} with materials/quizzes the viewer can see
+     */
     @Transactional(readOnly = true)
     public CourseDetailDto getCourseDetail(Long id, User viewer) {
         Course course = getCourseOrThrow(id);

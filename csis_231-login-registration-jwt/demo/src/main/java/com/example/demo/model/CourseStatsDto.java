@@ -2,6 +2,9 @@ package com.example.demo.model;
 
 /**
  * Aggregated metrics for an instructor course.
+ *
+ * <p>Returned by instructor dashboard/analytics to show course-level enrollments
+ * and quiz counts.</p>
  */
 public class CourseStatsDto {
     private Long courseId;

@@ -4,6 +4,9 @@ import java.util.List;
 
 /**
  * Represents a question + answers when creating a quiz.
+ *
+ * <p>Each answer should mark exactly one as correct; if multiple are marked,
+ * the backend may enforce validation.</p>
  */
 public class QuizQuestionRequest {
     private String questionText;

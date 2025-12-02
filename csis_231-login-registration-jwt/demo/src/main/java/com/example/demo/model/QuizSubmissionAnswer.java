@@ -2,6 +2,8 @@ package com.example.demo.model;
 
 /**
  * Single answer choice used when submitting a quiz.
+ *
+ * <p>Maps a question id to the selected answer option id.</p>
  */
 public class QuizSubmissionAnswer {
     private Long questionId;

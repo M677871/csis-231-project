@@ -4,6 +4,8 @@ import java.util.List;
 
 /**
  * Request body for submitting quiz answers.
+ *
+ * <p>Contains the selected answers for each question in a quiz attempt.</p>
  */
 public class QuizSubmissionRequest {
     private List<QuizSubmissionAnswer> answers;

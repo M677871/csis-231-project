@@ -4,6 +4,8 @@ import java.time.Instant;
 
 /**
  * Lightweight quiz summary shown in course detail and dashboards.
+ *
+ * <p>Contains enough metadata to list quizzes without loading full questions.</p>
  */
 public class QuizSummaryDto {
     private Long id;
