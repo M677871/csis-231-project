@@ -28,6 +28,7 @@ import java.util.concurrent.CompletableFuture;
  * current user's role or ownership, and lets students enroll or view
  * details.</p>
  */
+
 public class CourseCatalogController {
     @FXML private TableView<CourseDto> courseTable;
     @FXML private TableColumn<CourseDto, String> titleColumn;

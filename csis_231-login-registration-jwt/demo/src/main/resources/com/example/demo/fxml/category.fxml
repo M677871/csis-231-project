@@ -84,7 +84,7 @@
                                     <Label text="Category Name" styleClass="field-label"
                                            GridPane.columnIndex="0" GridPane.rowIndex="0"/>
                                     <TextField fx:id="categoryNameField" promptText="Enter category name"
-                                               styleClass="rounded-text-field"
+                                               styleClass="rounded-text-field" onAction="#onSubmitCategory"
                                                GridPane.columnIndex="1" GridPane.rowIndex="0"/>
                                 </GridPane>
 

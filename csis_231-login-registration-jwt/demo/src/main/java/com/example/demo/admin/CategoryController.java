@@ -119,6 +119,19 @@ public class CategoryController {
     }
 
     /**
+     * Handles pressing Enter in the category form by routing to add or update
+     * based on whether a row is selected.
+     */
+    @FXML
+    private void onSubmitCategory() {
+        if (categoryTable.getSelectionModel().getSelectedItem() != null) {
+            onUpdateCategory();
+        } else {
+            onAddCategory();
+        }
+    }
+
+    /**
      * Handles adding a new category from the form input.
      */
     @FXML

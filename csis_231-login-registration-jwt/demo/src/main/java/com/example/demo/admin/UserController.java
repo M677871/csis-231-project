@@ -199,6 +199,19 @@ public class UserController {
         }
     }
 
+    /**
+     * Pressing Enter in the user form triggers add-or-update depending on
+     * whether a user is selected.
+     */
+    @FXML
+    private void onSubmitUser() {
+        if (userTable.getSelectionModel().getSelectedItem() != null) {
+            onUpdateUser();
+        } else {
+            onAddUser();
+        }
+    }
+
     // ---- CRUD ----
 
     @FXML

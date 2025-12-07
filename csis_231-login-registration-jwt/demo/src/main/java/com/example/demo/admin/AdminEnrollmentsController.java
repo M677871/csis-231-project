@@ -237,6 +237,20 @@ public class AdminEnrollmentsController {
         updateButtons();
     }
 
+    /**
+     * Allows pressing Enter in the course name field to trigger the enabled
+     * action (load enrollments when a course name is present, otherwise load
+     * instructor courses).
+     */
+    @FXML
+    private void onCourseNameEnter() {
+        if (!loadCourseEnrollmentsButton.isDisable()) {
+            onLoadCourseEnrollments();
+        } else if (!loadInstructorButton.isDisable()) {
+            onLoadInstructor();
+        }
+    }
+
     private void updateButtons() {
         String courseName = courseNameField.getText() == null ? "" : courseNameField.getText().trim();
         boolean hasCourseName = !courseName.isBlank();

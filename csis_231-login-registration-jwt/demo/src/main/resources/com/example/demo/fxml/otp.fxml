@@ -26,11 +26,12 @@
 
                                         <Label text="Verification Code" styleClass="field-label"/>
                                         <TextField fx:id="code" promptText="Enter 6-digit code"
-                                                   styleClass="form-field"/>
+                                                   styleClass="form-field" onAction="#onVerify"/>
 
                                 </VBox>
 
-                                <Button text="Verify Code →" onAction="#onVerify" styleClass="primary-button" maxWidth="Infinity"/>
+                                <Button text="Verify Code →" onAction="#onVerify" styleClass="primary-button"
+                                        maxWidth="Infinity" defaultButton="true"/>
 
                                 <HBox alignment="CENTER" spacing="8">
 

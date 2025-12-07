@@ -37,7 +37,9 @@
                                 </columnConstraints>
 
                                 <Label text="Title" styleClass="field-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                                <TextField fx:id="titleField" promptText="Course title" styleClass="rounded-text-field" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                                <TextField fx:id="titleField" promptText="Course title" styleClass="rounded-text-field"
+                                           onAction="#onSaveCourse"
+                                           GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
                                 <Label text="Category" styleClass="field-label" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
                                 <ComboBox fx:id="categoryChoiceBox" promptText="Choose category" styleClass="rounded-choice-box" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
@@ -63,10 +65,18 @@
                                     <ColumnConstraints percentWidth="40"/>
                                     <ColumnConstraints percentWidth="10"/>
                                 </columnConstraints>
-                                <TextField fx:id="materialTitleField" promptText="Title" styleClass="rounded-text-field" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                                <TextField fx:id="materialTypeField" promptText="Type" styleClass="rounded-text-field" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-                                <TextField fx:id="materialUrlField" promptText="URL" styleClass="rounded-text-field" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
-                                <TextField fx:id="materialMetaField" promptText="Metadata (JSON or note)" styleClass="rounded-text-field" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="3"/>
+                                <TextField fx:id="materialTitleField" promptText="Title" styleClass="rounded-text-field"
+                                           onAction="#onAddMaterial"
+                                           GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                                <TextField fx:id="materialTypeField" promptText="Type" styleClass="rounded-text-field"
+                                           onAction="#onAddMaterial"
+                                           GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                                <TextField fx:id="materialUrlField" promptText="URL" styleClass="rounded-text-field"
+                                           onAction="#onAddMaterial"
+                                           GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                                <TextField fx:id="materialMetaField" promptText="Metadata (JSON or note)" styleClass="rounded-text-field"
+                                           onAction="#onAddMaterial"
+                                           GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="3"/>
                                 <Button text="Add" onAction="#onAddMaterial" styleClass="secondary-button" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
                             </GridPane>
 

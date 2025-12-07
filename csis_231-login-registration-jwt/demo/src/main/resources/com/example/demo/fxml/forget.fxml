@@ -26,11 +26,12 @@
 
                                         <Label text="Email Address or Username" styleClass="field-label"/>
                                         <TextField fx:id="emailOrUsername" promptText="Enter your email address or Username"
-                                                   styleClass="form-field"/>
+                                                   styleClass="form-field" onAction="#onSend"/>
 
                                 </VBox>
 
-                                <Button text="Send Reset Code →" onAction="#onSend" styleClass="primary-button" maxWidth="Infinity"/>
+                                <Button text="Send Reset Code →" onAction="#onSend" styleClass="primary-button"
+                                        maxWidth="Infinity" defaultButton="true"/>
                                 <Button text="← Back to Login" onAction="#goLogin" styleClass="ghost-button" maxWidth="Infinity"/>
 
                         </VBox>

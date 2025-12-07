@@ -112,29 +112,35 @@
                                     <!-- Row 0 -->
                                     <Label text="Username" styleClass="field-label" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
                                     <TextField fx:id="userNameField" promptText="Username" styleClass="rounded-text-field"
-                                               GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                                               GridPane.columnIndex="1" GridPane.rowIndex="0"
+                                               onAction="#onSubmitUser"/>
 
                                     <Label text="Email" styleClass="field-label" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
                                     <TextField fx:id="userEmailField" promptText="name@example.com" styleClass="rounded-text-field"
-                                               GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+                                               GridPane.columnIndex="3" GridPane.rowIndex="0"
+                                               onAction="#onSubmitUser"/>
 
                                     <!-- Row 1 -->
                                     <Label text="First Name" styleClass="field-label" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
                                     <TextField fx:id="firstNameField" promptText="First name" styleClass="rounded-text-field"
-                                               GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                                               GridPane.columnIndex="1" GridPane.rowIndex="1"
+                                               onAction="#onSubmitUser"/>
 
                                     <Label text="Last Name" styleClass="field-label" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
                                     <TextField fx:id="lastNameField" promptText="Last name" styleClass="rounded-text-field"
-                                               GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+                                               GridPane.columnIndex="3" GridPane.rowIndex="1"
+                                               onAction="#onSubmitUser"/>
 
                                     <!-- Row 2 -->
                                     <Label text="Phone" styleClass="field-label" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
                                     <TextField fx:id="phoneField" promptText="+961..." styleClass="rounded-text-field"
-                                               GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                                               GridPane.columnIndex="1" GridPane.rowIndex="2"
+                                               onAction="#onSubmitUser"/>
 
                                     <Label text="Password" styleClass="field-label" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
                                     <PasswordField fx:id="userPasswordField" promptText="••••••••" styleClass="rounded-text-field"
-                                                   GridPane.columnIndex="3" GridPane.rowIndex="2"/>
+                                                   GridPane.columnIndex="3" GridPane.rowIndex="2"
+                                                   onAction="#onSubmitUser"/>
 
                                     <!-- Row 3 -->
                                     <Label text="Role" styleClass="field-label" GridPane.columnIndex="0" GridPane.rowIndex="3"/>

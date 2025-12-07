@@ -29,20 +29,23 @@
                                         <VBox spacing="8">
 
                                                 <Label text="Verification Code" styleClass="field-label"/>
-                                                <TextField fx:id="code" promptText="Enter 6-digit code" styleClass="form-field"/>
+                                                <TextField fx:id="code" promptText="Enter 6-digit code" styleClass="form-field"
+                                                           onAction="#onReset"/>
 
                                         </VBox>
 
                                         <VBox spacing="8">
 
                                                 <Label text="New Password" styleClass="field-label"/>
-                                                <PasswordField fx:id="newPassword" promptText="Enter new password" styleClass="password-field"/>
+                                                <PasswordField fx:id="newPassword" promptText="Enter new password" styleClass="password-field"
+                                                               onAction="#onReset"/>
 
                                         </VBox>
 
                                 </VBox>
 
-                                <Button text="Change Password →" onAction="#onReset" styleClass="primary-button" maxWidth="Infinity"/>
+                                <Button text="Change Password →" onAction="#onReset" styleClass="primary-button"
+                                        maxWidth="Infinity" defaultButton="true"/>
                                 <Button text="← Back to Login" onAction="#goLogin" styleClass="ghost-button" maxWidth="Infinity"/>
 
                         </VBox>
