@@ -11,6 +11,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -119,7 +122,11 @@ public class OtpService {
                 mailSender.send(msg);
             }
         } catch (Exception ex) {
-            log.info("OTP email not sent (dev/local is fine). {}", ex.toString());
+            log.warn("Failed to send OTP email to {}: {}", user.getEmail(), ex.toString());
+            if (isConnectivityIssue(ex)) {
+                throw new BadRequestException("No internet connection. Unable to send verification email.");
+            }
+            throw new BadRequestException("Could not send verification email. Please try again later.");
         }
 
         log.info("OTP for user={} purpose={} CODE={}", user.getUsername(), purpose, code);
@@ -160,6 +167,22 @@ public class OtpService {
 
         latest.setConsumedAt(now);
         repo.save(latest);
+    }
+
+    /**
+     * Attempts to classify whether a mail failure was caused by connectivity loss.
+     */
+    private boolean isConnectivityIssue(Throwable ex) {
+        Throwable cause = ex;
+        while (cause != null) {
+            if (cause instanceof UnknownHostException
+                    || cause instanceof ConnectException
+                    || cause instanceof SocketTimeoutException) {
+                return true;
+            }
+            cause = cause.getCause();
+        }
+        return false;
     }
 
 
