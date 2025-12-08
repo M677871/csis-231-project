@@ -555,14 +555,14 @@ The JavaFX app will handle login (with OTP 2FA), dashboards, and the **2D/3D ana
 
 ## 11. How This Project Meets CSIS 231 Final Requirements
 
-**Spring Boot Backend (25 pts)**
+**Spring Boot Backend**
 
 - Proper **layered architecture** (Controller / Service / Repository / Domain).
 - PostgreSQL schema mapped via JPA entities.
 - Business logic pushed into service layer, not controllers.
 - Full, documented REST API (see section 8).
 
-**Advanced Features & JavaFX 2D/3D (20 pts)**
+**Advanced Features & JavaFX 2D/3D**
 
 - **Real 3D graphics**:
     - JavaFX 3D (`SubScene`, `Box`, `PerspectiveCamera`, `RotateTransition`).
@@ -575,21 +575,21 @@ The JavaFX app will handle login (with OTP 2FA), dashboards, and the **2D/3D ana
     - `/api/courses/{courseId}/enrollments`
     - `/api/statistics/courses/{courseId}/quiz-averages`
 
-**JavaFX UI (30 pts)**
+**JavaFX UI**
 
 - Multiple FXML screens: login, register, forgot password, OTP, dashboards, courses, quizzes, graphics.
 - Shared `styles.css` with reusable style classes.
 - Clear role-based dashboards (Student / Instructor / Admin).
 - Dedicated **2D/3D visualization playground** with back navigation and course selector.
 
-**Security, OTP 2FA & Forgot Password (10 pts)**
+**Security, OTP 2FA & Forgot Password**
 
 - **JWT + Spring Security** for authentication and authorization.
 - **OTP 2FA on login** via `/api/auth/login` + `/api/auth/otp/verify`.
 - **OTP-based forgot-password** via `/api/auth/password/forgot` + `/api/auth/password/reset`.
 - Centralized error handling and validation.
 
-**Documentation & API Docs (15 pts)**
+**Documentation & API Docs**
 
 - This README includes:
     - Setup and configuration via `application.yml`.
